@@ -1,4 +1,5 @@
-# 🍔 Smart Food Delivery App
+Zomato-Style Food Delivery App (Flutter Frontend)
+
 
 ![GitHub stars](https://img.shields.io/github/stars/Suffixdigital/Smart-Food-Delivery?style=flat-square)
 ![GitHub forks](https://img.shields.io/github/forks/Suffixdigital/Smart-Food-Delivery?style=flat-square)
@@ -12,17 +13,19 @@ Android and iOS devices.
 
 ---
 
-## 🚀 Features
+## Features
 
-- 🧭 Persistent Bottom Navigation with nested navigation
-- 🛍️ Product listing with cart support
-- 🛒 Add to cart, remove, update quantities
-- 💳 Order flow and delivery information bar
-- 🧑 Profile & Personal Information screens
-- 💬 Chat screen UI
-- 🎯 Onboarding flow and launcher splash screen
-- 📱 Fully responsive across screen sizes
-- 🔧 MVVM + Riverpod + Clean folder architecture
+- Onboarding & Walkthrough
+- Authentication (Login, Sign-Up, Forgot Password)
+- Home & Exploration
+- Product Listing & Details
+- Cart Management
+- Checkout (UI Only)
+- Chat & Support (Design Only)
+- User Profile
+- Offer Banner Section for Discounts and Deals
+- Settings & Preferences
+- Cross-Platform Compatibility (Android & iOS)
 
 ---
 
