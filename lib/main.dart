@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:smart_flutter/core/constants/app_colors.dart';
 
 // Assuming OnboardingScreen is in this path
 import 'screens/onboarding_screen.dart'; //
@@ -126,7 +127,7 @@ class MyApp extends StatelessWidget {
             // Colors.orange will generate different shades of orange for UI elements.
             primarySwatch: Colors.orange,
             // Sets the default background color for [Scaffold] widgets.
-            scaffoldBackgroundColor: Colors.white,
+            scaffoldBackgroundColor: AppColors.neutral0,
             // Enables Material 3 design features and components.
             useMaterial3: true,
           ),

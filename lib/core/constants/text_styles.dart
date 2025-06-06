@@ -272,8 +272,8 @@ class AppTextTheme extends ThemeExtension<AppTextTheme> {
       fontStyle: FontStyle.normal,
       decoration: TextDecoration.none,
     ),
-    headingH5Medium: const TextStyle(
-      fontSize: 24,
+    headingH5Medium: TextStyle(
+      fontSize: isTablet ? 36.sp : 24.sp,
       fontWeight: FontWeight.w500,
       fontFamily: "Inter",
       height: 1.33,
@@ -297,7 +297,7 @@ class AppTextTheme extends ThemeExtension<AppTextTheme> {
       decoration: TextDecoration.none,
     ),
     headingH6SemiBold: TextStyle(
-      fontSize: isTablet ? 26.sp : 18.sp,
+      fontSize: isTablet ? 26.sp : 20.sp,
       fontWeight: FontWeight.w700,
       fontFamily: "Inter",
       height: 1.44,
@@ -440,8 +440,8 @@ class AppTextTheme extends ThemeExtension<AppTextTheme> {
       fontStyle: FontStyle.normal,
       decoration: TextDecoration.none,
     ),
-    bodySuperSmallRegular: const TextStyle(
-      fontSize: 10,
+    bodySuperSmallRegular: TextStyle(
+      fontSize: isTablet ? 12.sp : 10.sp,
       fontWeight: FontWeight.w400,
       fontFamily: "Inter",
       height: 1.6,

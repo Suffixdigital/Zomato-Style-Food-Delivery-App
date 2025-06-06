@@ -30,49 +30,6 @@ class _HomeScreenState extends State<HomeScreen> {
     {"icon": "assets/images/pizza.png", "label": "Pizza"},
   ];
 
-  /*final List<BurgerModel> burgers = [
-    BurgerModel(
-      id: "1",
-      name: 'Ordinary Burgers',
-      image: 'assets/images/burger1.png',
-    ),
-    BurgerModel(
-      id: "1",
-      name: 'Burger With Meat',
-      image: 'assets/images/burger2.png',
-    ),
-    BurgerModel(
-      id: "1",
-      name: 'BBQ Burger',
-      image: 'assets/images/burger3.png',
-    ),
-    BurgerModel(
-      id: "1",
-      name: 'Cheese Overload',
-      image: 'assets/images/burger4.png',
-    ),
-    BurgerModel(
-      id: "1",
-      name: 'Ordinary Burgers',
-      image: 'assets/images/burger1.png',
-    ),
-    BurgerModel(
-      id: "1",
-      name: 'Burger With Meat',
-      image: 'assets/images/burger2.png',
-    ),
-    BurgerModel(
-      id: "1",
-      name: 'BBQ Burger',
-      image: 'assets/images/burger3.png',
-    ),
-    BurgerModel(
-      id: "1",
-      name: 'Cheese Overload',
-      image: 'assets/images/burger4.png',
-    ),
-  ];*/
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -91,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
               SliverAppBar(
                 expandedHeight: 220.h,
                 pinned: true,
-                backgroundColor: Colors.orange,
+                backgroundColor: AppColors.primaryAccent,
                 flexibleSpace: FlexibleSpaceBar(
                   titlePadding: EdgeInsets.only(
                     left: 16.w,
@@ -163,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         SizedBox(width: 4.w),
                                         Icon(
                                           Icons.keyboard_arrow_down_rounded,
-                                          color: Colors.white,
+                                          color: AppColors.neutral0,
                                           size: 18.sp,
                                         ),
                                       ],
@@ -270,8 +227,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: crossAxisCount,
                     childAspectRatio: 0.7,
-                    crossAxisSpacing: 10.w,
-                    mainAxisSpacing: 10.h,
+                    crossAxisSpacing: 12.w,
+                    mainAxisSpacing: 12.h,
                   ),
                 ),
               ),
@@ -286,27 +243,29 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       padding: EdgeInsets.all(8.w),
       decoration: BoxDecoration(
-        color: selected ? Colors.orangeAccent : Colors.white,
+        color: selected ? AppColors.primaryAccent : AppColors.neutral0,
         borderRadius: BorderRadius.circular(10.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4.r,
-            offset: Offset(2, 2),
+            color: AppColors.neutral20,
+            spreadRadius: 2.r,
+            blurRadius: 2.r,
+            blurStyle: BlurStyle.solid,
+            offset: Offset(0, 1),
           ),
         ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(icon, width: 24.w, height: 24.w),
+          Image.asset(icon, width: 28.w, height: 28.w),
           SizedBox(height: 6.h),
           Text(
             label,
-            style: TextStyle(
-              color: selected ? Colors.white : Colors.black87,
-              fontWeight: FontWeight.w500,
-              fontSize: 12.sp,
+            style: AppTextTheme.fallback(
+              isTablet: false,
+            ).bodyMediumMedium!.copyWith(
+              color: selected ? AppColors.neutral0 : AppColors.neutral60,
             ),
           ),
         ],
@@ -326,8 +285,16 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10.r),
-          color: Colors.white,
-          boxShadow: [BoxShadow(color: Colors.grey.shade200, blurRadius: 5.r)],
+          color: AppColors.neutral0,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.neutral20,
+              spreadRadius: 1.r,
+              blurRadius: 2.r,
+              blurStyle: BlurStyle.solid,
+              offset: Offset(0, 1.5),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -351,7 +318,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   right: 15.w,
                   child: CircleAvatar(
                     radius: 14.r,
-                    backgroundColor: Colors.white,
+                    backgroundColor: AppColors.neutral0,
                     child: SvgPicture.asset(
                       "assets/icons/favorite.svg",
                       width: 16.w,
@@ -380,13 +347,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   SizedBox(height: 5.h),
                   Row(
                     children: [
-                      Icon(Icons.star, color: Colors.orange, size: 14.sp),
+                      Icon(
+                        Icons.star,
+                        color: AppColors.primaryAccent,
+                        size: 14.sp,
+                      ),
                       Text('4.9', style: TextStyle(fontSize: 12.sp)),
                       SizedBox(width: 10.w),
                       Icon(
                         Icons.location_on,
                         size: 14.sp,
-                        color: Colors.orange,
+                        color: AppColors.primaryAccent,
                       ),
                       Text('190m', style: TextStyle(fontSize: 12.sp)),
                     ],
@@ -395,7 +366,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text(
                     '\$ 17,230',
                     style: TextStyle(
-                      color: Colors.orange,
+                      color: AppColors.primaryAccent,
                       fontWeight: FontWeight.bold,
                       fontSize: 14.sp,
                     ),

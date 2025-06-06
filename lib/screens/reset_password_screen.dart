@@ -225,7 +225,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                         child: ElevatedButton(
                                           onPressed: _onVerifyPressed,
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.orange,
+                                            backgroundColor:
+                                                AppColors.primaryAccent,
                                             padding: EdgeInsets.symmetric(
                                               vertical: 16.h,
                                             ),

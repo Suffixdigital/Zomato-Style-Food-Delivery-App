@@ -215,7 +215,8 @@ class _EmailOtpVerificationScreenState
                                     child: ElevatedButton(
                                       onPressed: onContinuePressed,
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.orange,
+                                        backgroundColor:
+                                            AppColors.primaryAccent,
                                         padding: EdgeInsets.symmetric(
                                           vertical: 16.h,
                                         ),

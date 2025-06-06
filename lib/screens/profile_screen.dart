@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
+import 'package:smart_flutter/screens/credit_card_screen.dart';
 import 'package:smart_flutter/screens/login_screen.dart';
 import 'package:smart_flutter/screens/personal_data_screen.dart';
 import 'package:smart_flutter/screens/settings_screen.dart';
@@ -84,7 +85,13 @@ class ProfileScreen extends ConsumerWidget {
                         buildListTile(
                           "assets/icons/card.svg",
                           "Extra Card",
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.of(context, rootNavigator: true).push(
+                              MaterialPageRoute(
+                                builder: (context) => const CreditCardScreen(),
+                              ),
+                            );
+                          },
                         ),
                         SizedBox(height: 5.h),
                         Align(
