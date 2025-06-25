@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../core/data/page_data.dart';
 import '../views/widgets/onboarding_screen/onboarding_card.dart';
-import 'login_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -37,15 +37,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   curve: Curves.easeInOut,
                 );
               } else {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder:
-                        (context) => const LoginScreen(
-                          shouldForgotPasswordModelOnLoad: false,
-                        ),
-                  ),
-                );
+                context.goNamed('login', extra: false);
               }
             },
             onSkip: () {

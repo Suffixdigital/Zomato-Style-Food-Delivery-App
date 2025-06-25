@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
-import 'package:smart_flutter/screens/login_screen.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/text_styles.dart';
@@ -78,15 +78,7 @@ class _ResetPasswordSuccessfulState extends State<ResetPasswordSuccessful> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder:
-                            (context) => LoginScreen(
-                              shouldForgotPasswordModelOnLoad: false,
-                            ),
-                      ),
-                    );
+                    context.goNamed('login', extra: false);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange,

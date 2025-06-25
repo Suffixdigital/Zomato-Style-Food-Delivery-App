@@ -20,9 +20,40 @@
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme" />
+
+            <meta-data
+                android:name="flutter_deeplinking_enabled"
+                android:value="true" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+
+            <!-- Firebase Dynamic Link (short link) -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="suffixdigital.page.link"
+                    android:scheme="https" />
+            </intent-filter>
+
+            <!-- Firebase email link fallback domain -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="suffix-digital-app.firebaseapp.com"
+                    android:pathPrefix="/__/auth/links"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/core/data/dummy_data.dart';
 import 'package:smart_flutter/core/utils/device_utils.dart';
 import 'package:smart_flutter/model/food_item.dart';
-
-import 'product_details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -217,7 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   left: 16.w,
                   right: 16.w,
                   top: 4.h,
-                  bottom: 120.h,
+                  bottom: 24.h,
                 ),
                 sliver: SliverGrid(
                   delegate: SliverChildBuilderDelegate(
@@ -276,10 +275,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildBurgerCard(FoodItem foodItem) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context, rootNavigator: true).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => ProductDetailsScreen(foodItem: foodItem),
-          ),
+        context.pushNamed(
+          'productDetails',
+          pathParameters: {
+            'id': foodItem.id.toString(), // just for route uniqueness
+          },
+          extra: foodItem,
         );
       },
       child: Container(

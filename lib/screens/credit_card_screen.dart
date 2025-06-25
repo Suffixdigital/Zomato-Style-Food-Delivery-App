@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/routes/tab_controller_notifier.dart';
@@ -21,8 +22,8 @@ class _CreditCardScreenState extends ConsumerState<CreditCardScreen> {
   int selectedIndex = 0;
 
   Future<bool> onBackPressed() async {
-    ref.read(persistentTabController).jumpToTab(3);
-    Navigator.of(context).pop(); // no changes, just pop
+    ref.read(tabIndexProvider.notifier).state = 3;
+    context.pop();
     return false;
   }
 

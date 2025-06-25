@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/core/utils/device_utils.dart';
@@ -24,7 +25,12 @@ class ChatHeader extends ConsumerWidget {
                 AppColors.neutral100,
                 16,
               ),
-              onPressed: () => ref.read(persistentTabController).jumpToTab(0),
+              onPressed: () {
+                ref.read(tabIndexProvider.notifier).state = 0;
+
+                // Go to home screen
+                context.goNamed('home');
+              },
             ),
           ),
 
