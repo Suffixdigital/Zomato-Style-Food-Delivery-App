@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
@@ -131,13 +132,13 @@ class _ProfileDataScreenState extends ConsumerState<ProfileDataScreen> {
 
   void saveAndPop() {
     saveProfile();
-    ref.read(persistentTabController).jumpToTab(3);
-    Navigator.of(context).pop();
+    ref.read(tabIndexProvider.notifier).state = 3;
+    context.pop();
   }
 
   void discardAndPop() {
-    ref.read(persistentTabController).jumpToTab(3);
-    Navigator.of(context).pop();
+    ref.read(tabIndexProvider.notifier).state = 3;
+    context.pop();
   }
 
   @override
@@ -231,23 +232,120 @@ class _ProfileDataScreenState extends ConsumerState<ProfileDataScreen> {
                                   .copyWith(color: AppColors.neutral100),
                             ),
                             SizedBox(height: 8.h),
-                            DropdownButtonFormField<String>(
-                              value: selectedGender,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              items:
+                            /*Wrap(
+                              spacing: 20,
+                              runSpacing: 20,
+                              children:
                                   genderOptions.map((gender) {
-                                    return DropdownMenuItem(
-                                      value: gender,
-                                      child: Text(gender),
+                                    final isSelected = selectedGender == gender;
+                                    return ChoiceChip(
+                                      label: Text(
+                                        gender,
+                                        style: TextStyle(
+                                          color:
+                                              isSelected
+                                                  ? AppColors.neutral0
+                                                  : AppColors.neutral100,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      selected: isSelected,
+                                      selectedColor: AppColors.primaryAccent,
+                                      backgroundColor: AppColors.neutral0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          15.r,
+                                        ),
+                                        side: BorderSide(
+                                          color:
+                                              isSelected
+                                                  ? AppColors.primaryAccent
+                                                  : AppColors.neutral80
+                                                      .withValues(alpha: 0.3),
+                                        ),
+                                      ),
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 15.w,
+                                        vertical: 10.h,
+                                      ),
+                                      onSelected: (_) {
+                                        setState(() => selectedGender = gender);
+                                      },
+                                      avatar:
+                                          isSelected
+                                              ? Icon(
+                                                Icons.check_outlined,
+                                                color: AppColors.neutral100,
+                                                size: 20.sp,
+                                              )
+                                              : null,
                                     );
                                   }).toList(),
-                              onChanged:
-                                  (value) =>
-                                      setState(() => selectedGender = value!),
+                            ),*/
+                            Wrap(
+                              spacing: 20,
+                              runSpacing: 20,
+                              children:
+                                  genderOptions.map((gender) {
+                                    final isSelected = selectedGender == gender;
+                                    return RawChip(
+                                      checkmarkColor: AppColors.neutral0,
+                                      showCheckmark: false,
+                                      label: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          if (isSelected)
+                                            Padding(
+                                              padding: EdgeInsets.only(
+                                                right: 6.w,
+                                              ),
+                                              child: Icon(
+                                                Icons.check,
+                                                color: AppColors.neutral0,
+                                                size: 20.sp,
+                                              ),
+                                            ),
+                                          Text(
+                                            gender,
+                                            style: TextStyle(
+                                              color:
+                                                  isSelected
+                                                      ? AppColors.neutral0
+                                                      : AppColors.neutral100,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      selected: isSelected,
+                                      selectedColor: AppColors.primaryAccent,
+                                      backgroundColor: AppColors.neutral0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          15.r,
+                                        ),
+                                        side: BorderSide(
+                                          color:
+                                              isSelected
+                                                  ? AppColors.primaryAccent
+                                                  : AppColors.neutral80
+                                                      .withOpacity(0.3),
+                                        ),
+                                      ),
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 10.w,
+                                        vertical: 10.h,
+                                      ),
+                                      onSelected:
+                                          (_) => setState(
+                                            () => selectedGender = gender,
+                                          ),
+
+                                      // Removes default avatar container
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                    );
+                                  }).toList(),
                             ),
                             SizedBox(height: 16.h),
                             Text(

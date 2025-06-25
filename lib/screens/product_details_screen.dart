@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/core/utils/device_utils.dart';
 import 'package:smart_flutter/model/food_item.dart';
-import 'package:smart_flutter/screens/persistent_bottom_navigation.dart';
 import 'package:smart_flutter/viewmodels/cart_viewmodel.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -286,12 +286,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
               children: [
                 IconButton(
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PersistentBottomNavigation(),
-                      ),
-                    ); // Or any tab index you want to return to Home screen
+                    context.goNamed('home');
                   },
                   icon: DeviceUtils.backIcon(
                     "assets/icons/back.svg",
@@ -360,7 +355,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
         padding: EdgeInsets.only(
           left: 16.w,
           right: 16.h,
-          bottom: 48.h,
+          bottom: 56.h,
           top: 10.h,
         ),
         child: Row(

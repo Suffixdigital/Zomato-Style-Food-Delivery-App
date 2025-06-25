@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smart_flutter/core/constants/app_colors.dart';
-import 'package:smart_flutter/screens/email_otp_verification_screen.dart';
 
 import '../core/constants/text_styles.dart';
 import '../core/data/contact_details.dart';
 
-class ForgotPasswordContactDetailsScreen extends StatefulWidget {
+class ForgotPasswordContactDetailsScreen extends ConsumerStatefulWidget {
   const ForgotPasswordContactDetailsScreen({super.key});
 
   @override
-  State<ForgotPasswordContactDetailsScreen> createState() =>
+  ConsumerState<ForgotPasswordContactDetailsScreen> createState() =>
       _ForgotPasswordContactDetailsScreenState();
 }
 
 class _ForgotPasswordContactDetailsScreenState
-    extends State<ForgotPasswordContactDetailsScreen> {
+    extends ConsumerState<ForgotPasswordContactDetailsScreen> {
   int selectedIndex = 0;
 
   void onOptionTap(int index) {
@@ -139,12 +140,8 @@ class _ForgotPasswordContactDetailsScreenState
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EmailOtpVerificationScreen(),
-                      ),
-                    );
+                    Navigator.of(context).pop();
+                    context.pushNamed('emailOtpVerification');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryAccent,

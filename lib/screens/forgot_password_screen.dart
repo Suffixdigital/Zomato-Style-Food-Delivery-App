@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:smart_flutter/routes/tab_controller_notifier.dart';
 
 import '../core/constants/app_colors.dart';
 import '../core/constants/text_styles.dart';
 import '../views/widgets/login_screen/custom_text_field.dart';
-import 'login_screen.dart';
 
-class ForgotPasswordScreen extends StatefulWidget {
+class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() =>
+      _ForgotPasswordScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   final emailController = TextEditingController();
 
   @override
@@ -66,15 +69,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => LoginScreen(
-                                      shouldForgotPasswordModelOnLoad: true,
-                                    ),
-                              ),
-                            );
+                            // Navigator.pop(context); // from forgot password
+                            //context.pushNamed('login');
+                            ref
+                                .read(showResetPasswordSheetProvider.notifier)
+                                .state = true;
+                            context.goNamed('login', extra: true);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primaryAccent,
@@ -99,15 +99,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           padding: EdgeInsets.only(bottom: 16.h),
                           child: GestureDetector(
                             onTap: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) => const LoginScreen(
-                                        shouldForgotPasswordModelOnLoad: false,
-                                      ),
-                                ),
-                              );
+                              context.goNamed('login', extra: false);
                             },
                             child: RichText(
                               text: TextSpan(

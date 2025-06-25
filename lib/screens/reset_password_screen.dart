@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smart_flutter/views/widgets/login_screen/custom_text_field.dart';
 import 'package:smart_flutter/views/widgets/reset_password_screen/reset_password_success.dart';
 
@@ -60,6 +61,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     });
   }
 
+  Future<bool> onBackPressed() async {
+    context.goNamed('login', extra: false);
+    return false;
+  }
+
   void toggleConfirmVisibility() {
     setState(() {
       obscureConfirm = !obscureConfirm;
@@ -89,177 +95,183 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     final bool isTablet = screenSize.shortestSide >= 600;
-    return ScreenUtilInit(
-      designSize: const Size(375, 812),
-      builder:
-          (_, __) => Scaffold(
-            body: SafeArea(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: constraints.minHeight,
-                      ),
-                      child: IntrinsicHeight(
-                        child: Form(
-                          key: _formKey,
-                          child: Padding(
-                            padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: IconButton(
-                                        padding: EdgeInsets.only(left: 20.h),
-                                        icon: DeviceUtils.backIcon(
-                                          'assets/icons/back.svg',
-                                          AppColors.neutral100,
-                                          16,
-                                        ),
-                                        onPressed: () => Navigator.pop(context),
-                                      ),
-                                    ),
-                                    Text(
-                                      'Reset Password',
-                                      style: AppTextTheme.fallback(
-                                        isTablet: isTablet,
-                                      ).bodyLargeSemiBold!.copyWith(
-                                        color: AppColors.neutral100,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(
-                                    left: 24.w,
-                                    right: 24.w,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+    return WillPopScope(
+      onWillPop: onBackPressed,
+      child: ScreenUtilInit(
+        designSize: const Size(375, 812),
+        builder:
+            (_, __) => Scaffold(
+              body: SafeArea(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.minHeight,
+                        ),
+                        child: IntrinsicHeight(
+                          child: Form(
+                            key: _formKey,
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Stack(
+                                    alignment: Alignment.center,
                                     children: [
-                                      SizedBox(height: 15.h),
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: IconButton(
+                                          padding: EdgeInsets.only(left: 20.h),
+                                          icon: DeviceUtils.backIcon(
+                                            'assets/icons/back.svg',
+                                            AppColors.neutral100,
+                                            16,
+                                          ),
+                                          onPressed: () => onBackPressed(),
+                                        ),
+                                      ),
                                       Text(
                                         'Reset Password',
                                         style: AppTextTheme.fallback(
                                           isTablet: isTablet,
-                                        ).headingH4SemiBold!.copyWith(
+                                        ).bodyLargeSemiBold!.copyWith(
                                           color: AppColors.neutral100,
                                         ),
                                       ),
-                                      SizedBox(height: 10.h),
-                                      Text(
-                                        'Your new password must be different from the previously used password',
-                                        style: AppTextTheme.fallback(
-                                          isTablet: isTablet,
-                                        ).bodyMediumMedium!.copyWith(
-                                          color: AppColors.neutral60,
-                                        ),
-                                      ),
-                                      SizedBox(height: 35.h),
-
-                                      // New Password Field
-                                      Text(
-                                        "New Password",
-                                        style: AppTextTheme.fallback(
-                                          isTablet: isTablet,
-                                        ).bodyMediumMedium!.copyWith(
-                                          color: AppColors.neutral100,
-                                        ),
-                                      ),
-
-                                      SizedBox(height: 8.h),
-                                      CustomTextField(
-                                        controller: newPasswordController,
-                                        hintText: "Enter New Password",
-                                        keyboardType:
-                                            TextInputType.visiblePassword,
-                                        isPassword: true,
-                                        obscureText: obscureNew,
-                                        onTap: () {},
-                                        onVisibilityTap:
-                                            () => toggleNewVisibility(),
-                                        onChanged:
-                                            (value) =>
-                                                validateNewPassword(value),
-                                        errorText: newPasswordErrorMessage,
-                                      ),
-
-                                      SizedBox(height: 24.h),
-
-                                      // Confirm Password Field
-                                      Text(
-                                        "Confirm Password",
-                                        style: AppTextTheme.fallback(
-                                          isTablet: isTablet,
-                                        ).bodyMediumMedium!.copyWith(
-                                          color: AppColors.neutral100,
-                                        ),
-                                      ),
-                                      SizedBox(height: 8.h),
-                                      CustomTextField(
-                                        controller: confirmPasswordController,
-                                        hintText: "Enter Confirm Password",
-                                        keyboardType:
-                                            TextInputType.visiblePassword,
-                                        isPassword: true,
-                                        obscureText: obscureConfirm,
-                                        onTap: () {},
-                                        onVisibilityTap:
-                                            () => toggleConfirmVisibility(),
-                                        onChanged:
-                                            (value) =>
-                                                validateConfirmPassword(value),
-                                        errorText: confirmPasswordErrorMessage,
-                                      ),
-
-                                      // Verify Button
-                                      SizedBox(height: 30.h),
-                                      SizedBox(
-                                        width: double.infinity,
-                                        child: ElevatedButton(
-                                          onPressed: _onVerifyPressed,
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                AppColors.primaryAccent,
-                                            padding: EdgeInsets.symmetric(
-                                              vertical: 16.h,
-                                            ),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(30.r),
-                                            ),
-                                          ),
-                                          child: Text(
-                                            "Continue",
-                                            style: AppTextTheme.fallback(
-                                              isTablet: isTablet,
-                                            ).bodyMediumSemiBold!.copyWith(
-                                              color: AppColors.neutral0,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(height: 20.h),
                                     ],
                                   ),
-                                ),
-                              ],
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      left: 24.w,
+                                      right: 24.w,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(height: 15.h),
+                                        Text(
+                                          'Reset Password',
+                                          style: AppTextTheme.fallback(
+                                            isTablet: isTablet,
+                                          ).headingH4SemiBold!.copyWith(
+                                            color: AppColors.neutral100,
+                                          ),
+                                        ),
+                                        SizedBox(height: 10.h),
+                                        Text(
+                                          'Your new password must be different from the previously used password',
+                                          style: AppTextTheme.fallback(
+                                            isTablet: isTablet,
+                                          ).bodyMediumMedium!.copyWith(
+                                            color: AppColors.neutral60,
+                                          ),
+                                        ),
+                                        SizedBox(height: 35.h),
+
+                                        // New Password Field
+                                        Text(
+                                          "New Password",
+                                          style: AppTextTheme.fallback(
+                                            isTablet: isTablet,
+                                          ).bodyMediumMedium!.copyWith(
+                                            color: AppColors.neutral100,
+                                          ),
+                                        ),
+
+                                        SizedBox(height: 8.h),
+                                        CustomTextField(
+                                          controller: newPasswordController,
+                                          hintText: "Enter New Password",
+                                          keyboardType:
+                                              TextInputType.visiblePassword,
+                                          isPassword: true,
+                                          obscureText: obscureNew,
+                                          onTap: () {},
+                                          onVisibilityTap:
+                                              () => toggleNewVisibility(),
+                                          onChanged:
+                                              (value) =>
+                                                  validateNewPassword(value),
+                                          errorText: newPasswordErrorMessage,
+                                        ),
+
+                                        SizedBox(height: 24.h),
+
+                                        // Confirm Password Field
+                                        Text(
+                                          "Confirm Password",
+                                          style: AppTextTheme.fallback(
+                                            isTablet: isTablet,
+                                          ).bodyMediumMedium!.copyWith(
+                                            color: AppColors.neutral100,
+                                          ),
+                                        ),
+                                        SizedBox(height: 8.h),
+                                        CustomTextField(
+                                          controller: confirmPasswordController,
+                                          hintText: "Enter Confirm Password",
+                                          keyboardType:
+                                              TextInputType.visiblePassword,
+                                          isPassword: true,
+                                          obscureText: obscureConfirm,
+                                          onTap: () {},
+                                          onVisibilityTap:
+                                              () => toggleConfirmVisibility(),
+                                          onChanged:
+                                              (value) =>
+                                                  validateConfirmPassword(
+                                                    value,
+                                                  ),
+                                          errorText:
+                                              confirmPasswordErrorMessage,
+                                        ),
+
+                                        // Verify Button
+                                        SizedBox(height: 30.h),
+                                        SizedBox(
+                                          width: double.infinity,
+                                          child: ElevatedButton(
+                                            onPressed: _onVerifyPressed,
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  AppColors.primaryAccent,
+                                              padding: EdgeInsets.symmetric(
+                                                vertical: 16.h,
+                                              ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(30.r),
+                                              ),
+                                            ),
+                                            child: Text(
+                                              "Continue",
+                                              style: AppTextTheme.fallback(
+                                                isTablet: isTablet,
+                                              ).bodyMediumSemiBold!.copyWith(
+                                                color: AppColors.neutral0,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 20.h),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
-          ),
+      ),
     );
   }
 }

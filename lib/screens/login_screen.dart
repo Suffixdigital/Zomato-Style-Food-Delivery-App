@@ -1,34 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/core/utils/device_utils.dart';
-import 'package:smart_flutter/screens/register_screen.dart';
+import 'package:smart_flutter/routes/tab_controller_notifier.dart';
 
 import '../core/constants/app_colors.dart';
 import '../views/widgets/login_screen/custom_text_field.dart';
 import 'forgot_password_contact_details_screen.dart';
-import 'forgot_password_screen.dart';
-import 'persistent_bottom_navigation.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   final bool shouldForgotPasswordModelOnLoad;
 
   const LoginScreen({super.key, required this.shouldForgotPasswordModelOnLoad});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   bool obscureText = true;
 
+  // bool hasShowingShet = false;
+
   @override
   void initState() {
     super.initState();
-    if (widget.shouldForgotPasswordModelOnLoad) {
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final bool isTablet = screenSize.shortestSide >= 600;
+    final shouldShow = ref.read(showResetPasswordSheetProvider);
+    print('didChangeDependencies() called $shouldShow');
+    if (shouldShow) {
       Future.delayed(Duration.zero, () {
+        ref.read(showResetPasswordSheetProvider.notifier).state = false;
         showModalBottomSheet(
           context: context,
           isScrollControlled: true,
@@ -37,12 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       });
     }
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
-    final bool isTablet = screenSize.shortestSide >= 600;
     return Scaffold(
       body: SafeArea(
         child: LayoutBuilder(
@@ -110,12 +116,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         alignment: Alignment.centerRight,
                         child: TextButton(
                           onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ForgotPasswordScreen(),
-                              ),
-                            );
+                            // context.goNamed('forgotPassword');
+                            context.pushNamed('forgotPassword');
                           },
                           child: Text(
                             "Forgot password?",
@@ -130,13 +132,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => PersistentBottomNavigation(),
-                              ),
-                            );
+                            ref.read(tabIndexProvider.notifier).state = 0;
+
+                            // Go to home screen
+                            context.goNamed('home');
+                            // context.goNamed('home');
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange,
@@ -186,12 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           padding: EdgeInsets.only(bottom: 16.h),
                           child: GestureDetector(
                             onTap: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const RegisterScreen(),
-                                ),
-                              );
+                              context.goNamed('register');
                             },
                             child: RichText(
                               text: TextSpan(

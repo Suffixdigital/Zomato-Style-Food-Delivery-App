@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/core/utils/device_utils.dart';
-import 'package:smart_flutter/screens/reset_password_screen.dart';
 
 class EmailOtpVerificationScreen extends StatefulWidget {
   const EmailOtpVerificationScreen({super.key});
@@ -44,10 +44,7 @@ class _EmailOtpVerificationScreenState
     if (otp.length == 4) {
       // Perform verification logic here
       debugPrint('OTP Verified: $otp');
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => ResetPasswordScreen()),
-      );
+      context.pushNamed('resetPassword');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter the valid OTP')),
@@ -98,7 +95,11 @@ class _EmailOtpVerificationScreenState
                                       AppColors.neutral100,
                                       16,
                                     ),
-                                    onPressed: () => Navigator.pop(context),
+                                    onPressed:
+                                        () => context.goNamed(
+                                          'login',
+                                          extra: false,
+                                        ),
                                   ),
                                 ),
 

@@ -1,4 +1,8 @@
-Zomato-Style Food Delivery App (Flutter Frontend)
+<p align="center">
+  <img src="assets/icons/app_icons.png" width="120" alt="App Icon" />
+</p>
+
+<h1 align="center">Zomato-Style Food Delivery App (Flutter Frontend)</h1>
 
 
 ![GitHub stars](https://img.shields.io/github/stars/Suffixdigital/Smart-Food-Delivery?style=flat-square)

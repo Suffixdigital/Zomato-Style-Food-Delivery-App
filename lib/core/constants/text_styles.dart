@@ -361,7 +361,7 @@ class AppTextTheme extends ThemeExtension<AppTextTheme> {
       decoration: TextDecoration.none,
     ),
     bodyMediumSemiBold: TextStyle(
-      fontSize: isTablet ? 18.sp : 14.sp,
+      fontSize: isTablet ? 18.sp : 16.sp,
       fontWeight: FontWeight.w700,
       fontFamily: "Inter",
       height: 1.43,

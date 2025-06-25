@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/core/data/language_details.dart';
@@ -19,8 +20,8 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<bool> onBackPressed() async {
-    ref.read(persistentTabController).jumpToTab(3);
-    Navigator.of(context).pop(); // no changes, just pop
+    ref.read(tabIndexProvider.notifier).state = 3;
+    context.pop();
     return false;
   }
 
