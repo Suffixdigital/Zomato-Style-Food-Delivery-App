@@ -9,9 +9,19 @@ class CreditCardHeader extends ConsumerWidget {
   final bool isTablet;
   final Future<bool> Function() onBackPressed;
 
+  /* final bool isTablet;
+  final Future<bool> Function() onBackPressed;
+
+
   const CreditCardHeader({
     required this.isTablet,
     super.key,
+    required this.onBackPressed,
+  });*/
+
+  const CreditCardHeader({
+    super.key,
+    required this.isTablet,
     required this.onBackPressed,
   });
 
@@ -30,16 +40,14 @@ class CreditCardHeader extends ConsumerWidget {
                 AppColors.neutral100,
                 16,
               ),
-              onPressed: () {
-                onBackPressed;
-              },
+              onPressed: onBackPressed,
             ),
           ),
 
           Text(
             'Extra Card',
             style: AppTextTheme.fallback(
-              isTablet: false,
+              isTablet: isTablet,
             ).bodyLargeSemiBold!.copyWith(color: AppColors.neutral100),
           ),
         ],

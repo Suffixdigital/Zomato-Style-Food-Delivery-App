@@ -1,9 +1,10 @@
 class UserModel {
   String fullName;
-  DateTime dateOfBirth;
+  String dateOfBirth;
   String gender;
   String phone;
   String email;
+  String provider;
 
   UserModel({
     required this.fullName,
@@ -11,5 +12,6 @@ class UserModel {
     required this.gender,
     required this.phone,
     required this.email,
+    required this.provider,
   });
 }

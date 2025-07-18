@@ -46,6 +46,15 @@
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
 		<key>UIStatusBarHidden</key>
+		<key>CFBundleURLTypes</key>
+        <array>
+          <dict>
+            <key>CFBundleURLSchemes</key>
+            <array>
+              <string>io.supabase.flutter</string> <!-- this is your URI scheme -->
+            </array>
+          </dict>
+        </array>
 		<false/>
 	</dict>
 </plist>

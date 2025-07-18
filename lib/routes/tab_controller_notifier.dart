@@ -12,4 +12,7 @@ final needsPasswordSetupProvider = StateProvider<bool>((ref) => false);
 
 final showResetPasswordSheetProvider = StateProvider<bool>((ref) => false);
 
+final isLinkExpired = StateProvider<bool>((ref) => false);
+final linkExpiredMessage = StateProvider<String>((ref) => '');
+
 final tabIndexProvider = StateProvider<int>((ref) => 0);

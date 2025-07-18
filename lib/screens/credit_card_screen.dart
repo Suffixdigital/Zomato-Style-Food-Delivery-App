@@ -5,11 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/routes/tab_controller_notifier.dart';
+import 'package:smart_flutter/viewmodels/credit_card_viewmodel.dart';
 import 'package:smart_flutter/views/widgets/credit_card_screen/card_list_tile.dart';
 import 'package:smart_flutter/views/widgets/credit_card_screen/credit_card_header.dart';
 import 'package:smart_flutter/views/widgets/credit_card_screen/credit_card_widget.dart';
-
-import '../viewmodels/credit_card_viewmodel.dart';
 
 class CreditCardScreen extends ConsumerStatefulWidget {
   const CreditCardScreen({super.key});
@@ -22,6 +21,7 @@ class _CreditCardScreenState extends ConsumerState<CreditCardScreen> {
   int selectedIndex = 0;
 
   Future<bool> onBackPressed() async {
+    print("back pressed");
     ref.read(tabIndexProvider.notifier).state = 3;
     context.pop();
     return false;

@@ -33,24 +33,40 @@ class _ProfileDataScreenState extends ConsumerState<ProfileDataScreen> {
   final genderOptions = ['Male', 'Female'];
   String selectedGender = 'Male';
 
+  bool controllersInitialized = false;
+
   @override
   void initState() {
-    final user = ref.read(personalDataProvider).user;
-    fullNameController = TextEditingController(text: user.fullName);
-    dobController = TextEditingController(
-      text: DateFormat('dd/MM/yyyy').format(user.dateOfBirth),
+    super.initState();
+  }
+
+  void loadUserData(UserModel userData) {
+    if (controllersInitialized) return;
+    print(
+      'userData fullname: ${userData.fullName} email: ${userData.email}  dob: ${userData.dateOfBirth}  phone: ${userData.phone}  gender: ${userData.gender}',
     );
-    phoneController = TextEditingController(text: user.phone);
-    emailController = TextEditingController(text: user.email);
-    selectedGender = user.gender;
+    fullNameController = TextEditingController(text: userData.fullName);
+
+    dobController = TextEditingController(
+      text:
+          userData.dateOfBirth.isNotEmpty
+              ? userData.dateOfBirth
+              : DateFormat('dd/MM/yyyy').format(DateTime.now()),
+    );
+    phoneController = TextEditingController(text: userData.phone);
+    emailController = TextEditingController(text: userData.email);
+    selectedGender = userData.gender;
 
     initialFullName = fullNameController.text;
     initialDob = dobController.text;
     initialPhone = phoneController.text;
     initialEmail = emailController.text;
     initialGender = selectedGender;
-    super.initState();
+
+    controllersInitialized = true;
   }
+
+  bool _hasChanges = false;
 
   bool get hasChanges {
     return fullNameController.text != initialFullName ||
@@ -61,19 +77,37 @@ class _ProfileDataScreenState extends ConsumerState<ProfileDataScreen> {
   }
 
   void saveProfile() {
-    final viewModel = ref.read(personalDataProvider);
-    viewModel.updateUser(
-      UserModel(
-        fullName: fullNameController.text,
-        dateOfBirth: DateFormat('dd/MM/yyyy').parse(dobController.text),
-        gender: selectedGender,
-        phone: phoneController.text,
-        email: emailController.text,
-      ),
+    ref
+        .read(personalDataProvider.notifier)
+        .updateUser(
+          UserModel(
+            fullName: fullNameController.text,
+            dateOfBirth: dobController.text,
+            gender: selectedGender,
+            phone: phoneController.text,
+            email: emailController.text,
+            provider: "",
+          ),
+        );
+
+    final result = ref.read(personalDataProvider);
+
+    result.when(
+      data: (userdata) {
+        _hasChanges = true;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Profile Saved")));
+      },
+      error: (error, _) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error $error')));
+      },
+      loading: () {
+        // UI already shows CircularProgressIndicator
+      },
     );
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text("Profile Saved")));
   }
 
   Future<void> selectDate() async {
@@ -89,7 +123,7 @@ class _ProfileDataScreenState extends ConsumerState<ProfileDataScreen> {
   }
 
   Future<bool> onBackPressed() async {
-    if (hasChanges) {
+    if (hasChanges && !_hasChanges) {
       final result = await showDialog<bool>(
         context: context,
         builder:
@@ -145,268 +179,250 @@ class _ProfileDataScreenState extends ConsumerState<ProfileDataScreen> {
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     final bool isTablet = screenSize.shortestSide >= 600;
+    final state = ref.watch(personalDataProvider);
 
-    return WillPopScope(
-      onWillPop: onBackPressed,
-      child: ScreenUtilInit(
-        designSize: const Size(375, 812),
-        minTextAdapt: true,
-        builder:
-            (context, child) => Scaffold(
-              body: SafeArea(
-                child: Column(
-                  children: [
-                    PersonalDataHeader(onBackPressed),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        padding: EdgeInsets.only(left: 20.w, right: 20.w),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Center(
-                              child: Stack(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 45.r,
-                                    child: Image.asset(
-                                      "assets/images/profile.png",
-                                    ),
-                                  ),
-                                  Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.orange,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: Colors.white,
-                                          width: 1.w,
+    return state.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, _) => Center(child: Text('Error: $err')),
+      data: (userData) {
+        loadUserData(userData);
+        return WillPopScope(
+          onWillPop: onBackPressed,
+          child: ScreenUtilInit(
+            designSize: const Size(375, 812),
+            minTextAdapt: true,
+            builder:
+                (context, child) => Scaffold(
+                  body: SafeArea(
+                    child: Column(
+                      children: [
+                        PersonalDataHeader(onBackPressed),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            padding: EdgeInsets.only(left: 20.w, right: 20.w),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Center(
+                                  child: Stack(
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 45.r,
+                                        child: Image.asset(
+                                          "assets/images/profile.png",
                                         ),
                                       ),
-                                      padding: EdgeInsets.all(5.sp),
-                                      child: Icon(
-                                        Icons.camera_alt,
-                                        size: 16.sp,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(height: 20.h),
-                            Text(
-                              "Full Name",
-                              style: AppTextTheme.fallback(isTablet: isTablet)
-                                  .bodyMediumMedium!
-                                  .copyWith(color: AppColors.neutral100),
-                            ),
-                            SizedBox(height: 8.h),
-                            CustomTextField(
-                              controller: fullNameController,
-                              hintText: "Full Name",
-                              keyboardType: TextInputType.name,
-                              onTap: () {},
-                            ),
-                            SizedBox(height: 16.h),
-                            Text(
-                              "Date of birth",
-                              style: AppTextTheme.fallback(isTablet: isTablet)
-                                  .bodyMediumMedium!
-                                  .copyWith(color: AppColors.neutral100),
-                            ),
-                            SizedBox(height: 8.h),
-                            CustomTextField(
-                              controller: dobController,
-                              hintText: "Date of Birth",
-                              keyboardType: TextInputType.number,
-                              readOnly: true,
-                              onTap: selectDate,
-                            ),
-                            SizedBox(height: 16.h),
-                            Text(
-                              "Gender",
-                              style: AppTextTheme.fallback(isTablet: isTablet)
-                                  .bodyMediumMedium!
-                                  .copyWith(color: AppColors.neutral100),
-                            ),
-                            SizedBox(height: 8.h),
-                            /*Wrap(
-                              spacing: 20,
-                              runSpacing: 20,
-                              children:
-                                  genderOptions.map((gender) {
-                                    final isSelected = selectedGender == gender;
-                                    return ChoiceChip(
-                                      label: Text(
-                                        gender,
-                                        style: TextStyle(
-                                          color:
-                                              isSelected
-                                                  ? AppColors.neutral0
-                                                  : AppColors.neutral100,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      selected: isSelected,
-                                      selectedColor: AppColors.primaryAccent,
-                                      backgroundColor: AppColors.neutral0,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                          15.r,
-                                        ),
-                                        side: BorderSide(
-                                          color:
-                                              isSelected
-                                                  ? AppColors.primaryAccent
-                                                  : AppColors.neutral80
-                                                      .withValues(alpha: 0.3),
-                                        ),
-                                      ),
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 15.w,
-                                        vertical: 10.h,
-                                      ),
-                                      onSelected: (_) {
-                                        setState(() => selectedGender = gender);
-                                      },
-                                      avatar:
-                                          isSelected
-                                              ? Icon(
-                                                Icons.check_outlined,
-                                                color: AppColors.neutral100,
-                                                size: 20.sp,
-                                              )
-                                              : null,
-                                    );
-                                  }).toList(),
-                            ),*/
-                            Wrap(
-                              spacing: 20,
-                              runSpacing: 20,
-                              children:
-                                  genderOptions.map((gender) {
-                                    final isSelected = selectedGender == gender;
-                                    return RawChip(
-                                      checkmarkColor: AppColors.neutral0,
-                                      showCheckmark: false,
-                                      label: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          if (isSelected)
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                right: 6.w,
-                                              ),
-                                              child: Icon(
-                                                Icons.check,
-                                                color: AppColors.neutral0,
-                                                size: 20.sp,
-                                              ),
-                                            ),
-                                          Text(
-                                            gender,
-                                            style: TextStyle(
-                                              color:
-                                                  isSelected
-                                                      ? AppColors.neutral0
-                                                      : AppColors.neutral100,
-                                              fontWeight: FontWeight.w600,
+                                      Positioned(
+                                        bottom: 0,
+                                        right: 0,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.orange,
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: Colors.white,
+                                              width: 1.w,
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                      selected: isSelected,
-                                      selectedColor: AppColors.primaryAccent,
-                                      backgroundColor: AppColors.neutral0,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                          15.r,
-                                        ),
-                                        side: BorderSide(
-                                          color:
-                                              isSelected
-                                                  ? AppColors.primaryAccent
-                                                  : AppColors.neutral80
-                                                      .withOpacity(0.3),
-                                        ),
-                                      ),
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 10.w,
-                                        vertical: 10.h,
-                                      ),
-                                      onSelected:
-                                          (_) => setState(
-                                            () => selectedGender = gender,
+                                          padding: EdgeInsets.all(5.sp),
+                                          child: Icon(
+                                            Icons.camera_alt,
+                                            size: 16.sp,
+                                            color: Colors.white,
                                           ),
-
-                                      // Removes default avatar container
-                                      materialTapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap,
-                                    );
-                                  }).toList(),
-                            ),
-                            SizedBox(height: 16.h),
-                            Text(
-                              "Phone",
-                              style: AppTextTheme.fallback(isTablet: isTablet)
-                                  .bodyMediumMedium!
-                                  .copyWith(color: AppColors.neutral100),
-                            ),
-                            SizedBox(height: 8.h),
-                            CustomTextField(
-                              controller: phoneController,
-                              hintText: "Phone",
-                              keyboardType: TextInputType.phone,
-                              onTap: () {},
-                            ),
-                            SizedBox(height: 16.h),
-                            Text(
-                              "Email",
-                              style: AppTextTheme.fallback(isTablet: isTablet)
-                                  .bodyMediumMedium!
-                                  .copyWith(color: AppColors.neutral100),
-                            ),
-                            SizedBox(height: 8.h),
-                            CustomTextField(
-                              controller: emailController,
-                              hintText: "Email",
-                              keyboardType: TextInputType.emailAddress,
-                              onTap: () {},
-                            ),
-                            SizedBox(height: 25.h),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: () => saveProfile(),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.orange,
-                                  padding: EdgeInsets.symmetric(vertical: 16.h),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30.r),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                child: Text(
-                                  "Save",
+                                SizedBox(height: 20.h),
+                                Text(
+                                  "Full Name",
                                   style: AppTextTheme.fallback(
                                     isTablet: isTablet,
-                                  ).bodyMediumSemiBold!.copyWith(
-                                    color: AppColors.neutral0,
+                                  ).bodyMediumMedium!.copyWith(
+                                    color: AppColors.neutral100,
                                   ),
                                 ),
-                              ),
+                                SizedBox(height: 8.h),
+                                CustomTextField(
+                                  controller: fullNameController,
+                                  hintText: "Full Name",
+                                  keyboardType: TextInputType.name,
+                                  onTap: () {},
+                                ),
+                                SizedBox(height: 16.h),
+                                Text(
+                                  "Date of birth",
+                                  style: AppTextTheme.fallback(
+                                    isTablet: isTablet,
+                                  ).bodyMediumMedium!.copyWith(
+                                    color: AppColors.neutral100,
+                                  ),
+                                ),
+                                SizedBox(height: 8.h),
+                                CustomTextField(
+                                  controller: dobController,
+                                  hintText: "Date of Birth",
+                                  keyboardType: TextInputType.number,
+                                  readOnly: true,
+                                  onTap: selectDate,
+                                ),
+                                SizedBox(height: 16.h),
+                                Text(
+                                  "Gender",
+                                  style: AppTextTheme.fallback(
+                                    isTablet: isTablet,
+                                  ).bodyMediumMedium!.copyWith(
+                                    color: AppColors.neutral100,
+                                  ),
+                                ),
+                                SizedBox(height: 8.h),
+                                Wrap(
+                                  spacing: 20,
+                                  runSpacing: 20,
+                                  children:
+                                      genderOptions.map((gender) {
+                                        final isSelected =
+                                            selectedGender
+                                                .trim()
+                                                .toLowerCase() ==
+                                            gender.trim().toLowerCase();
+                                        return RawChip(
+                                          checkmarkColor: AppColors.neutral0,
+                                          showCheckmark: false,
+                                          label: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              if (isSelected)
+                                                Padding(
+                                                  padding: EdgeInsets.only(
+                                                    right: 6.w,
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.check,
+                                                    color: AppColors.neutral0,
+                                                    size: 20.sp,
+                                                  ),
+                                                ),
+                                              Text(
+                                                gender,
+                                                style: TextStyle(
+                                                  color:
+                                                      isSelected
+                                                          ? AppColors.neutral0
+                                                          : AppColors
+                                                              .neutral100,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          selected: isSelected,
+                                          selectedColor:
+                                              AppColors.primaryAccent,
+                                          backgroundColor: AppColors.neutral0,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              15.r,
+                                            ),
+                                            side: BorderSide(
+                                              color:
+                                                  isSelected
+                                                      ? AppColors.primaryAccent
+                                                      : AppColors.neutral80
+                                                          .withOpacity(0.3),
+                                            ),
+                                          ),
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 10.w,
+                                            vertical: 10.h,
+                                          ),
+                                          onSelected:
+                                              (_) => setState(
+                                                () => selectedGender = gender,
+                                              ),
+
+                                          // Removes default avatar container
+                                          materialTapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                        );
+                                      }).toList(),
+                                ),
+                                SizedBox(height: 16.h),
+                                Text(
+                                  "Phone",
+                                  style: AppTextTheme.fallback(
+                                    isTablet: isTablet,
+                                  ).bodyMediumMedium!.copyWith(
+                                    color: AppColors.neutral100,
+                                  ),
+                                ),
+                                SizedBox(height: 8.h),
+                                CustomTextField(
+                                  controller: phoneController,
+                                  hintText: "Phone",
+                                  keyboardType: TextInputType.phone,
+                                  onTap: () {},
+                                ),
+                                SizedBox(height: 16.h),
+                                Text(
+                                  "Email",
+                                  style: AppTextTheme.fallback(
+                                    isTablet: isTablet,
+                                  ).bodyMediumMedium!.copyWith(
+                                    color: AppColors.neutral100,
+                                  ),
+                                ),
+                                SizedBox(height: 8.h),
+                                CustomTextField(
+                                  controller: emailController,
+                                  hintText: "Email",
+                                  keyboardType: TextInputType.emailAddress,
+                                  onTap: () {},
+                                ),
+                                SizedBox(height: 25.h),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed:
+                                        state.isLoading ? null : saveProfile,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.orange,
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 16.h,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          30.r,
+                                        ),
+                                      ),
+                                    ),
+                                    child:
+                                        state.isLoading
+                                            ? const CircularProgressIndicator()
+                                            : Text(
+                                              "Save",
+                                              style: AppTextTheme.fallback(
+                                                isTablet: isTablet,
+                                              ).bodyMediumSemiBold!.copyWith(
+                                                color: AppColors.neutral0,
+                                              ),
+                                            ),
+                                  ),
+                                ),
+                                SizedBox(height: 25.h),
+                              ],
                             ),
-                            SizedBox(height: 25.h),
-                          ],
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
