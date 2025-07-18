@@ -1,14 +1,13 @@
-import 'dart:async';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:smart_flutter/core/constants/app_colors.dart';
+import 'package:smart_flutter/firebase_options.dart';
 import 'package:smart_flutter/routes/app_routes.dart';
 import 'package:smart_flutter/services/deep_link_service.dart';
+import 'package:smart_flutter/services/shared_preferences_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,11 +20,19 @@ void main() async {
       statusBarIconBrightness: Brightness.dark,
     ),
   );
-
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
-  await Firebase.initializeApp();
-  runApp(ProviderScope(child: MyApp()));
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  await SharedPreferencesService.init();
+
+  await Supabase.initialize(
+    url: 'https://evqveotscootuaaruplk.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2cXZlb3RzY29vdHVhYXJ1cGxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5MTg4NjQsImV4cCI6MjA2NjQ5NDg2NH0.HKn7JP4qvnMCQLW8guV4uzWrzv5ft_gBZo_HKeFDW3U',
+  );
+
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerStatefulWidget {
@@ -36,8 +43,6 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class _MyAppState extends ConsumerState<MyApp> {
-  StreamSubscription? _sub;
-
   @override
   void initState() {
     super.initState();
@@ -47,38 +52,23 @@ class _MyAppState extends ConsumerState<MyApp> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final router = ref.watch(appRouterProvider);
-    return ScreenUtilInit(
-      designSize: const Size(375, 812),
-      minTextAdapt: true,
-      splitScreenMode: true,
-      builder: (BuildContext buildContext, Widget? child) {
-        return MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            primarySwatch: Colors.orange,
-            scaffoldBackgroundColor: AppColors.neutral0,
-            useMaterial3: true,
-          ),
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('en', ''), // Default English locale
-          ],
-          locale: const Locale('en'),
-          routerConfig: router,
-        );
-      },
-    );
+  void dispose() {
+    super.dispose();
   }
 
   @override
-  void dispose() {
-    _sub?.cancel();
-    super.dispose();
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(useMaterial3: true),
+      routerConfig: ref.watch(appRouterProvider),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        DefaultWidgetsLocalizations.delegate,
+      ],
+
+      supportedLocales: const [Locale('en')],
+    );
   }
 }

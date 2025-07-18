@@ -1,0 +1,98 @@
+{
+  "project_info": {
+    "project_number": "776521156581",
+    "project_id": "suffix-digital-app",
+    "storage_bucket": "suffix-digital-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:776521156581:android:2ca8e8911dda4af1d0110c",
+        "android_client_info": {
+          "package_name": "com.suffixdigital.smart_flutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "776521156581-04pak3avda32u3nfj65gcid5nc4upfhr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.suffixdigital.smart_flutter",
+            "certificate_hash": "ac964ce01f1be72e9a7ccd67ebe7cfa7392b75ce"
+          }
+        },
+        {
+          "client_id": "776521156581-utb63hi3s4cj50kej8ngvg073aal69qe.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDo8BDxev_WSBJ4t-Ue8RPw36_c-lD18v0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "776521156581-utb63hi3s4cj50kej8ngvg073aal69qe.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "776521156581-adcsscpodhu8qbfj0mn9r9eonck8p652.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.suffixdigital.smartflutter.smartFlutter"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:776521156581:android:2a4af03d58c62199d0110c",
+        "android_client_info": {
+          "package_name": "com.suffixdigital.smartauthenticator"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "776521156581-ifvgfcfj9hikk1oabsh9rnmsjpldagv4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.suffixdigital.smartauthenticator",
+            "certificate_hash": "ac964ce01f1be72e9a7ccd67ebe7cfa7392b75ce"
+          }
+        },
+        {
+          "client_id": "776521156581-utb63hi3s4cj50kej8ngvg073aal69qe.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDo8BDxev_WSBJ4t-Ue8RPw36_c-lD18v0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "776521156581-utb63hi3s4cj50kej8ngvg073aal69qe.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "776521156581-adcsscpodhu8qbfj0mn9r9eonck8p652.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.suffixdigital.smartflutter.smartFlutter"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

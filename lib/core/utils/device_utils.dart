@@ -80,7 +80,7 @@ class DeviceUtils {
         radius: 22.r,
         backgroundColor: AppColors.neutral0,
         //child: Image.asset(assetPath, width: 24.w, height: 24.h),
-        child: SvgPicture.asset(assetPath, width: 24.w, height: 24.h),
+        child: SvgPicture.asset(assetPath, width: 26.w, height: 26.h),
       ),
     );
   }

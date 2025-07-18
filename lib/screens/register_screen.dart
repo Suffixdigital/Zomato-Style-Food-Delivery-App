@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart'
@@ -9,8 +10,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_flutter/core/utils/device_utils.dart';
+import 'package:smart_flutter/routes/tab_controller_notifier.dart';
+import 'package:smart_flutter/screens/link_expired_dialog.dart';
 import 'package:smart_flutter/viewmodels/register_viewmodel.dart';
 import 'package:smart_flutter/views/widgets/login_screen/custom_form_field.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../core/constants/app_colors.dart';
 import '../core/constants/text_styles.dart';
@@ -51,11 +55,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     await ref
         .read(registerViewModelProvider.notifier)
         .registerUser(
-          name: fullNameController.text,
           email: emailController.text,
-          phone: phoneNumberController.text,
-          gender: selectedGender,
-          dob: dobController.text,
+          metadata: {
+            'name': fullNameController.text,
+            'dob': dobController.text,
+            'gender': selectedGender.toLowerCase(),
+            'phone': phoneNumberController.text,
+            'password_set': false,
+            'provider': 'email',
+          },
         );
 
     final result = ref.read(registerViewModelProvider);
@@ -75,6 +83,37 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         // UI already shows CircularProgressIndicator
       },
     );
+  }
+
+  Future<void> signInWithProvider(
+    OAuthProvider provider,
+    BuildContext context,
+  ) async {
+    final supabase = Supabase.instance.client;
+
+    try {
+      // 🌐 Web platform
+      if (kIsWeb) {
+        await supabase.auth.signInWithOAuth(
+          provider,
+          redirectTo: 'https://<your-project-ref>.supabase.co/auth/v1/callback',
+        );
+      }
+      // 📱 Mobile platforms (Android/iOS)
+      else {
+        await supabase.auth.signInWithOAuth(
+          provider,
+          authScreenLaunchMode: LaunchMode.externalApplication,
+          redirectTo:
+              'https://jpi.nub.mybluehostin.me/callback', // matches your scheme
+        );
+      }
+    } catch (e) {
+      debugPrint('OAuth SignIn Error: $e');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Login failed: $e')));
+    }
   }
 
   Future<void> selectDate(
@@ -185,362 +224,452 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final message = ref.read(linkExpiredMessage);
+
+    if (message.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        LinkExpiredDialog.show(context, message);
+        ref.watch(linkExpiredMessage.notifier).state = '';
+      });
+    }
     final state = ref.watch(registerViewModelProvider);
     final Size screenSize = MediaQuery.of(context).size;
     final bool isTablet = screenSize.shortestSide >= 600;
-    return Scaffold(
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.minHeight),
-                child: IntrinsicHeight(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Create your new account",
-                        style: AppTextTheme.fallback(isTablet: isTablet)
-                            .headingH4SemiBold!
-                            .copyWith(color: AppColors.neutral100),
+    return ScreenUtilInit(
+      designSize: const Size(375, 812),
+      builder:
+          (context, child) => Scaffold(
+            body: SafeArea(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 24.w,
+                      vertical: 24.h,
+                    ),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.minHeight,
                       ),
-                      SizedBox(height: 8.h),
-                      Text(
-                        "Create an account to start looking for the food you like",
-                        style: AppTextTheme.fallback(isTablet: isTablet)
-                            .bodyMediumMedium!
-                            .copyWith(color: AppColors.neutral60),
-                      ),
-                      SizedBox(height: 12.h),
-
-                      Form(
-                        key: _formKey,
-                        onChanged: validateForm, // Re-validate on any change
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                      child: IntrinsicHeight(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Full Name",
+                              "Create your new account",
                               style: AppTextTheme.fallback(isTablet: isTablet)
-                                  .bodyMediumMedium!
+                                  .headingH4SemiBold!
                                   .copyWith(color: AppColors.neutral100),
                             ),
                             SizedBox(height: 8.h),
-                            CustomFormField(
-                              hintText: "Enter your full name",
-                              controller: fullNameController,
-                              onTap: () {},
-                              keyboardType: TextInputType.name,
-                              validator: (value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return '• Name is required';
-                                }
-                                if (value.length < 3) {
-                                  return '• Enter at least 3 characters';
-                                }
-                                return null;
-                              },
-                            ),
-                            SizedBox(height: 16.h),
-
                             Text(
-                              "Email ID",
+                              "Create an account to start looking for the food you like",
                               style: AppTextTheme.fallback(isTablet: isTablet)
                                   .bodyMediumMedium!
-                                  .copyWith(color: AppColors.neutral100),
+                                  .copyWith(color: AppColors.neutral60),
                             ),
-                            SizedBox(height: 8.h),
-                            CustomFormField(
-                              controller: emailController,
-                              hintText: "Enter your email id",
-                              keyboardType: TextInputType.emailAddress,
-                              onTap: () {},
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return '• Email is required';
-                                }
-                                if (!emailRegex.hasMatch(value)) {
-                                  return '• Enter a valid email';
-                                }
-                                return null;
-                              },
-                              //label: "Email Address",
-                            ),
+                            SizedBox(height: 12.h),
 
-                            SizedBox(height: 16.h),
-                            Text(
-                              "Phone Number",
-                              style: AppTextTheme.fallback(isTablet: isTablet)
-                                  .bodyMediumMedium!
-                                  .copyWith(color: AppColors.neutral100),
-                            ),
-                            SizedBox(height: 8.h),
-                            CustomFormField(
-                              controller: phoneNumberController,
-                              hintText: "Enter your phone number",
-                              keyboardType: TextInputType.phone,
-                              onTap: () {},
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return '• Phone number is required';
-                                } else if (value.length < 10) {
-                                  return '• Enter a valid phone number';
-                                }
-                                return null;
-                              },
-                            ),
-                            SizedBox(height: 16.h),
+                            Form(
+                              key: _formKey,
+                              onChanged: validateForm,
+                              // Re-validate on any change
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Full Name",
+                                    style: AppTextTheme.fallback(
+                                      isTablet: isTablet,
+                                    ).bodyMediumMedium!.copyWith(
+                                      color: AppColors.neutral100,
+                                    ),
+                                  ),
+                                  SizedBox(height: 8.h),
+                                  CustomFormField(
+                                    hintText: "Enter your full name",
+                                    controller: fullNameController,
+                                    onTap: () {},
+                                    keyboardType: TextInputType.name,
+                                    validator: (value) {
+                                      if (value == null ||
+                                          value.trim().isEmpty) {
+                                        return '• Name is required';
+                                      }
+                                      if (value.length < 3) {
+                                        return '• Enter at least 3 characters';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  SizedBox(height: 16.h),
 
-                            Text(
-                              "Date of birth",
-                              style: AppTextTheme.fallback(isTablet: isTablet)
-                                  .bodyMediumMedium!
-                                  .copyWith(color: AppColors.neutral100),
-                            ),
-                            SizedBox(height: 8.h),
-                            CustomFormField(
-                              controller: dobController,
-                              hintText: "Date of Birth",
-                              keyboardType: TextInputType.number,
-                              readOnly: true,
-                              onTap: () => selectDate(context, dobController),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return '• Date of birth is required';
-                                }
-                                return null;
-                              },
-                            ),
-                            SizedBox(height: 16.h),
-                            Text(
-                              "Gender",
-                              style: AppTextTheme.fallback(isTablet: isTablet)
-                                  .bodyMediumMedium!
-                                  .copyWith(color: AppColors.neutral100),
-                            ),
-                            SizedBox(height: 8.h),
-                            Wrap(
-                              spacing: 20.w,
-                              runSpacing: 20.w,
-                              alignment: WrapAlignment.start,
+                                  Text(
+                                    "Email ID",
+                                    style: AppTextTheme.fallback(
+                                      isTablet: isTablet,
+                                    ).bodyMediumMedium!.copyWith(
+                                      color: AppColors.neutral100,
+                                    ),
+                                  ),
+                                  SizedBox(height: 8.h),
+                                  CustomFormField(
+                                    controller: emailController,
+                                    hintText: "Enter your email id",
+                                    keyboardType: TextInputType.emailAddress,
+                                    onTap: () {},
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return '• Email is required';
+                                      }
+                                      if (!emailRegex.hasMatch(value)) {
+                                        return '• Enter a valid email';
+                                      }
+                                      return null;
+                                    },
+                                    //label: "Email Address",
+                                  ),
 
-                              children:
-                                  genderOptions.map((gender) {
-                                    final isSelected = selectedGender == gender;
-                                    return ChoiceChip(
-                                      checkmarkColor: AppColors.neutral0,
+                                  SizedBox(height: 16.h),
+                                  Text(
+                                    "Phone Number",
+                                    style: AppTextTheme.fallback(
+                                      isTablet: isTablet,
+                                    ).bodyMediumMedium!.copyWith(
+                                      color: AppColors.neutral100,
+                                    ),
+                                  ),
+                                  SizedBox(height: 8.h),
+                                  CustomFormField(
+                                    controller: phoneNumberController,
+                                    hintText: "Enter your phone number",
+                                    keyboardType: TextInputType.phone,
+                                    onTap: () {},
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return '• Phone number is required';
+                                      } else if (value.length < 10) {
+                                        return '• Enter a valid phone number';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  SizedBox(height: 16.h),
 
-                                      label: Text(
-                                        gender,
-                                        style: AppTextTheme.fallback(
-                                          isTablet: isTablet,
-                                        ).bodyMediumMedium!.copyWith(
-                                          color:
-                                              isSelected
-                                                  ? AppColors.neutral0
-                                                  : AppColors.neutral100,
+                                  Text(
+                                    "Date of birth",
+                                    style: AppTextTheme.fallback(
+                                      isTablet: isTablet,
+                                    ).bodyMediumMedium!.copyWith(
+                                      color: AppColors.neutral100,
+                                    ),
+                                  ),
+                                  SizedBox(height: 8.h),
+                                  CustomFormField(
+                                    controller: dobController,
+                                    hintText: "Date of Birth",
+                                    keyboardType: TextInputType.number,
+                                    readOnly: true,
+                                    onTap:
+                                        () =>
+                                            selectDate(context, dobController),
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return '• Date of birth is required';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  SizedBox(height: 16.h),
+                                  Text(
+                                    "Gender",
+                                    style: AppTextTheme.fallback(
+                                      isTablet: isTablet,
+                                    ).bodyMediumMedium!.copyWith(
+                                      color: AppColors.neutral100,
+                                    ),
+                                  ),
+                                  SizedBox(height: 8.h),
+                                  Wrap(
+                                    spacing: 20.w,
+                                    runSpacing: 20.w,
+                                    alignment: WrapAlignment.start,
+
+                                    children:
+                                        genderOptions.map((gender) {
+                                          final isSelected =
+                                              selectedGender == gender;
+                                          return ChoiceChip(
+                                            checkmarkColor: AppColors.neutral0,
+
+                                            label: Text(
+                                              gender,
+                                              style: AppTextTheme.fallback(
+                                                isTablet: isTablet,
+                                              ).bodyMediumMedium!.copyWith(
+                                                color:
+                                                    isSelected
+                                                        ? AppColors.neutral0
+                                                        : AppColors.neutral100,
+                                              ),
+                                            ),
+                                            selected: isSelected,
+                                            selectedColor:
+                                                AppColors.primaryAccent,
+                                            backgroundColor: AppColors.neutral0,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10.r),
+                                              side: BorderSide(
+                                                color:
+                                                    isSelected
+                                                        ? AppColors
+                                                            .primaryAccent
+                                                        : AppColors.neutral100
+                                                            .withValues(
+                                                              alpha: 0.2,
+                                                            ),
+                                              ),
+                                            ),
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 10.w,
+                                              vertical: 10.h,
+                                            ),
+                                            onSelected: (_) {
+                                              setState(
+                                                () => selectedGender = gender,
+                                              );
+                                              validateForm();
+                                            },
+                                          );
+                                        }).toList(),
+                                  ),
+                                  SizedBox(height: 16.h),
+
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Checkbox(
+                                        value: agreeTerms,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            agreeTerms = value ?? false;
+                                            validateForm();
+                                          });
+                                        },
+                                        activeColor: AppColors.primaryAccent,
+                                        checkColor: AppColors.neutral0,
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        visualDensity: VisualDensity(
+                                          horizontal: -4,
+                                          vertical: -4,
                                         ),
                                       ),
-                                      selected: isSelected,
-                                      selectedColor: AppColors.primaryAccent,
-                                      backgroundColor: AppColors.neutral0,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                          10.r,
-                                        ),
-                                        side: BorderSide(
-                                          color:
-                                              isSelected
-                                                  ? AppColors.primaryAccent
-                                                  : AppColors.neutral100
-                                                      .withValues(alpha: 0.2),
+                                      Expanded(
+                                        child: Padding(
+                                          padding: EdgeInsets.only(left: 5.w),
+                                          child: RichText(
+                                            text: TextSpan(
+                                              style: AppTextTheme.fallback(
+                                                isTablet: isTablet,
+                                              ).bodyMediumMedium!.copyWith(
+                                                color: AppColors.neutral100,
+                                              ),
+                                              children: [
+                                                TextSpan(text: "I Agree with "),
+                                                TextSpan(
+                                                  text: "Terms of Service",
+                                                  style: AppTextTheme.fallback(
+                                                        isTablet: isTablet,
+                                                      ).bodyMediumSemiBold!
+                                                      .copyWith(
+                                                        color:
+                                                            AppColors
+                                                                .primaryAccent,
+                                                      ),
+                                                  recognizer:
+                                                      TapGestureRecognizer()
+                                                        ..onTap = () {
+                                                          // Navigate to terms screen or open dialog
+                                                        },
+                                                ),
+                                                TextSpan(text: " and "),
+                                                TextSpan(
+                                                  text: "Privacy Policy",
+                                                  style: AppTextTheme.fallback(
+                                                        isTablet: isTablet,
+                                                      ).bodyMediumSemiBold!
+                                                      .copyWith(
+                                                        color:
+                                                            AppColors
+                                                                .primaryAccent,
+                                                      ),
+                                                  recognizer:
+                                                      TapGestureRecognizer()
+                                                        ..onTap = () {
+                                                          // Navigate to privacy screen or open dialog
+                                                        },
+                                                ),
+                                              ],
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 10.w,
-                                        vertical: 10.h,
+                                    ],
+                                  ),
+
+                                  SizedBox(height: 20.h),
+
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: ElevatedButton(
+                                      onPressed:
+                                          state.isLoading || !isFormValid
+                                              ? null
+                                              : registerUser,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            AppColors.primaryAccent,
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 16.h,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            30.r,
+                                          ),
+                                        ),
                                       ),
-                                      onSelected: (_) {
-                                        setState(() => selectedGender = gender);
-                                        validateForm();
-                                      },
-                                    );
-                                  }).toList(),
+                                      child:
+                                          state.isLoading
+                                              ? const CircularProgressIndicator()
+                                              : Text(
+                                                "Register",
+                                                style: AppTextTheme.fallback(
+                                                  isTablet: isTablet,
+                                                ).bodyMediumSemiBold!.copyWith(
+                                                  color: AppColors.neutral0,
+                                                ),
+                                              ),
+                                    ),
+                                  ),
+
+                                  SizedBox(height: 16.h),
+                                ],
+                              ),
+                            ),
+
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Divider(color: AppColors.neutral60),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 10.w,
+                                  ),
+                                  child: Text(
+                                    "Or sign in with",
+                                    style: AppTextTheme.fallback(
+                                      isTablet: isTablet,
+                                    ).bodyMediumMedium!.copyWith(
+                                      color: AppColors.neutral60,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Divider(color: AppColors.neutral60),
+                                ),
+                              ],
                             ),
                             SizedBox(height: 16.h),
 
                             Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Checkbox(
-                                  value: agreeTerms,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      agreeTerms = value ?? false;
-                                      validateForm();
-                                    });
+                                GestureDetector(
+                                  onTap: () {
+                                    signInWithProvider(
+                                      OAuthProvider.google,
+                                      context,
+                                    );
                                   },
-                                  activeColor: AppColors.primaryAccent,
-                                  checkColor: AppColors.neutral0,
-                                  materialTapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                  visualDensity: VisualDensity(
-                                    horizontal: -4,
-                                    vertical: -4,
+                                  child: DeviceUtils.socialIcon(
+                                    "assets/icons/google.svg",
                                   ),
                                 ),
-                                Expanded(
-                                  child: Padding(
-                                    padding: EdgeInsets.only(left: 5.w),
-                                    child: RichText(
-                                      text: TextSpan(
-                                        style: AppTextTheme.fallback(
-                                          isTablet: isTablet,
-                                        ).bodyMediumMedium!.copyWith(
-                                          color: AppColors.neutral100,
-                                        ),
-                                        children: [
-                                          TextSpan(text: "I Agree with "),
-                                          TextSpan(
-                                            text: "Terms of Service",
-                                            style: AppTextTheme.fallback(
-                                              isTablet: isTablet,
-                                            ).bodyMediumSemiBold!.copyWith(
-                                              color: AppColors.primaryAccent,
-                                            ),
-                                            recognizer:
-                                                TapGestureRecognizer()
-                                                  ..onTap = () {
-                                                    // Navigate to terms screen or open dialog
-                                                  },
-                                          ),
-                                          TextSpan(text: " and "),
-                                          TextSpan(
-                                            text: "Privacy Policy",
-                                            style: AppTextTheme.fallback(
-                                              isTablet: isTablet,
-                                            ).bodyMediumSemiBold!.copyWith(
-                                              color: AppColors.primaryAccent,
-                                            ),
-                                            recognizer:
-                                                TapGestureRecognizer()
-                                                  ..onTap = () {
-                                                    // Navigate to privacy screen or open dialog
-                                                  },
-                                          ),
-                                        ],
-                                      ),
-                                    ),
+                                SizedBox(width: 16.w),
+                                GestureDetector(
+                                  onTap: () {
+                                    signInWithProvider(
+                                      OAuthProvider.twitter,
+                                      context,
+                                    );
+                                  },
+                                  child: DeviceUtils.socialIcon(
+                                    "assets/icons/twitter.svg",
+                                  ),
+                                ),
+                                SizedBox(width: 16.w),
+                                GestureDetector(
+                                  onTap: () {
+                                    signInWithProvider(
+                                      OAuthProvider.facebook,
+                                      context,
+                                    );
+                                  },
+                                  child: DeviceUtils.socialIcon(
+                                    "assets/icons/facebook.svg",
                                   ),
                                 ),
                               ],
                             ),
 
-                            SizedBox(height: 20.h),
+                            SizedBox(height: 30.h),
 
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed:
-                                    state.isLoading || !isFormValid
-                                        ? null
-                                        : registerUser,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primaryAccent,
-                                  padding: EdgeInsets.symmetric(vertical: 16.h),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30.r),
-                                  ),
-                                ),
-                                child:
-                                    state.isLoading
-                                        ? const CircularProgressIndicator()
-                                        : Text(
-                                          "Register",
+                            Center(
+                              child: Padding(
+                                padding: EdgeInsets.only(bottom: 16.h),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    context.goNamed('login');
+                                  },
+                                  child: RichText(
+                                    text: TextSpan(
+                                      text: "Already register? ",
+                                      style: AppTextTheme.fallback(
+                                        isTablet: isTablet,
+                                      ).bodyMediumMedium!.copyWith(
+                                        color: AppColors.neutral100,
+                                      ),
+                                      children: [
+                                        TextSpan(
+                                          text: "Sign In",
                                           style: AppTextTheme.fallback(
                                             isTablet: isTablet,
                                           ).bodyMediumSemiBold!.copyWith(
-                                            color: AppColors.neutral0,
+                                            color: AppColors.primaryAccent,
                                           ),
                                         ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
-
-                            SizedBox(height: 16.h),
                           ],
                         ),
                       ),
-
-                      Row(
-                        children: [
-                          Expanded(child: Divider(color: AppColors.neutral60)),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10.w),
-                            child: Text(
-                              "Or sign in with",
-                              style: AppTextTheme.fallback(isTablet: isTablet)
-                                  .bodyMediumMedium!
-                                  .copyWith(color: AppColors.neutral60),
-                            ),
-                          ),
-                          Expanded(child: Divider(color: AppColors.neutral60)),
-                        ],
-                      ),
-                      SizedBox(height: 16.h),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          DeviceUtils.socialIcon('assets/icons/google.svg'),
-                          SizedBox(width: 16.w),
-                          DeviceUtils.socialIcon('assets/icons/facebook.svg'),
-                          SizedBox(width: 16.w),
-                          DeviceUtils.socialIcon('assets/icons/apple.svg'),
-                        ],
-                      ),
-
-                      SizedBox(height: 30.h),
-
-                      Center(
-                        child: Padding(
-                          padding: EdgeInsets.only(bottom: 16.h),
-                          child: GestureDetector(
-                            onTap: () {
-                              context.goNamed('login', extra: false);
-                            },
-                            child: RichText(
-                              text: TextSpan(
-                                text: "Already register? ",
-                                style: AppTextTheme.fallback(isTablet: isTablet)
-                                    .bodyMediumMedium!
-                                    .copyWith(color: AppColors.neutral100),
-                                children: [
-                                  TextSpan(
-                                    text: "Sign In",
-                                    style: AppTextTheme.fallback(
-                                      isTablet: isTablet,
-                                    ).bodyMediumSemiBold!.copyWith(
-                                      color: AppColors.primaryAccent,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
-      ),
+            ),
+          ),
     );
   }
 }

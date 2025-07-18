@@ -7,7 +7,9 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/text_styles.dart';
 
 class ResetPasswordSuccessful extends StatefulWidget {
-  const ResetPasswordSuccessful({super.key});
+  final bool isPasswordSet;
+
+  const ResetPasswordSuccessful({super.key, required this.isPasswordSet});
 
   @override
   State<ResetPasswordSuccessful> createState() =>
@@ -59,7 +61,7 @@ class _ResetPasswordSuccessfulState extends State<ResetPasswordSuccessful> {
 
               Center(
                 child: Text(
-                  "Password Changed",
+                  widget.isPasswordSet ? "Password Set" : "Password Changed",
                   style: AppTextTheme.fallback(
                     isTablet: isTablet,
                   ).headingH5SemiBold!.copyWith(color: AppColors.neutral100),
@@ -67,7 +69,9 @@ class _ResetPasswordSuccessfulState extends State<ResetPasswordSuccessful> {
               ),
               SizedBox(height: 8.h),
               Text(
-                "Password changed successfully, you can login \nagain with a new password",
+                widget.isPasswordSet
+                    ? "Your password has been set successfully."
+                    : "Password changed successfully, you can login \nagain with a new password",
                 style: AppTextTheme.fallback(
                   isTablet: isTablet,
                 ).bodyMediumMedium!.copyWith(color: AppColors.neutral60),
@@ -78,7 +82,7 @@ class _ResetPasswordSuccessfulState extends State<ResetPasswordSuccessful> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    context.goNamed('login', extra: false);
+                    context.goNamed('login');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange,
@@ -88,6 +92,7 @@ class _ResetPasswordSuccessfulState extends State<ResetPasswordSuccessful> {
                     ),
                   ),
                   child: Text(
+                    /*widget.isPasswordSet ? "Home" :*/
                     "Log In",
                     style: AppTextTheme.fallback(
                       isTablet: isTablet,

@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/core/utils/device_utils.dart';
+import 'package:smart_flutter/routes/tab_controller_notifier.dart';
+import 'package:smart_flutter/screens/link_expired_dialog.dart';
 
-class EmailOtpVerificationScreen extends StatefulWidget {
+class EmailOtpVerificationScreen extends ConsumerStatefulWidget {
   const EmailOtpVerificationScreen({super.key});
 
   @override
-  State<EmailOtpVerificationScreen> createState() =>
+  ConsumerState<EmailOtpVerificationScreen> createState() =>
       _EmailOtpVerificationScreenState();
 }
 
 class _EmailOtpVerificationScreenState
-    extends State<EmailOtpVerificationScreen> {
+    extends ConsumerState<EmailOtpVerificationScreen> {
   TextEditingController otpController = TextEditingController();
   int countdownSeconds = 30;
   late final String emailAddress;
@@ -66,6 +69,15 @@ class _EmailOtpVerificationScreenState
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     final bool isTablet = screenSize.shortestSide >= 600;
+
+    final message = ref.read(linkExpiredMessage);
+
+    if (message.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        LinkExpiredDialog.show(context, message);
+        ref.watch(linkExpiredMessage.notifier).state = '';
+      });
+    }
     return ScreenUtilInit(
       designSize: const Size(375, 812),
       builder:

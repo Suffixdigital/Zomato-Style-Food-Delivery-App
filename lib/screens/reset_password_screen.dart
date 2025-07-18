@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
+import 'package:smart_flutter/screens/confirmation_dialog.dart';
+import 'package:smart_flutter/services/shared_preferences_service.dart';
+import 'package:smart_flutter/viewmodels/register_viewmodel.dart';
 import 'package:smart_flutter/views/widgets/login_screen/custom_text_field.dart';
 import 'package:smart_flutter/views/widgets/reset_password_screen/reset_password_success.dart';
 
@@ -8,14 +11,15 @@ import '../core/constants/app_colors.dart';
 import '../core/constants/text_styles.dart';
 import '../core/utils/device_utils.dart';
 
-class ResetPasswordScreen extends StatefulWidget {
+class ResetPasswordScreen extends ConsumerStatefulWidget {
   const ResetPasswordScreen({super.key});
 
   @override
-  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+  ConsumerState<ResetPasswordScreen> createState() =>
+      _ResetPasswordScreenState();
 }
 
-class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
+class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final newPasswordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
@@ -25,6 +29,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   bool obscureNew = true;
   bool obscureConfirm = true;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   void toggleNewVisibility() {
     setState(() {
@@ -62,7 +71,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   }
 
   Future<bool> onBackPressed() async {
-    context.goNamed('login', extra: false);
+    ConfirmationDialog.show(
+      context,
+      'Confirmation!',
+      'Are you sure to open Login screen without complete reset password process?',
+    );
     return false;
   }
 
@@ -72,20 +85,37 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     });
   }
 
-  void _onVerifyPressed() {
+  void onVerifyPressed() async {
     validateNewPassword(newPasswordController.text);
     validateConfirmPassword(confirmPasswordController.text);
     if (confirmPasswordErrorMessage == null &&
         newPasswordErrorMessage == null) {
       // Submit password to backend
-      Future.delayed(Duration.zero, () {
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          builder: (_) => ResetPasswordSuccessful(),
-        );
-      });
+      await ref
+          .read(registerViewModelProvider.notifier)
+          .setUserPassword(password: newPasswordController.text.toString());
+
+      final result = ref.read(registerViewModelProvider);
+
+      result.when(
+        data: (_) {
+          SharedPreferencesService.setResetPassword(false);
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (_) => const ResetPasswordSuccessful(isPasswordSet: false),
+          );
+        },
+        error: (error, _) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to set password')),
+          );
+        },
+        loading: () {
+          // UI already shows CircularProgressIndicator
+        },
+      );
 
       // Navigate if needed
     }
@@ -95,6 +125,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     final bool isTablet = screenSize.shortestSide >= 600;
+    final state = ref.watch(registerViewModelProvider);
     return WillPopScope(
       onWillPop: onBackPressed,
       child: ScreenUtilInit(
@@ -234,7 +265,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                         SizedBox(
                                           width: double.infinity,
                                           child: ElevatedButton(
-                                            onPressed: _onVerifyPressed,
+                                            onPressed:
+                                                state.isLoading
+                                                    ? null
+                                                    : onVerifyPressed,
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor:
                                                   AppColors.primaryAccent,
@@ -246,14 +280,20 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                                     BorderRadius.circular(30.r),
                                               ),
                                             ),
-                                            child: Text(
-                                              "Continue",
-                                              style: AppTextTheme.fallback(
-                                                isTablet: isTablet,
-                                              ).bodyMediumSemiBold!.copyWith(
-                                                color: AppColors.neutral0,
-                                              ),
-                                            ),
+                                            child:
+                                                state.isLoading
+                                                    ? const CircularProgressIndicator()
+                                                    : Text(
+                                                      "Continue",
+                                                      style: AppTextTheme.fallback(
+                                                            isTablet: isTablet,
+                                                          ).bodyMediumSemiBold!
+                                                          .copyWith(
+                                                            color:
+                                                                AppColors
+                                                                    .neutral0,
+                                                          ),
+                                                    ),
                                           ),
                                         ),
                                         SizedBox(height: 20.h),
