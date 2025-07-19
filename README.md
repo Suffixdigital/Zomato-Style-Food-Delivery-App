@@ -52,8 +52,6 @@ A full-featured Flutter app inspired by Zomato, designed for food ordering and d
 |--------------------------------------|--------------------------------------------|--------------------------------------|--------------------------------------------|
 | ![Home](assets/screenshots/home.png) | ![Details](assets/screenshots/details.png) | ![Cart](assets/screenshots/cart.png) | ![Profile](assets/screenshots/profile.png) |
 
-> 📁 You can add your own screenshots inside `assets/screenshots/` and update paths above.
-
 ---
 
 ## 🔥 App Preview
