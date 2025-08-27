@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:smart_flutter/core/constants/app_colors.dart';
+import 'package:smart_flutter/core/constants/text_styles.dart';
+import 'package:smart_flutter/theme/app_colors.dart';
 
 class Style9BottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -16,15 +17,20 @@ class Style9BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).extension<AppTextTheme>()!;
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.neutral0, // background color
+        color: context.colors.background, // background color
         borderRadius: BorderRadius.circular(20.r), // rounded corners
+        border: Border.all(
+          color: context.colors.defaultGrayEEEEEE.withValues(alpha: 0.5),
+          width: 1.w,
+        ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.neutral40,
-            blurRadius: 5.r,
-            offset: const Offset(0, -1),
+            color: context.colors.defaultGray878787,
+            blurRadius: 3.r,
+            offset: Offset(0, -1),
           ),
         ],
       ),
@@ -33,15 +39,13 @@ class Style9BottomNavBar extends StatelessWidget {
         child: BottomNavigationBar(
           currentIndex: currentIndex,
           onTap: onTap,
-          selectedItemColor: AppColors.primaryAccent,
-          unselectedItemColor: AppColors.neutral60,
-          selectedLabelStyle: const TextStyle(
-            fontWeight: FontWeight.bold,
-            color: AppColors.primaryAccent,
+          selectedItemColor: context.colors.primary,
+          unselectedItemColor: context.colors.defaultGray878787,
+          selectedLabelStyle: textTheme.bodyMediumBold!.copyWith(
+            color: context.colors.primary,
           ),
-          unselectedLabelStyle: const TextStyle(
-            fontWeight: FontWeight.normal,
-            color: AppColors.neutral60,
+          unselectedLabelStyle: textTheme.bodyMediumBold!.copyWith(
+            color: context.colors.defaultGray878787,
           ),
           items:
               items.map((item) {
@@ -49,7 +53,7 @@ class Style9BottomNavBar extends StatelessWidget {
                   icon: item.icon,
                   label: item.title,
                   activeIcon: item.icon,
-                  backgroundColor: AppColors.neutral0,
+                  backgroundColor: context.colors.background,
                 );
               }).toList(),
         ),

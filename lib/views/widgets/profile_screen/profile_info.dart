@@ -1,22 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/model/user_model.dart';
+import 'package:smart_flutter/theme/app_colors.dart';
 
 class ProfileInfo extends StatelessWidget {
-  final bool isTablet = false;
-
   final UserModel userData;
 
-  const ProfileInfo({
-    super.key,
-    required bool isTablet,
-    required this.userData,
-  });
+  const ProfileInfo({super.key, required this.userData});
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).extension<AppTextTheme>()!;
     return Column(
       children: [
         Stack(
@@ -43,15 +38,15 @@ class ProfileInfo extends StatelessWidget {
         SizedBox(height: 10.h),
         Text(
           userData.fullName,
-          style: AppTextTheme.fallback(
-            isTablet: isTablet,
-          ).bodyLargeSemiBold!.copyWith(color: AppColors.neutral100),
+          style: textTheme.bodyLargeSemiBold!.copyWith(
+            color: context.colors.generalText,
+          ),
         ),
         Text(
           userData.email,
-          style: AppTextTheme.fallback(
-            isTablet: isTablet,
-          ).bodyMediumRegular!.copyWith(color: AppColors.neutral60),
+          style: textTheme.bodyMediumRegular!.copyWith(
+            color: context.colors.defaultGray878787,
+          ),
         ),
       ],
     );

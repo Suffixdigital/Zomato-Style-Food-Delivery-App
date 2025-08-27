@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/core/data/language_details.dart';
 import 'package:smart_flutter/routes/tab_controller_notifier.dart';
+import 'package:smart_flutter/theme/app_colors.dart';
 import 'package:smart_flutter/viewmodels/settings_viewmodel.dart';
 import 'package:smart_flutter/views/widgets/settings_screen/language_selection.dart';
 import 'package:smart_flutter/views/widgets/settings_screen/settings_header.dart';
@@ -27,14 +27,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
-    final bool isTablet = screenSize.shortestSide >= 600;
     final vm = ref.watch(settingsViewModelProvider);
-
+    final textTheme = Theme.of(context).extension<AppTextTheme>()!;
     return WillPopScope(
       onWillPop: onBackPressed,
       child: ScreenUtilInit(
-        designSize: const Size(375, 812),
+        designSize: Size(375, 812),
         minTextAdapt: true,
         builder:
             (context, child) => Scaffold(
@@ -50,9 +48,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           children: [
                             Text(
                               'General',
-                              style: AppTextTheme.fallback(isTablet: false)
-                                  .bodyMediumMedium!
-                                  .copyWith(color: AppColors.neutral60),
+                              style: textTheme.bodyMediumMedium!.copyWith(
+                                color: context.colors.defaultGray878787,
+                              ),
                               textAlign: TextAlign.start,
                             ),
 
@@ -61,69 +59,84 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  "Push Notification",
-                                  style: AppTextTheme.fallback(isTablet: false)
-                                      .bodyMediumMedium!
-                                      .copyWith(color: AppColors.neutral100),
+                                  "Dark Mode",
+                                  style: textTheme.bodyMediumMedium!.copyWith(
+                                    color: context.colors.generalText,
+                                  ),
                                 ),
                                 Transform.scale(
                                   alignment: Alignment.centerRight,
-                                  scale: 0.7,
-                                  child: Switch(
-                                    value: vm.pushNotification,
-                                    onChanged:
-                                        (val) => ref
+                                  scale: 0.9,
+                                  child: customSwitch(
+                                    value: vm.isDarkMode,
+                                    onChanged: (val) {
+                                      setState(
+                                        () => ref
                                             .read(
                                               settingsViewModelProvider
                                                   .notifier,
                                             )
-                                            .togglePushNotification(val),
-                                    activeColor: AppColors.neutral0,
-                                    activeTrackColor: AppColors.primaryAccent,
-                                    inactiveTrackColor: AppColors.primaryColor,
-                                    inactiveThumbColor: AppColors.neutral0,
-                                    materialTapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                    trackOutlineColor:
-                                        MaterialStateProperty.all(
-                                          Colors.transparent,
-                                        ),
+                                            .updateDarkMode(val),
+                                      );
+                                    },
                                   ),
                                 ),
                               ],
                             ),
-
+                            SizedBox(height: 5.h),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Push Notification",
+                                  style: textTheme.bodyMediumMedium!.copyWith(
+                                    color: context.colors.generalText,
+                                  ),
+                                ),
+                                Transform.scale(
+                                  alignment: Alignment.centerRight,
+                                  scale: 0.9,
+                                  child: customSwitch(
+                                    value: vm.pushNotification,
+                                    onChanged: (val) {
+                                      setState(
+                                        () => ref
+                                            .read(
+                                              settingsViewModelProvider
+                                                  .notifier,
+                                            )
+                                            .updatePushNotification(val),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 5.h),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
                                   "Location",
-                                  style: AppTextTheme.fallback(isTablet: false)
-                                      .bodyMediumMedium!
-                                      .copyWith(color: AppColors.neutral100),
+                                  style: textTheme.bodyMediumMedium!.copyWith(
+                                    color: context.colors.generalText,
+                                  ),
                                 ),
                                 Transform.scale(
                                   alignment: Alignment.centerRight,
-                                  scale: 0.7,
-                                  child: Switch(
+                                  scale: 0.9,
+                                  child: customSwitch(
                                     value: vm.locationEnabled,
-                                    onChanged:
-                                        (val) => ref
+                                    onChanged: (val) {
+                                      setState(
+                                        () => ref
                                             .read(
                                               settingsViewModelProvider
                                                   .notifier,
                                             )
-                                            .toggleLocation(val),
-                                    activeColor: AppColors.neutral0,
-                                    activeTrackColor: AppColors.primaryAccent,
-                                    inactiveTrackColor: AppColors.primaryColor,
-                                    inactiveThumbColor: AppColors.neutral0,
-                                    materialTapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                    trackOutlineColor:
-                                        MaterialStateProperty.all(
-                                          Colors.transparent,
-                                        ),
+                                            .updateLocation(val),
+                                      );
+                                    },
                                   ),
                                 ),
                               ],
@@ -147,24 +160,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   children: [
                                     Text(
                                       "Language",
-                                      style: AppTextTheme.fallback(
-                                        isTablet: false,
-                                      ).bodyMediumMedium!.copyWith(
-                                        color: AppColors.neutral100,
-                                      ),
+                                      style: textTheme.bodyMediumMedium!
+                                          .copyWith(
+                                            color: context.colors.generalText,
+                                          ),
                                     ),
                                     Spacer(),
                                     Text(
                                       languageDetails[vm
                                           .languageIndex]['selectedLanguage'],
-                                      style: AppTextTheme.fallback(
-                                        isTablet: false,
-                                      ).bodyMediumMedium!.copyWith(
-                                        color: AppColors.neutral100,
-                                      ),
+                                      style: textTheme.bodyMediumMedium!
+                                          .copyWith(
+                                            color: context.colors.generalText,
+                                          ),
                                     ),
                                     SizedBox(width: 20.w),
                                     SvgPicture.asset(
+                                      colorFilter: ColorFilter.mode(
+                                        context.colors.generalText,
+                                        BlendMode.srcIn,
+                                      ),
                                       'assets/icons/next.svg',
                                       width: 16.w,
                                       height: 16.h,
@@ -176,9 +191,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             SizedBox(height: 10.h),
                             Text(
                               'Other',
-                              style: AppTextTheme.fallback(isTablet: false)
-                                  .bodyMediumMedium!
-                                  .copyWith(color: AppColors.neutral60),
+                              style: textTheme.bodyMediumMedium!.copyWith(
+                                color: context.colors.defaultGray878787,
+                              ),
                               textAlign: TextAlign.start,
                             ),
                             SizedBox(height: 15.h),
@@ -202,6 +217,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Widget buildListTile(String title, {required Function() onPressed}) {
+    final textTheme = Theme.of(context).extension<AppTextTheme>()!;
     return Container(
       margin: EdgeInsets.only(bottom: 20.h),
       child: GestureDetector(
@@ -211,17 +227,59 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           children: [
             Text(
               title,
-              style: AppTextTheme.fallback(
-                isTablet: false,
-              ).bodyMediumMedium!.copyWith(color: AppColors.neutral100),
+              style: textTheme.bodyMediumMedium!.copyWith(
+                color: context.colors.generalText,
+              ),
             ),
             Spacer(),
             SvgPicture.asset(
+              colorFilter: ColorFilter.mode(
+                context.colors.generalText,
+                BlendMode.srcIn,
+              ),
               'assets/icons/next.svg',
               width: 16.w,
               height: 16.h,
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget customSwitch({
+    required bool value,
+    required Function(dynamic val) onChanged,
+  }) {
+    return GestureDetector(
+      onTap: () => onChanged(!value),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 58.w,
+        height: 30.h,
+        padding: EdgeInsets.all(2.5.w),
+        decoration: BoxDecoration(
+          color: value ? context.colors.primary : context.colors.background,
+          borderRadius: BorderRadius.circular(20.r),
+          border: Border.all(
+            color:
+                value
+                    ? context.colors.primary
+                    : context.colors.defaultGray878787.withOpacity(0.5),
+            width: 1.2.w,
+          ),
+        ),
+        alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+        child: Container(
+          width: 25.w,
+          height: 25.h,
+          decoration: BoxDecoration(
+            color:
+                value
+                    ? context.colors.defaultWhite
+                    : context.colors.defaultGray878787,
+            shape: BoxShape.circle,
+          ),
         ),
       ),
     );

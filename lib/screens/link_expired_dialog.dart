@@ -8,12 +8,8 @@ class LinkExpiredDialog {
     if (ctx == null || !ctx.mounted) {
       return;
     }
-    print(
-      "[Deeplink] exception message: ${message.contains("code verifier")} || ${message.contains("expired")}  || ${message.contains('flow_state_not_found')}",
-    );
-    if (message.contains("code verifier") ||
-        message.contains("expired") ||
-        message.contains('flow_state_not_found')) {
+    print("[Deeplink] exception message: ${message.contains("code verifier")} || ${message.contains("expired")}  || ${message.contains('invalid flow state')}");
+    if (message.contains("code verifier") || message.contains("expired") || message.contains('invalid flow state')) {
       showDialog(
         context: ctx,
         barrierDismissible: true,

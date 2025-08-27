@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/model/order_model.dart';
+import 'package:smart_flutter/theme/app_colors.dart';
 
 class OrderCard extends StatelessWidget {
   final OrderModel order;
-  final bool isTablet = false;
 
-  const OrderCard({super.key, required this.order, required bool isTablet});
+  const OrderCard({super.key, required this.order});
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).extension<AppTextTheme>()!;
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: AppColors.neutral0,
+        color: context.colors.background,
         borderRadius: BorderRadius.all(Radius.circular(10.r)),
         boxShadow: [
           BoxShadow(
-            color: AppColors.neutral20,
+            color: context.colors.defaultGrayEEEEEE.withValues(alpha: 0.5),
             spreadRadius: 2.r,
             blurRadius: 2.r,
             blurStyle: BlurStyle.solid,
@@ -34,15 +34,15 @@ class OrderCard extends StatelessWidget {
             children: [
               Text(
                 'My Orders',
-                style: AppTextTheme.fallback(
-                  isTablet: isTablet,
-                ).bodyLargeSemiBold!.copyWith(color: AppColors.neutral100),
+                style: textTheme.bodyLargeSemiBold!.copyWith(
+                  color: context.colors.generalText,
+                ),
               ),
               Text(
                 'See All',
-                style: AppTextTheme.fallback(
-                  isTablet: isTablet,
-                ).bodyMediumSemiBold!.copyWith(color: AppColors.primaryAccent),
+                style: textTheme.bodyMediumSemiBold!.copyWith(
+                  color: context.colors.primary,
+                ),
               ),
             ],
           ),
@@ -50,27 +50,32 @@ class OrderCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Order ID ${order.orderId}'),
+              Text(
+                'Order ID ${order.orderId}',
+                style: textTheme.bodyMediumRegular!.copyWith(
+                  color: context.colors.generalText,
+                ),
+              ),
               Container(
                 height: 26.h,
                 width: 80.w,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: Colors.orange,
+                  color: context.colors.primary,
                   borderRadius: BorderRadius.circular(20.r),
                 ),
                 child: Text(
                   'In Delivery',
-                  style: AppTextTheme.fallback(
-                    isTablet: isTablet,
-                  ).bodySuperSmallMedium!.copyWith(color: AppColors.neutral0),
+                  style: textTheme.bodySuperSmallMedium!.copyWith(
+                    color: context.colors.defaultWhite,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
             ],
           ),
           SizedBox(height: 8.h),
-          Divider(color: AppColors.neutral20, height: 1.h),
+          Divider(color: context.colors.defaultGray878787, height: 1.h),
           SizedBox(height: 5.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -86,24 +91,24 @@ class OrderCard extends StatelessWidget {
                 children: [
                   Text(
                     order.title,
-                    style: AppTextTheme.fallback(
-                      isTablet: isTablet,
-                    ).bodyMediumSemiBold!.copyWith(color: AppColors.neutral100),
+                    style: textTheme.bodyMediumSemiBold!.copyWith(
+                      color: context.colors.generalText,
+                    ),
                   ),
                   Text(
                     '\$ ${order.price.toStringAsFixed(0)}',
-                    style: AppTextTheme.fallback(
-                      isTablet: isTablet,
-                    ).bodyMediumBold!.copyWith(color: AppColors.primaryAccent),
+                    style: textTheme.bodyMediumBold!.copyWith(
+                      color: context.colors.primary,
+                    ),
                   ),
                 ],
               ),
               Spacer(),
               Text(
                 '${order.items} items',
-                style: AppTextTheme.fallback(
-                  isTablet: isTablet,
-                ).bodyMediumSemiBold!.copyWith(color: AppColors.neutral100),
+                style: textTheme.bodyMediumSemiBold!.copyWith(
+                  color: context.colors.generalText,
+                ),
               ),
             ],
           ),

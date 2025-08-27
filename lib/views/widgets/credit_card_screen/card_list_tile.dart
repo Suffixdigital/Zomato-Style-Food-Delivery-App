@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/model/credit_card_model.dart';
+import 'package:smart_flutter/theme/app_colors.dart';
 
 class CardListTile extends StatelessWidget {
   final CreditCardModel card;
@@ -12,28 +12,35 @@ class CardListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).extension<AppTextTheme>()!;
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
       decoration: BoxDecoration(
-        color: AppColors.neutral0,
+        color: context.colors.background,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
-          color: isSelected ? AppColors.primaryAccent : Colors.transparent,
+          color:
+              isSelected
+                  ? context.colors.primary
+                  : context.colors.defaultGrayEEEEEE,
           width: 1.w,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.neutral30,
+            color:
+                isSelected
+                    ? context.colors.primary.withValues(alpha: 0.4)
+                    : context.colors.defaultGrayEEEEEE.withValues(alpha: 0.4),
             blurRadius: 2.r,
             spreadRadius: 2.r,
-            offset: Offset(0, 2),
+            offset: Offset(0, 1),
           ),
         ],
       ),
       child: Row(
         children: [
-          const Icon(Icons.credit_card_rounded, color: AppColors.neutral100),
+          Icon(Icons.credit_card_rounded, color: context.colors.generalText),
           SizedBox(width: 12.w),
           Expanded(
             child: Column(
@@ -41,16 +48,16 @@ class CardListTile extends StatelessWidget {
               children: [
                 Text(
                   card.brand,
-                  style: AppTextTheme.fallback(
-                    isTablet: false,
-                  ).bodyMediumSemiBold!.copyWith(color: AppColors.neutral100),
+                  style: textTheme.bodyMediumSemiBold!.copyWith(
+                    color: context.colors.generalText,
+                  ),
                 ),
                 SizedBox(height: 4.h),
                 Text(
                   "**** **** **** ${card.last4Digits}",
-                  style: AppTextTheme.fallback(
-                    isTablet: false,
-                  ).bodySmallRegular!.copyWith(color: AppColors.neutral60),
+                  style: textTheme.bodySmallRegular!.copyWith(
+                    color: context.colors.defaultGray878787,
+                  ),
                 ),
               ],
             ),

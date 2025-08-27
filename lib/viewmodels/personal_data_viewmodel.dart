@@ -11,26 +11,8 @@ class PersonalDataViewModel extends AsyncNotifier<UserModel> {
     return getCurrentUserProfile();
   }
 
-  UserModel _user = UserModel(
-    fullName: "Kirtikant Patadiya",
-    dateOfBirth: DateFormat('dd/MM/yyyy').format(DateTime(1991, 5, 17)),
-    gender: "Male",
-    phone: "8866121457",
-    email: "kirtikantpatadiya@gmail.com",
-    provider: "",
-  );
-
-  UserModel get user => _user;
-
   Future<UserModel> getCurrentUserProfile() async {
-    final userData = UserModel(
-      fullName: "",
-      dateOfBirth: DateFormat('dd/MM/yyyy').format(DateTime.now()),
-      gender: "",
-      phone: "",
-      email: "",
-      provider: "",
-    );
+    final userData = UserModel(fullName: "", dateOfBirth: DateFormat('dd/MM/yyyy').format(DateTime.now()), gender: "", phone: "", email: "", provider: "");
 
     final supabase = Supabase.instance.client;
     final user = supabase.auth.currentUser;
@@ -41,13 +23,13 @@ class PersonalDataViewModel extends AsyncNotifier<UserModel> {
 
     final data =
         await supabase
-            .from('users') // your custom table
+            .from('profiles') // your custom table
             .select()
             .eq('id', user.id)
             .single();
 
     return UserModel(
-      fullName: data['name'] ?? '',
+      fullName: data['full_name'] ?? '',
       dateOfBirth: data['dob'] ?? '',
       gender: data['gender'] ?? '',
       phone: data['phone'] ?? '',
@@ -62,10 +44,10 @@ class PersonalDataViewModel extends AsyncNotifier<UserModel> {
     try {
       final userId = supabase.auth.currentUser!.id;
       await supabase
-          .from('users')
+          .from('profiles')
           .update({
             'email': updatedUser.email,
-            'name': updatedUser.fullName,
+            'full_name': updatedUser.fullName,
             'dob': updatedUser.dateOfBirth,
             'gender': updatedUser.gender.toLowerCase(),
             'phone': updatedUser.phone,
@@ -73,21 +55,13 @@ class PersonalDataViewModel extends AsyncNotifier<UserModel> {
           .eq('id', userId);
 
       await supabase.auth.refreshSession();
-      print(
-        "Supabase user id: ${supabase.auth.currentUser?.id} email: ${supabase.auth.currentUser?.email}",
-      );
+      print("Supabase user id: ${supabase.auth.currentUser?.id} email: ${supabase.auth.currentUser?.email}");
 
       state = AsyncData(updatedUser); // Success
     } on AuthException catch (e) {
-      state = AsyncError(
-        Exception('Auth error: ${e.message}'),
-        StackTrace.current,
-      );
+      state = AsyncError(Exception('Auth error: ${e.message}'), StackTrace.current);
     } on SocketException catch (_) {
-      state = AsyncError(
-        Exception('No internet connection.'),
-        StackTrace.current,
-      );
+      state = AsyncError(Exception('No internet connection.'), StackTrace.current);
     } catch (e, stack) {
       state = AsyncError(Exception('Unexpected error: $e'), stack);
     }
@@ -100,7 +74,4 @@ class PersonalDataViewModel extends AsyncNotifier<UserModel> {
   (ref) => PersonalDataViewModel(),
 );*/
 
-final personalDataProvider =
-    AsyncNotifierProvider<PersonalDataViewModel, UserModel>(
-      () => PersonalDataViewModel(),
-    );
+final personalDataProvider = AsyncNotifierProvider<PersonalDataViewModel, UserModel>(() => PersonalDataViewModel());

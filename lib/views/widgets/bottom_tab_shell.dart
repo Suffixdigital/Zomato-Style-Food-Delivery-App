@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:smart_flutter/core/constants/app_colors.dart';
+import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/routes/tab_controller_notifier.dart';
+import 'package:smart_flutter/theme/app_colors.dart';
 import 'package:smart_flutter/views/widgets/Style9BottomNavBar.dart';
 
 class BottomTabShell extends ConsumerStatefulWidget {
@@ -64,11 +65,12 @@ class _BottomTabShellState extends ConsumerState<BottomTabShell> {
   }
 
   NavBarItem _navBarItem(String asset, String title, bool isActive) {
+    final textTheme = Theme.of(context).extension<AppTextTheme>()!;
     return NavBarItem(
       icon: SvgPicture.asset(
         'assets/icons/$asset',
         colorFilter: ColorFilter.mode(
-          isActive ? AppColors.primaryAccent : AppColors.neutral60,
+          isActive ? context.colors.primary : context.colors.defaultGray878787,
           BlendMode.srcIn,
         ),
       ),

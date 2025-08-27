@@ -19,7 +19,7 @@ class CartScreen extends ConsumerWidget {
     // Access notifier to call methods if needed:
 
     return ScreenUtilInit(
-      designSize: const Size(375, 812),
+      designSize: Size(375, 812),
       minTextAdapt: true,
       builder:
           (context, child) => Scaffold(
@@ -33,8 +33,8 @@ class CartScreen extends ConsumerWidget {
                   Expanded(
                     child:
                         cartState.items.isEmpty
-                            ? EmptyCartView(isTablet: isTablet)
-                            : CartFilledView(isTablet: isTablet),
+                            ? EmptyCartView()
+                            : CartFilledView(),
                   ),
                 ],
               ),

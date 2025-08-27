@@ -4,17 +4,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/core/utils/device_utils.dart';
-import 'package:smart_flutter/model/food_item.dart';
+import 'package:smart_flutter/model/CategoryItem.dart';
+import 'package:smart_flutter/theme/app_colors.dart';
 import 'package:smart_flutter/viewmodels/cart_viewmodel.dart';
+import 'package:smart_flutter/viewmodels/home_viewmodel.dart';
+import 'package:smart_flutter/views/widgets/shimmer_loader.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class ProductDetailsScreen extends ConsumerStatefulWidget {
-  final FoodItem foodItem;
+  final CategoryItem categoryItem;
 
-  const ProductDetailsScreen({super.key, required this.foodItem});
+  const ProductDetailsScreen({super.key, required this.categoryItem});
 
   @override
   ConsumerState<ProductDetailsScreen> createState() =>
@@ -22,34 +24,24 @@ class ProductDetailsScreen extends ConsumerStatefulWidget {
 }
 
 class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
-  int _quantity = 1;
-  int _current = 0;
-  bool _isFavorite = false;
+  int quantity = 1;
+  int currentIndex = 0;
+  bool isFavorite = false;
   bool _showAppBar = true;
   double _lastOffset = 0;
   final ScrollController _scrollController = ScrollController();
 
-  final List<String> imageList = [
-    'assets/images/burger1.png',
-    'assets/images/burger2.png',
-    'assets/images/burger3.png',
-  ];
-
-  final List<String> _images = [
-    'assets/images/burger1.png',
-    'assets/images/burger2.png',
-    'assets/images/burger3.png',
-    'assets/images/burger1.png',
-    'assets/images/burger2.png',
-    'assets/images/burger3.png',
-    'assets/images/burger1.png',
-    'assets/images/burger2.png',
-    'assets/images/burger3.png',
-  ];
+  late List<String> imageList;
 
   @override
   void initState() {
     super.initState();
+    imageList = [
+      widget.categoryItem.image,
+      widget.categoryItem.image,
+      widget.categoryItem.image,
+    ];
+
     _scrollController.addListener(() {
       final offset = _scrollController.offset;
       if (offset > _lastOffset && _showAppBar) {
@@ -63,8 +55,13 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final relatedItemsAsync = ref.watch(
+      relatedItemsProvider(widget.categoryItem.categoryId),
+    );
+    final textTheme = Theme.of(context).extension<AppTextTheme>()!;
+
     return ScreenUtilInit(
-      designSize: const Size(375, 812),
+      designSize: Size(375, 812),
       builder:
           (context, child) => Scaffold(
             body: Stack(
@@ -78,7 +75,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                       Stack(
                         children: [
                           Hero(
-                            tag: widget.foodItem,
+                            tag: widget.categoryItem,
                             child: ClipRRect(
                               borderRadius: BorderRadius.only(
                                 bottomLeft: Radius.circular(24.r),
@@ -87,17 +84,17 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                               child: CarouselSlider.builder(
                                 itemCount: imageList.length,
                                 options: CarouselOptions(
-                                  height: 300.h,
+                                  height: 320.h,
                                   autoPlay: true,
                                   viewportFraction: 1.0,
                                   onPageChanged: (index, reason) {
                                     setState(() {
-                                      _current = index;
+                                      currentIndex = index;
                                     });
                                   },
                                 ),
                                 itemBuilder: (context, index, _) {
-                                  return Image.asset(
+                                  return Image.network(
                                     imageList[index],
                                     width: double.infinity,
                                     fit: BoxFit.cover,
@@ -114,17 +111,17 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                             right: 0,
                             child: Center(
                               child: AnimatedSmoothIndicator(
-                                activeIndex: _current,
+                                activeIndex: currentIndex,
                                 count: imageList.length,
                                 effect: ExpandingDotsEffect(
                                   dotHeight: 8.h,
-                                  dotWidth: 8.h,
-                                  activeDotColor: Colors.white,
-                                  dotColor: Colors.white30,
-                                  expansionFactor: 3,
+                                  dotWidth: 20.h,
+                                  activeDotColor: context.colors.defaultWhite,
+                                  dotColor: context.colors.defaultGray878787,
+                                  expansionFactor: 2,
                                 ),
                                 onDotClicked: (index) {
-                                  setState(() => _current = index);
+                                  setState(() => currentIndex = index);
                                 },
                               ),
                             ),
@@ -132,33 +129,33 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                         ],
                       ),
 
-                      /// Dummy product content (you can replace with yours)
+                      /// Product details and description
                       Padding(
                         padding: EdgeInsets.all(16.w),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              widget.foodItem.title,
-                              style: AppTextTheme.fallback(isTablet: false)
-                                  .headingH5SemiBold!
-                                  .copyWith(color: AppColors.neutral100),
+                              widget.categoryItem.name,
+                              style: textTheme.headingH5SemiBold!.copyWith(
+                                color: context.colors.generalText,
+                              ),
                             ),
                             SizedBox(height: 10.h),
                             Text(
-                              "\$${widget.foodItem.price}",
-                              style: AppTextTheme.fallback(isTablet: false)
-                                  .headingH6Bold!
-                                  .copyWith(color: AppColors.primaryAccent),
+                              "\$${widget.categoryItem.price}",
+                              style: textTheme.headingH6Bold!.copyWith(
+                                color: context.colors.primary,
+                              ),
                             ),
-                            SizedBox(height: 15.h),
+                            SizedBox(height: 12.h),
                             Container(
                               padding: EdgeInsets.symmetric(
                                 horizontal: 12.w,
                                 vertical: 12.h,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.primaryAccent.withValues(
+                                color: context.colors.primary.withValues(
                                   alpha: 0.06,
                                 ),
                                 // Light peach-like color
@@ -173,17 +170,17 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                                     width: 15.w,
                                     height: 15.h,
                                     colorFilter: ColorFilter.mode(
-                                      AppColors.primaryAccent,
+                                      context.colors.primary,
                                       BlendMode.srcIn,
                                     ),
                                   ),
                                   Text(
                                     "Free Delivery",
-                                    style: AppTextTheme.fallback(
-                                      isTablet: false,
-                                    ).bodyMediumRegular!.copyWith(
-                                      color: AppColors.neutral60,
-                                    ),
+                                    style: textTheme.bodyMediumRegular!
+                                        .copyWith(
+                                          color:
+                                              context.colors.defaultGray878787,
+                                        ),
                                   ),
                                   SizedBox(width: 50.w),
                                   SvgPicture.asset(
@@ -191,17 +188,17 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                                     width: 15.w,
                                     height: 15.h,
                                     colorFilter: ColorFilter.mode(
-                                      AppColors.primaryAccent,
+                                      context.colors.primary,
                                       BlendMode.srcIn,
                                     ),
                                   ),
                                   Text(
                                     " 20 - 30",
-                                    style: AppTextTheme.fallback(
-                                      isTablet: false,
-                                    ).bodyMediumRegular!.copyWith(
-                                      color: AppColors.neutral60,
-                                    ),
+                                    style: textTheme.bodyMediumRegular!
+                                        .copyWith(
+                                          color:
+                                              context.colors.defaultGray878787,
+                                        ),
                                   ),
                                   SizedBox(width: 50.w),
                                   SvgPicture.asset(
@@ -209,36 +206,39 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                                     width: 15.w,
                                     height: 15.h,
                                     colorFilter: ColorFilter.mode(
-                                      AppColors.primaryAccent,
+                                      context.colors.primary,
                                       BlendMode.srcIn,
                                     ),
                                   ),
                                   Text(
-                                    " 4.5",
-                                    style: AppTextTheme.fallback(
-                                      isTablet: false,
-                                    ).bodyMediumRegular!.copyWith(
-                                      color: AppColors.neutral60,
-                                    ),
+                                    " ${widget.categoryItem.rating}",
+                                    style: textTheme.bodyMediumRegular!
+                                        .copyWith(
+                                          color:
+                                              context.colors.defaultGray878787,
+                                        ),
                                   ),
                                 ],
                               ),
                             ),
                             SizedBox(height: 15.h),
-                            Divider(color: AppColors.neutral30, height: 2.h),
+                            Divider(
+                              color: context.colors.defaultGray878787,
+                              height: 2.h,
+                            ),
                             SizedBox(height: 15.h),
                             Text(
                               "Description",
-                              style: AppTextTheme.fallback(isTablet: false)
-                                  .bodyLargeSemiBold!
-                                  .copyWith(color: AppColors.neutral100),
+                              style: textTheme.bodyLargeSemiBold!.copyWith(
+                                color: context.colors.generalText,
+                              ),
                             ),
                             SizedBox(height: 8.h),
                             Text(
-                              "Burger With Meat is a typical food from our restaurant that is much in demand by many people, this is very recommended for you.",
-                              style: AppTextTheme.fallback(isTablet: false)
-                                  .bodyMediumRegular!
-                                  .copyWith(color: AppColors.neutral60),
+                              "${widget.categoryItem.description} ${widget.categoryItem.description} ${widget.categoryItem.description} ${widget.categoryItem.description}",
+                              style: textTheme.bodyMediumRegular!.copyWith(
+                                color: context.colors.defaultGray878787,
+                              ),
                             ),
                             SizedBox(height: 24.h),
                             Row(
@@ -246,38 +246,45 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                               children: [
                                 Text(
                                   "Recommended For You",
-                                  style: TextStyle(
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.bold,
+                                  style: textTheme.bodyLargeSemiBold!.copyWith(
+                                    color: context.colors.generalText,
                                   ),
                                 ),
                                 Text(
                                   "See All",
-                                  style: TextStyle(
-                                    color: Colors.orange,
-                                    fontSize: 14.sp,
+                                  style: textTheme.bodyLargeRegular!.copyWith(
+                                    color: context.colors.primary,
                                   ),
                                 ),
                               ],
                             ),
                             SizedBox(height: 12.h),
-                            SizedBox(
-                              height: 100.h,
-                              child: ListView.separated(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: _images.length,
-                                separatorBuilder:
-                                    (_, __) => SizedBox(width: 10.w),
-                                itemBuilder:
-                                    (_, index) => ClipRRect(
-                                      borderRadius: BorderRadius.circular(12.r),
-                                      child: Image.asset(
-                                        _images[index],
-                                        width: 100.w,
-                                        fit: BoxFit.cover,
-                                      ),
+                            relatedItemsAsync.when(
+                              error:
+                                  (err, stack) =>
+                                      Center(child: Text('Error: $err')),
+                              loading: () => Center(child: ShimmerLoader()),
+                              data:
+                                  (categoryItems) => SizedBox(
+                                    height: 100.h,
+                                    child: ListView.separated(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: categoryItems.length,
+                                      separatorBuilder:
+                                          (_, __) => SizedBox(width: 10.w),
+                                      itemBuilder:
+                                          (_, index) => ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                              12.r,
+                                            ),
+                                            child: Image.network(
+                                              categoryItems[index].image,
+                                              width: 100.w,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
                                     ),
-                              ),
+                                  ),
                             ),
                           ],
                         ),
@@ -289,7 +296,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                 /// Blurred AppBar with animation
                 AnimatedPositioned(
                   duration: Duration(milliseconds: 300),
-                  top: _showAppBar ? 40.h : 40.h,
+                  top: 40.h,
                   left: 16.w,
                   right: 16.w,
                   child: Row(
@@ -301,15 +308,15 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                         },
                         icon: DeviceUtils.backIcon(
                           "assets/icons/back.svg",
-                          AppColors.neutral0,
+                          context.colors.generalText,
                           16,
                         ),
                       ),
                       Text(
                         "About This Menu",
-                        style: AppTextTheme.fallback(isTablet: false)
-                            .bodyLargeSemiBold!
-                            .copyWith(color: AppColors.neutral0),
+                        style: textTheme.bodyLargeSemiBold!.copyWith(
+                          color: context.colors.generalText,
+                        ),
                       ),
                       AnimatedSwitcher(
                         duration: Duration(milliseconds: 300),
@@ -317,40 +324,41 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                             (child, animation) =>
                                 ScaleTransition(scale: animation, child: child),
                         child: IconButton(
-                          key: ValueKey(_isFavorite),
+                          key: ValueKey(isFavorite),
                           onPressed:
-                              () => setState(() => _isFavorite = !_isFavorite),
+                              () => setState(() => isFavorite = !isFavorite),
                           icon: Container(
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: AppColors.neutral0, // border color
+                                color: context.colors.defaultGray878787,
+                                // border color
                                 width: 1.w, // border width
                               ),
                             ),
                             child: CircleAvatar(
                               radius: 16.r,
                               backgroundColor:
-                                  _isFavorite
-                                      ? Colors.transparent
-                                      : AppColors.neutral0,
+                                  isFavorite
+                                      ? context.colors.defaultWhite
+                                      : Colors.transparent,
                               child:
-                                  _isFavorite
+                                  isFavorite
                                       ? SvgPicture.asset(
-                                        "assets/icons/favorite.svg",
-                                        width: 16.w,
-                                        height: 16.h,
-                                        colorFilter: ColorFilter.mode(
-                                          AppColors.neutral0,
-                                          BlendMode.srcIn,
-                                        ),
-                                      )
-                                      : SvgPicture.asset(
                                         "assets/icons/favorite_selected.svg",
                                         width: 16.w,
                                         height: 16.h,
                                         colorFilter: ColorFilter.mode(
-                                          AppColors.errorBase,
+                                          context.colors.error,
+                                          BlendMode.srcIn,
+                                        ),
+                                      )
+                                      : SvgPicture.asset(
+                                        "assets/icons/favorite.svg",
+                                        width: 16.w,
+                                        height: 16.h,
+                                        colorFilter: ColorFilter.mode(
+                                          context.colors.defaultWhite,
                                           BlendMode.srcIn,
                                         ),
                                       ),
@@ -376,31 +384,31 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          if (_quantity > 1) {
-                            setState(() => _quantity--);
+                          if (quantity > 1) {
+                            setState(() => quantity--);
                           }
                         },
                         child: DeviceUtils.backIcon(
                           "assets/icons/minus.svg",
-                          _quantity > 1
-                              ? AppColors.neutral100
-                              : AppColors.neutral60,
+                          quantity > 1
+                              ? context.colors.generalText
+                              : context.colors.defaultGray878787,
                           16,
                         ),
                       ),
                       SizedBox(width: 12.w),
                       Text(
-                        "$_quantity",
+                        "$quantity",
                         style: AppTextTheme.fallback(isTablet: false)
                             .headingH6SemiBold!
-                            .copyWith(color: AppColors.neutral100),
+                            .copyWith(color: context.colors.generalText),
                       ),
                       SizedBox(width: 12.w),
                       GestureDetector(
-                        onTap: () => setState(() => _quantity++),
+                        onTap: () => setState(() => quantity++),
                         child: DeviceUtils.backIcon(
                           "assets/icons/plus.svg",
-                          AppColors.neutral100,
+                          context.colors.generalText,
                           16,
                         ),
                       ),
@@ -412,17 +420,18 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         final cartVM = ref.read(cartViewModelProvider.notifier);
-                        cartVM.addItemFromFood(widget.foodItem);
+                        cartVM.addItemFromFood(widget.categoryItem, quantity);
+                        context.goNamed('home');
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              '${widget.foodItem.title} added to cart!',
+                              '${widget.categoryItem.name} added to cart!',
                             ),
                           ),
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
+                        backgroundColor: context.colors.primary,
                         padding: EdgeInsets.symmetric(vertical: 16.h),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.r),
@@ -433,15 +442,15 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                         width: 20.w,
                         height: 20.h,
                         colorFilter: ColorFilter.mode(
-                          AppColors.neutral0,
+                          context.colors.defaultWhite,
                           BlendMode.srcIn,
                         ),
                       ),
                       label: Text(
                         "Add to Cart",
-                        style: AppTextTheme.fallback(isTablet: false)
-                            .bodyMediumSemiBold!
-                            .copyWith(color: AppColors.neutral0),
+                        style: textTheme.bodyMediumSemiBold!.copyWith(
+                          color: context.colors.defaultWhite,
+                        ),
                       ),
                     ),
                   ),

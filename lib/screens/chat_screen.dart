@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
+import 'package:smart_flutter/theme/app_colors.dart';
 import 'package:smart_flutter/viewmodels/chat_viewmodel.dart';
 import 'package:smart_flutter/views/widgets/chat_screen/chat_header.dart';
 import 'package:smart_flutter/views/widgets/chat_screen/chat_tile.dart';
@@ -12,33 +13,42 @@ class ChatScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final Size screenSize = MediaQuery.of(context).size;
-    final bool isTablet = screenSize.shortestSide >= 600;
-    final chats = ref.watch(chatListProvider);
+    final textTheme = Theme.of(context).extension<AppTextTheme>()!;
+    final chats = ref.watch(chatViewModelProvider).getChats();
+    // Transparent status bar
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent, // Makes status bar transparent
+        statusBarIconBrightness: Brightness.dark,
+      ),
+    );
 
     return ScreenUtilInit(
-      designSize: const Size(375, 812),
+      designSize: Size(375, 812),
       minTextAdapt: true,
       builder:
           (context, child) => Scaffold(
-            body: SafeArea(
-              child: Stack(
-                children: [
-                  // Background image
-                  Container(
-                    height: double.infinity,
-                    width: double.infinity,
-                    decoration: const BoxDecoration(
+            extendBodyBehindAppBar: true, // Allows layout behind status bar
+            body: Stack(
+              children: [
+                // Repeated background behind everything including status bar
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
                       image: DecorationImage(
-                        opacity: 0.2,
+                        opacity: 0.3,
                         image: AssetImage('assets/images/chat_background.png'),
-                        fit: BoxFit.fill,
+                        // Your image
+                        repeat: ImageRepeat.repeatY,
+                        alignment: Alignment.topCenter,
                       ),
                     ),
                   ),
+                ),
 
-                  // Foreground content
-                  Column(
+                // Foreground content
+                SafeArea(
+                  child: Column(
                     children: [
                       // Common Header (Back Button + Title)
                       ChatHeader(),
@@ -49,9 +59,9 @@ class ChatScreen extends ConsumerWidget {
                           child: Text(
                             "All Message",
                             textAlign: TextAlign.start,
-                            style: AppTextTheme.fallback(isTablet: isTablet)
-                                .bodyLargeSemiBold!
-                                .copyWith(color: AppColors.neutral100),
+                            style: textTheme.bodyLargeSemiBold!.copyWith(
+                              color: context.colors.generalText,
+                            ),
                           ),
                         ),
                       ),
@@ -60,16 +70,13 @@ class ChatScreen extends ConsumerWidget {
                         child: ListView.builder(
                           itemCount: chats.length,
                           itemBuilder:
-                              (context, index) => ChatTile(
-                                isTablet: isTablet,
-                                chat: chats[index],
-                              ),
+                              (context, index) => ChatTile(chat: chats[index]),
                         ),
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
     );

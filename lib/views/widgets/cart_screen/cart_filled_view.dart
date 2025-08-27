@@ -2,16 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
-import 'package:smart_flutter/core/data/dummy_data.dart';
 import 'package:smart_flutter/core/utils/device_utils.dart';
+import 'package:smart_flutter/theme/app_colors.dart';
 import 'package:smart_flutter/viewmodels/cart_viewmodel.dart';
 
 class CartFilledView extends ConsumerWidget {
-  final bool isTablet;
-
-  const CartFilledView({required this.isTablet, super.key});
+  const CartFilledView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -19,6 +16,11 @@ class CartFilledView extends ConsumerWidget {
     final cartState = ref.watch(cartViewModelProvider);
     // Get notifier for calling methods
     final cartVM = ref.read(cartViewModelProvider.notifier);
+    final textTheme = Theme.of(context).extension<AppTextTheme>()!;
+    print("cartState.categoryIds : ${cartState.categoryIds.length}");
+    final relatedItemsAsync = ref.watch(
+      relatedItemsProviders(cartState.categoryIds),
+    );
 
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -33,22 +35,22 @@ class CartFilledView extends ConsumerWidget {
                 children: [
                   Text(
                     'Delivery Location',
-                    style: AppTextTheme.fallback(
-                      isTablet: isTablet,
-                    ).bodyMediumRegular!.copyWith(color: AppColors.neutral60),
+                    style: textTheme.bodyMediumRegular!.copyWith(
+                      color: context.colors.defaultGray878787,
+                    ),
                   ),
                   SizedBox(height: 2.h),
                   Text(
                     'Home',
-                    style: AppTextTheme.fallback(
-                      isTablet: isTablet,
-                    ).bodyMediumSemiBold!.copyWith(color: AppColors.neutral100),
+                    style: textTheme.bodyMediumSemiBold!.copyWith(
+                      color: context.colors.generalText,
+                    ),
                   ),
                 ],
               ),
               OutlinedButton(
                 style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: AppColors.primaryAccent),
+                  side: BorderSide(color: context.colors.primary),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20.r),
                   ),
@@ -59,9 +61,9 @@ class CartFilledView extends ConsumerWidget {
 
                 child: Text(
                   'Change Location',
-                  style: AppTextTheme.fallback(isTablet: isTablet)
-                      .bodySuperSmallMedium!
-                      .copyWith(color: AppColors.primaryAccent),
+                  style: textTheme.bodySuperSmallMedium!.copyWith(
+                    color: context.colors.primary,
+                  ),
                 ),
               ),
             ],
@@ -73,25 +75,35 @@ class CartFilledView extends ConsumerWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 10.w),
             decoration: BoxDecoration(
-              border: Border.all(color: AppColors.neutral30),
-              color: AppColors.neutral0,
+              border: Border.all(
+                color: context.colors.defaultGray878787,
+                width: 1.w,
+              ),
+              color: context.colors.background,
               borderRadius: BorderRadius.circular(30.r),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 SizedBox(width: 4.w),
-                SvgPicture.asset("assets/icons/promo_icon.svg"),
-                SizedBox(width: 10.w),
+                SvgPicture.asset(
+                  "assets/icons/promo_icon.svg",
+                  colorFilter: ColorFilter.mode(
+                    context.colors.primary,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                SizedBox(width: 4.w),
                 Expanded(
                   child: TextField(
                     decoration: InputDecoration(
                       hintText: 'Promo Code...',
-                      hintStyle: AppTextTheme.fallback(
-                        isTablet: isTablet,
-                      ).bodyMediumMedium!.copyWith(color: AppColors.neutral50),
+                      hintStyle: textTheme.bodyMediumMedium!.copyWith(
+                        color: context.colors.defaultGray878787,
+                      ),
                       border: InputBorder.none,
-                      isDense: true,
+                      filled: true,
+                      fillColor: context.colors.background,
                     ),
                   ),
                 ),
@@ -99,7 +111,7 @@ class CartFilledView extends ConsumerWidget {
                 ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryAccent,
+                    backgroundColor: context.colors.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20.r),
                     ),
@@ -107,9 +119,9 @@ class CartFilledView extends ConsumerWidget {
                   ),
                   child: Text(
                     'Apply',
-                    style: AppTextTheme.fallback(
-                      isTablet: isTablet,
-                    ).bodySmallSemiBold!.copyWith(color: AppColors.neutral0),
+                    style: textTheme.bodySmallSemiBold!.copyWith(
+                      color: context.colors.defaultWhite,
+                    ),
                   ),
                 ),
               ],
@@ -128,12 +140,17 @@ class CartFilledView extends ConsumerWidget {
               return Container(
                 margin: EdgeInsets.symmetric(vertical: 8.h),
                 decoration: BoxDecoration(
-                  color: AppColors.neutral0,
+                  color: context.colors.background,
+                  border: Border.all(
+                    color: context.colors.defaultGrayEEEEEE,
+                    width: 1.w,
+                  ),
                   borderRadius: BorderRadius.circular(16.r),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.neutral40,
-                      blurRadius: 4.r,
+                      color: context.colors.defaultGrayEEEEEE,
+                      blurRadius: 2.r,
+                      spreadRadius: 0.5.r,
                       offset: Offset(0, 2),
                     ),
                   ],
@@ -145,8 +162,8 @@ class CartFilledView extends ConsumerWidget {
                     Padding(
                       padding: EdgeInsets.only(right: 8.w),
                       child: Icon(
-                        Icons.check_box_rounded,
-                        color: AppColors.primaryAccent,
+                        Icons.check_circle_outlined,
+                        color: context.colors.primary,
                         size: 24.sp,
                       ),
                     ),
@@ -154,7 +171,7 @@ class CartFilledView extends ConsumerWidget {
                     /// Product Image
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10.r),
-                      child: Image.asset(
+                      child: Image.network(
                         item.imageUrl,
                         height: 80.h,
                         width: 90.w,
@@ -173,16 +190,16 @@ class CartFilledView extends ConsumerWidget {
                             item.title,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: AppTextTheme.fallback(isTablet: isTablet)
-                                .bodyLargeSemiBold!
-                                .copyWith(color: AppColors.neutral100),
+                            style: textTheme.bodyLargeSemiBold!.copyWith(
+                              color: context.colors.generalText,
+                            ),
                           ),
                           SizedBox(height: 2.h),
                           Text(
-                            '\$ ${item.price.toStringAsFixed(0)}',
-                            style: AppTextTheme.fallback(isTablet: isTablet)
-                                .bodyMediumBold!
-                                .copyWith(color: AppColors.primaryAccent),
+                            '\$ ${(item.price * item.quantity).toStringAsFixed(2)}',
+                            style: textTheme.bodyMediumBold!.copyWith(
+                              color: context.colors.primary,
+                            ),
                           ),
                           SizedBox(height: 5.h),
                           Row(
@@ -200,8 +217,8 @@ class CartFilledView extends ConsumerWidget {
                                     child: DeviceUtils.backIcon(
                                       "assets/icons/minus.svg",
                                       item.quantity > 1
-                                          ? AppColors.neutral100
-                                          : AppColors.neutral60,
+                                          ? context.colors.generalText
+                                          : context.colors.defaultGray878787,
                                       14,
                                     ),
                                   ),
@@ -211,7 +228,7 @@ class CartFilledView extends ConsumerWidget {
                                     style: AppTextTheme.fallback(
                                       isTablet: false,
                                     ).bodyMediumMedium!.copyWith(
-                                      color: AppColors.neutral100,
+                                      color: context.colors.generalText,
                                     ),
                                   ),
                                   SizedBox(width: 12.w),
@@ -221,7 +238,7 @@ class CartFilledView extends ConsumerWidget {
                                     },
                                     child: DeviceUtils.backIcon(
                                       "assets/icons/plus.svg",
-                                      AppColors.neutral100,
+                                      context.colors.generalText,
                                       14,
                                     ),
                                   ),
@@ -235,6 +252,10 @@ class CartFilledView extends ConsumerWidget {
                                   "assets/icons/delete.svg",
                                   width: 20.w,
                                   height: 20.w,
+                                  colorFilter: ColorFilter.mode(
+                                    context.colors.error,
+                                    BlendMode.srcIn,
+                                  ),
                                 ),
                               ),
                             ],
@@ -256,126 +277,137 @@ class CartFilledView extends ConsumerWidget {
             children: [
               Text(
                 "Recommended For You",
-                style: AppTextTheme.fallback(
-                  isTablet: isTablet,
-                ).bodyLargeSemiBold!.copyWith(color: AppColors.neutral100),
+                style: textTheme.bodyLargeSemiBold!.copyWith(
+                  color: context.colors.generalText,
+                ),
               ),
               Text(
                 "See All",
-                style: AppTextTheme.fallback(
-                  isTablet: isTablet,
-                ).bodyMediumMedium!.copyWith(color: AppColors.primaryAccent),
+                style: textTheme.bodyMediumMedium!.copyWith(
+                  color: context.colors.primary,
+                ),
               ),
             ],
           ),
           SizedBox(height: 15.h),
 
-          SizedBox(
-            height: 190.h,
-            child: ListView.builder(
-              shrinkWrap: true,
-              scrollDirection: Axis.horizontal,
-              itemCount: foodItems.length,
-              itemBuilder: (context, index) {
-                final food = foodItems[index];
-                return GestureDetector(
-                  onTap: () => cartVM.addItemFromFood(food),
-                  child: Container(
-                    width: 130.w,
-                    margin: EdgeInsets.only(
-                      left: 1.w,
-                      right: 12.w,
-                      top: 2.h,
-                      bottom: 2.h,
-                    ),
-                    padding: EdgeInsets.all(8.w),
-                    decoration: BoxDecoration(
-                      color: AppColors.neutral0,
-                      borderRadius: BorderRadius.circular(10.r),
-                      boxShadow: [
-                        BoxShadow(color: AppColors.neutral40, blurRadius: 1.r),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(6.r),
-                          child: Image.asset(
-                            food.imageUrl,
-                            height: 100.h,
-                            width: 130.w,
-                            fit: BoxFit.cover,
+          relatedItemsAsync.when(
+            error: (err, stack) => Center(child: Text('Error: $err')),
+            loading: () => Center(child: CircularProgressIndicator()),
+            data:
+                (categoryItems) => SizedBox(
+                  height: 192.h,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: categoryItems.length,
+                    itemBuilder: (context, index) {
+                      final categoryItem = categoryItems[index];
+                      return GestureDetector(
+                        onTap: () => cartVM.addItemFromFood(categoryItem, 1),
+                        child: Container(
+                          width: 130.w,
+                          margin: EdgeInsets.only(
+                            left: 1.w,
+                            right: 12.w,
+                            top: 2.h,
+                            bottom: 2.h,
+                          ),
+                          padding: EdgeInsets.all(8.w),
+                          decoration: BoxDecoration(
+                            color: context.colors.background,
+                            borderRadius: BorderRadius.circular(10.r),
+                            border: Border.all(
+                              color: context.colors.defaultGrayEEEEEE,
+                              width: 1.5.w,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: context.colors.defaultGrayEEEEEE,
+                                blurRadius: 1.r,
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(6.r),
+                                child: Image.network(
+                                  categoryItem.image,
+                                  height: 100.h,
+                                  width: 130.w,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              SizedBox(height: 4.h),
+                              Text(
+                                categoryItem.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: textTheme.bodyLargeMedium!.copyWith(
+                                  color: context.colors.generalText,
+                                ),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      SvgPicture.asset("assets/icons/star.svg"),
+                                      SizedBox(width: 2.w),
+                                      Text(
+                                        "${categoryItem.rating}",
+                                        style: textTheme.bodySmallMedium!
+                                            .copyWith(
+                                              color: context.colors.generalText,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      SvgPicture.asset(
+                                        "assets/icons/location_on.svg",
+                                        colorFilter: ColorFilter.mode(
+                                          context.colors.primary,
+                                          BlendMode.srcIn,
+                                        ),
+                                        width: 10.w,
+                                        height: 10.h,
+                                      ),
+                                      SizedBox(width: 2.w),
+                                      Text(
+                                        "120m",
+                                        style: textTheme.bodySmallMedium!
+                                            .copyWith(
+                                              color: context.colors.generalText,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 5.h),
+                              Text(
+                                "\$${categoryItem.price}",
+                                style: textTheme.bodyLargeBold!.copyWith(
+                                  color: context.colors.primary,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        SizedBox(height: 4.h),
-                        Text(
-                          food.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTextTheme.fallback(isTablet: isTablet)
-                              .bodyLargeMedium!
-                              .copyWith(color: AppColors.neutral100),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                SvgPicture.asset("assets/icons/star.svg"),
-                                SizedBox(width: 2.w),
-                                Text(
-                                  "${food.rating}",
-                                  style: AppTextTheme.fallback(
-                                    isTablet: isTablet,
-                                  ).bodySmallMedium!.copyWith(
-                                    color: AppColors.neutral100,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                SvgPicture.asset(
-                                  "assets/icons/location_on.svg",
-                                  colorFilter: ColorFilter.mode(
-                                    AppColors.primaryAccent,
-                                    BlendMode.srcIn,
-                                  ),
-                                  width: 10.w,
-                                  height: 10.h,
-                                ),
-                                SizedBox(width: 2.w),
-                                Text(
-                                  "${food.distance}m",
-                                  style: AppTextTheme.fallback(
-                                    isTablet: isTablet,
-                                  ).bodySmallMedium!.copyWith(
-                                    color: AppColors.neutral100,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 5.h),
-                        Text(
-                          "\$${food.price.toStringAsFixed(0)}",
-                          style: AppTextTheme.fallback(isTablet: isTablet)
-                              .bodyLargeBold!
-                              .copyWith(color: AppColors.primaryAccent),
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
+                ),
           ),
 
           SizedBox(height: 15.h),
 
-          Divider(height: 1.5.h, color: AppColors.neutral30),
+          Divider(height: 1.5.h, color: context.colors.defaultGray878787),
 
           SizedBox(height: 15.h),
 
@@ -383,9 +415,12 @@ class CartFilledView extends ConsumerWidget {
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
-              color: AppColors.neutral0,
+              color: context.colors.background,
               borderRadius: BorderRadius.circular(16.r),
-              border: Border.all(color: AppColors.neutral30, width: 1.w),
+              border: Border.all(
+                color: context.colors.defaultGray878787,
+                width: 1.w,
+              ),
             ),
             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
             child: Column(
@@ -393,9 +428,9 @@ class CartFilledView extends ConsumerWidget {
               children: [
                 Text(
                   "Payment Summary",
-                  style: AppTextTheme.fallback(
-                    isTablet: isTablet,
-                  ).bodyLargeSemiBold!.copyWith(color: AppColors.neutral800),
+                  style: textTheme.bodyLargeSemiBold!.copyWith(
+                    color: context.colors.generalText,
+                  ),
                 ),
                 SizedBox(height: 10.h),
                 Row(
@@ -403,15 +438,15 @@ class CartFilledView extends ConsumerWidget {
                   children: [
                     Text(
                       "Total Items (${cartState.items.length})",
-                      style: AppTextTheme.fallback(
-                        isTablet: isTablet,
-                      ).bodyMediumMedium!.copyWith(color: AppColors.neutral60),
+                      style: textTheme.bodyMediumMedium!.copyWith(
+                        color: context.colors.generalText,
+                      ),
                     ),
                     Text(
-                      "\$${cartState.totalPrice.toStringAsFixed(0)}",
-                      style: AppTextTheme.fallback(
-                        isTablet: isTablet,
-                      ).bodyMediumBold!.copyWith(color: AppColors.neutral800),
+                      "\$${cartState.totalPrice.toStringAsFixed(2)}",
+                      style: textTheme.bodyMediumBold!.copyWith(
+                        color: context.colors.generalText,
+                      ),
                     ),
                   ],
                 ),
@@ -421,15 +456,51 @@ class CartFilledView extends ConsumerWidget {
                   children: [
                     Text(
                       "Delivery Fee",
-                      style: AppTextTheme.fallback(
-                        isTablet: isTablet,
-                      ).bodyMediumMedium!.copyWith(color: AppColors.neutral60),
+                      style: textTheme.bodyMediumMedium!.copyWith(
+                        color: context.colors.generalText,
+                      ),
                     ),
                     Text(
                       "Free",
-                      style: AppTextTheme.fallback(
-                        isTablet: isTablet,
-                      ).bodyMediumBold!.copyWith(color: AppColors.neutral800),
+                      style: textTheme.bodyMediumBold!.copyWith(
+                        color: context.colors.generalText,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Item Handling Charge",
+                      style: textTheme.bodyMediumMedium!.copyWith(
+                        color: context.colors.generalText,
+                      ),
+                    ),
+                    Text(
+                      "\$${cartState.itemHandlingFee.toStringAsFixed(2)}",
+                      style: textTheme.bodyMediumBold!.copyWith(
+                        color: context.colors.generalText,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Order Tax",
+                      style: textTheme.bodyMediumMedium!.copyWith(
+                        color: context.colors.generalText,
+                      ),
+                    ),
+                    Text(
+                      "\$${cartState.totalTax.toStringAsFixed(2)}",
+                      style: textTheme.bodyMediumBold!.copyWith(
+                        color: context.colors.generalText,
+                      ),
                     ),
                   ],
                 ),
@@ -439,15 +510,15 @@ class CartFilledView extends ConsumerWidget {
                   children: [
                     Text(
                       "Discount",
-                      style: AppTextTheme.fallback(
-                        isTablet: isTablet,
-                      ).bodyMediumMedium!.copyWith(color: AppColors.neutral60),
+                      style: textTheme.bodyMediumMedium!.copyWith(
+                        color: context.colors.generalText,
+                      ),
                     ),
                     Text(
-                      "-\$${cartState.discount.toStringAsFixed(0)}",
-                      style: AppTextTheme.fallback(isTablet: isTablet)
-                          .bodyMediumBold!
-                          .copyWith(color: AppColors.primaryAccent),
+                      "-\$${cartState.orderDiscount.toStringAsFixed(2)}",
+                      style: textTheme.bodyMediumBold!.copyWith(
+                        color: context.colors.primary,
+                      ),
                     ),
                   ],
                 ),
@@ -457,15 +528,15 @@ class CartFilledView extends ConsumerWidget {
                   children: [
                     Text(
                       "Total",
-                      style: AppTextTheme.fallback(
-                        isTablet: isTablet,
-                      ).bodyMediumMedium!.copyWith(color: AppColors.neutral60),
+                      style: textTheme.bodyMediumMedium!.copyWith(
+                        color: context.colors.generalText,
+                      ),
                     ),
                     Text(
-                      "\$${cartState.total.toStringAsFixed(0)}",
-                      style: AppTextTheme.fallback(
-                        isTablet: isTablet,
-                      ).bodyMediumBold!.copyWith(color: AppColors.neutral800),
+                      "\$${cartState.total.toStringAsFixed(2)}",
+                      style: textTheme.bodyMediumBold!.copyWith(
+                        color: context.colors.generalText,
+                      ),
                     ),
                   ],
                 ),
@@ -480,7 +551,7 @@ class CartFilledView extends ConsumerWidget {
             child: ElevatedButton(
               onPressed: () {},
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryAccent,
+                backgroundColor: context.colors.primary,
                 padding: EdgeInsets.symmetric(vertical: 16.h),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30.r),
@@ -488,9 +559,9 @@ class CartFilledView extends ConsumerWidget {
               ),
               child: Text(
                 "Order Now",
-                style: AppTextTheme.fallback(
-                  isTablet: isTablet,
-                ).bodyMediumSemiBold!.copyWith(color: AppColors.neutral0),
+                style: textTheme.bodyMediumSemiBold!.copyWith(
+                  color: context.colors.defaultWhite,
+                ),
               ),
             ),
           ),

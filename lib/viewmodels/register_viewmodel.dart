@@ -2,17 +2,12 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:smart_flutter/core/utils/device_utils.dart';
 import 'package:smart_flutter/services/shared_preferences_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-// final registerViewModelProvider = ChangeNotifierProvider(
-//   (ref) => RegisterViewModel(),
-// );
-
-final registerViewModelProvider =
-    AsyncNotifierProvider<RegisterViewModel, void>(RegisterViewModel.new);
+final registerViewModelProvider = AsyncNotifierProvider<RegisterViewModel, void>(RegisterViewModel.new);
 
 class RegisterViewModel extends AsyncNotifier<void> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -29,36 +24,28 @@ class RegisterViewModel extends AsyncNotifier<void> {
   }
 
   //Supabase based registration. email link verification
-  Future<void> registerUser({
-    required String email,
-    required Map<String, dynamic> metadata,
-  }) async {
+  Future<void> registerUser({required String email, required String fullName, required String dob, required String gender, required String phoneNumber}) async {
     state = const AsyncLoading();
     try {
       // await SharedPreferencesService.setCachedEmail(email);
       SharedPreferencesService.setUserLoggedIn(false);
+      SharedPreferencesService.setPhoneOTPAuthenticated(false);
+      Supabase.instance.client.auth.signOut();
       Supabase.instance.client.auth.signOut(scope: SignOutScope.local);
-      await supabase.auth.signInWithOtp(
+
+      await supabase.auth.signUp(
         email: email,
-        // emailRedirectTo: 'io.supabase.flutter://callback',
-        emailRedirectTo: 'https://jpi.nub.mybluehostin.me/callback',
-        data: metadata,
+        emailRedirectTo: 'io.supabase.flutterquickstart://callback/register-user',
+        password: DeviceUtils.generateTempPassword(),
+        data: {'full_name': fullName, 'dob': dob, 'gender': gender, 'phone': '91$phoneNumber', 'email': email, 'has_password': false},
       );
 
-      print(
-        "Supabase user id: ${supabase.auth.currentUser?.id} email: ${supabase.auth.currentUser?.email}",
-      );
+      print("Supabase user id: ${supabase.auth.currentUser?.id} email: ${supabase.auth.currentUser?.email}");
       state = const AsyncData(null); // Success
     } on AuthException catch (e) {
-      state = AsyncError(
-        Exception('Auth error: ${e.message}'),
-        StackTrace.current,
-      );
+      state = AsyncError(Exception('Auth error: ${e.message}'), StackTrace.current);
     } on SocketException catch (_) {
-      state = AsyncError(
-        Exception('No internet connection.'),
-        StackTrace.current,
-      );
+      state = AsyncError(Exception('No internet connection.'), StackTrace.current);
     } catch (e, stack) {
       state = AsyncError(Exception('Unexpected error: $e'), stack);
     }
@@ -67,32 +54,19 @@ class RegisterViewModel extends AsyncNotifier<void> {
   Future<void> setUserPassword({required String password}) async {
     state = const AsyncLoading();
     try {
-      await supabase.auth.updateUser(
-        UserAttributes(password: password, data: {'password_set': true}),
-      );
+      await supabase.auth.updateUser(UserAttributes(password: password, data: {'has_password': true}));
 
       final userId = supabase.auth.currentUser!.id;
-      await supabase
-          .from('users')
-          .update({'password': password, 'password_set': true})
-          .eq('id', userId);
+      await supabase.from('profiles').update({'has_password': true}).eq('id', userId);
 
       await supabase.auth.refreshSession();
-      print(
-        "Supabase user id: ${supabase.auth.currentUser?.id} email: ${supabase.auth.currentUser?.email}",
-      );
+      print("Supabase user id: ${supabase.auth.currentUser?.id} email: ${supabase.auth.currentUser?.email}");
 
       state = const AsyncData(null); // Success
     } on AuthException catch (e) {
-      state = AsyncError(
-        Exception('Auth error: ${e.message}'),
-        StackTrace.current,
-      );
+      state = AsyncError(Exception('Auth error: ${e.message}'), StackTrace.current);
     } on SocketException catch (_) {
-      state = AsyncError(
-        Exception('No internet connection.'),
-        StackTrace.current,
-      );
+      state = AsyncError(Exception('No internet connection.'), StackTrace.current);
     } catch (e, stack) {
       state = AsyncError(Exception('Unexpected error: $e'), stack);
     }
@@ -107,61 +81,41 @@ class RegisterViewModel extends AsyncNotifier<void> {
 
       state = const AsyncData(null); // Success
     } on AuthException catch (e) {
-      state = AsyncError(
-        Exception('Auth error: ${e.message}'),
-        StackTrace.current,
-      );
+      state = AsyncError(Exception('Auth error: ${e.message}'), StackTrace.current);
     } on SocketException catch (_) {
-      state = AsyncError(
-        Exception('No internet connection.'),
-        StackTrace.current,
-      );
+      state = AsyncError(Exception('No internet connection.'), StackTrace.current);
     } catch (e, stack) {
       state = AsyncError(Exception('Unexpected error: $e'), stack);
     }
   }
 
-  Future<void> sendPasswordResetEmail(String email) async {
+  Future<void> phoneLogin({required String phoneNumber}) async {
     state = const AsyncLoading();
     try {
-      // ✅ Check if user exists and is NOT a social login
-      final response =
-          await supabase
-              .from(
-                'users',
-              ) // your public users table (optional if using RLS properly)
-              .select('provider')
-              .eq('email', email)
-              .maybeSingle();
-
-      final provider = response?['provider'];
-
-      if (provider != null && provider != 'email') {
-        state = AsyncError(
-          Exception(
-            'This account uses ${provider.toUpperCase()} login. Please sign in with that provider.',
-          ),
-          StackTrace.current,
-        );
-      }
-
-      final redirectUrl =
-          'https://jpi.nub.mybluehostin.me/callback'; // ✅ Must match Supabase auth settings
-
-      await supabase.auth.resetPasswordForEmail(email, redirectTo: redirectUrl);
+      await supabase.auth.signInWithOtp(phone: '+91$phoneNumber', shouldCreateUser: false, channel: OtpChannel.sms);
 
       state = const AsyncData(null); // Success
-      debugPrint('Reset link sent successfully to $email');
     } on AuthException catch (e) {
-      state = AsyncError(
-        Exception('Auth error: ${e.message}'),
-        StackTrace.current,
-      );
+      state = AsyncError(Exception('Auth error: ${e.message}'), StackTrace.current);
     } on SocketException catch (_) {
-      state = AsyncError(
-        Exception('No internet connection.'),
-        StackTrace.current,
-      );
+      state = AsyncError(Exception('No internet connection.'), StackTrace.current);
+    } catch (e, stack) {
+      state = AsyncError(Exception('Unexpected error: $e'), stack);
+    }
+  }
+
+  Future<void> phoneOTPVerification({required String phoneNumber, required String otp}) async {
+    state = const AsyncLoading();
+    try {
+      await supabase.auth.verifyOTP(phone: '+91$phoneNumber', token: otp, type: OtpType.sms);
+
+      await supabase.auth.refreshSession();
+
+      state = const AsyncData(null); // Success
+    } on AuthException catch (e) {
+      state = AsyncError(Exception('Auth error: ${e.message}'), StackTrace.current);
+    } on SocketException catch (_) {
+      state = AsyncError(Exception('No internet connection.'), StackTrace.current);
     } catch (e, stack) {
       state = AsyncError(Exception('Unexpected error: $e'), stack);
     }

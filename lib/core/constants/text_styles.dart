@@ -1,46 +1,398 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'app_colors.dart';
+/*
+class AppTextTheme1 extends ThemeExtension<AppTextTheme1> {
+  final BuildContext context;
+  final bool isTablet;
 
-class AppTextStyles {
-  // Title text style
-  static TextStyle title(bool isTablet) => TextStyle(
-    fontSize: isTablet ? 50.sp : 36.sp,
+  AppTextTheme1({required this.context, this.isTablet = false});
+
+  Color get onBackground => Theme.of(context).colorScheme.onBackground;
+
+  Color get onSecondary => Theme.of(context).colorScheme.onSecondary;
+
+  TextStyle get headingH4SemiBold => TextStyle(
+    fontSize: isTablet ? 48.sp : 34.sp,
     fontWeight: FontWeight.w700,
-    color: AppColors.neutral0,
-    wordSpacing: 2.5,
-    letterSpacing: 1.5,
-    height: 1.0,
+    fontFamily: "Inter",
+    height: 1.25,
+    color: onBackground,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
   );
 
-  // Subtitle text style
-  static TextStyle subtitle(bool isTablet) => TextStyle(
-    fontSize: isTablet ? 24.sp : 16.sp,
-    color: AppColors.neutral0,
+  TextStyle get headingH5SemiBold => TextStyle(
+    fontSize: isTablet ? 36.sp : 24.sp,
+    fontWeight: FontWeight.w700,
+    fontFamily: "Inter",
+    height: 1.33,
+    color: onBackground,
+  );
+
+  TextStyle get headingH1Bold => TextStyle(
+    fontSize: 64,
+    fontWeight: FontWeight.w700,
+    fontFamily: "Inter",
+    height: 1.13,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get headingH1SemiBold => TextStyle(
+    fontSize: 64,
+    fontWeight: FontWeight.w700,
+    fontFamily: "Inter",
+    height: 1.13,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get headingH1Medium => TextStyle(
+    fontSize: 64,
+    fontWeight: FontWeight.w500,
+    fontFamily: "Inter",
+    height: 1.13,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get headingH1Regular => TextStyle(
+    fontSize: 64,
+    fontWeight: FontWeight.w400,
+    fontFamily: "Inter",
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get headingH2Bold => TextStyle(
+    fontSize: 48,
+    fontWeight: FontWeight.w700,
+    fontFamily: "Inter",
+    height: 1.17,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get headingH2SemiBold => TextStyle(
+    fontSize: 48,
+    fontWeight: FontWeight.w700,
+    fontFamily: "Inter",
+    height: 1.17,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get headingH2Medium => TextStyle(
+    fontSize: 48,
+    fontWeight: FontWeight.w500,
+    fontFamily: "Inter",
+    height: 1.17,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get headingH2Regular => TextStyle(
+    fontSize: 48,
+    fontWeight: FontWeight.w400,
+    fontFamily: "Inter",
+    height: 1.17,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get headingH3Bold => TextStyle(
+    fontSize: 40,
+    fontWeight: FontWeight.w700,
+    fontFamily: "Inter",
     height: 1.2,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
   );
 
-  // Button text style
-  static TextStyle buttonText(bool isTablet) => TextStyle(
-    color: AppColors.neutral0,
-    fontSize: isTablet ? 24.sp : 18.sp,
+  TextStyle get headingH3SemiBold => TextStyle(
+    fontSize: isTablet ? 52.sp : 40.sp,
     fontWeight: FontWeight.w700,
+    fontFamily: "Inter",
+    height: 1.2,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
   );
 
-  // General body text
-  static TextStyle body(bool isTablet) => TextStyle(
-    fontSize: isTablet ? 20.sp : 14.sp,
-    color: AppColors.neutral700,
-    height: 1.4,
+  TextStyle get headingH3Medium => TextStyle(
+    fontSize: 40,
+    fontWeight: FontWeight.w500,
+    fontFamily: "Inter",
+    height: 1.2,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
   );
 
-  // Caption or helper text
-  static TextStyle caption(bool isTablet) => TextStyle(
-    fontSize: isTablet ? 16.sp : 12.sp,
-    color: AppColors.neutral500,
+  TextStyle get headingH3Regular => TextStyle(
+    fontSize: 40,
+    fontWeight: FontWeight.w400,
+    fontFamily: "Inter",
+    height: 1.2,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
   );
+
+  TextStyle get headingH4Bold => TextStyle(
+    fontSize: 32,
+    fontWeight: FontWeight.w700,
+    fontFamily: "Inter",
+    height: 1.25,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get headingH4Medium => TextStyle(
+    fontSize: 32,
+    fontWeight: FontWeight.w500,
+    fontFamily: "Inter",
+    height: 1.25,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get headingH4Regular => TextStyle(
+    fontSize: 32,
+    fontWeight: FontWeight.w400,
+    fontFamily: "Inter",
+    height: 1.25,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get headingH5Bold => TextStyle(
+    fontSize: isTablet ? 36.sp : 24.sp,
+    fontWeight: FontWeight.w700,
+    fontFamily: "Inter",
+    height: 1.33,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get headingH5Medium => TextStyle(
+    fontSize: isTablet ? 36.sp : 24.sp,
+    fontWeight: FontWeight.w500,
+    fontFamily: "Inter",
+    height: 1.33,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get headingH5Regular => TextStyle(
+    fontSize: 24,
+    fontWeight: FontWeight.w400,
+    fontFamily: "Inter",
+    height: 1.33,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get headingH6Bold => TextStyle(
+    fontSize: isTablet ? 18.sp : 22.sp,
+    fontWeight: FontWeight.w700,
+    fontFamily: "Inter",
+    height: 1.44,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get headingH6SemiBold => TextStyle(
+    fontSize: isTablet ? 26.sp : 20.sp,
+    fontWeight: FontWeight.w700,
+    fontFamily: "Inter",
+    height: 1.44,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get headingH6Medium => TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.w500,
+    fontFamily: "Inter",
+    height: 1.44,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get headingH6Regular => TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.w400,
+    fontFamily: "Inter",
+    height: 1.44,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get bodyLargeBold => TextStyle(
+    fontSize: isTablet ? 22.sp : 16.sp,
+    fontWeight: FontWeight.w700,
+    fontFamily: "Inter",
+    height: 1.5,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get bodyLargeSemiBold => TextStyle(
+    fontSize: isTablet ? 22.sp : 16.sp,
+    fontWeight: FontWeight.w700,
+    fontFamily: "Inter",
+    height: 1.5,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get bodyLargeMedium => TextStyle(
+    fontSize: isTablet ? 22.sp : 14.sp,
+    fontWeight: FontWeight.w500,
+    fontFamily: "Inter",
+    height: 1.5,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get bodyLargeRegular => TextStyle(
+    fontSize: isTablet ? 22.sp : 16.sp,
+    fontWeight: FontWeight.w400,
+    fontFamily: "Inter",
+    height: 1.5,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+    color: onBackground,
+  );
+
+  TextStyle get bodyMediumBold => TextStyle(
+    fontSize: isTablet ? 18.sp : 14.sp,
+    fontWeight: FontWeight.w700,
+    fontFamily: "Inter",
+    height: 1.43,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get bodyMediumSemiBold => TextStyle(
+    fontSize: isTablet ? 18.sp : 16.sp,
+    fontWeight: FontWeight.w700,
+    fontFamily: "Inter",
+    height: 1.43,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get bodyMediumMedium => TextStyle(
+    fontSize: isTablet ? 18.sp : 14.sp,
+    fontWeight: FontWeight.w500,
+    fontFamily: "Inter",
+    height: 1.43,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get bodyMediumRegular => TextStyle(
+    fontSize: isTablet ? 18.sp : 14.sp,
+    fontWeight: FontWeight.w400,
+    fontFamily: "Inter",
+    height: 1.43,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+    color: onBackground,
+  );
+
+  TextStyle get bodySmallBold => TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.w700,
+    fontFamily: "Inter",
+    height: 1.33,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get bodySmallSemiBold => TextStyle(
+    fontSize: isTablet ? 14.sp : 12.sp,
+    fontWeight: FontWeight.w700,
+    fontFamily: "Inter",
+    height: 1.33,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+    color: onSecondary,
+  );
+
+  TextStyle get bodySmallMedium => TextStyle(
+    fontSize: isTablet ? 14.sp : 12.sp,
+    fontWeight: FontWeight.w500,
+    fontFamily: "Inter",
+    height: 1.33,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get bodySmallRegular => TextStyle(
+    fontSize: isTablet ? 15.sp : 12.sp,
+    fontWeight: FontWeight.w400,
+    fontFamily: "Inter",
+    height: 1.33,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get bodySuperSmallBold => TextStyle(
+    fontSize: 10,
+    fontWeight: FontWeight.w700,
+    fontFamily: "Inter",
+    height: 1.6,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get bodySuperSmallSemiBold => TextStyle(
+    fontSize: 10,
+    fontWeight: FontWeight.w700,
+    fontFamily: "Inter",
+    height: 1.6,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get bodySuperSmallMedium => TextStyle(
+    fontSize: isTablet ? 12.sp : 10.sp,
+    fontWeight: FontWeight.w500,
+    fontFamily: "Inter",
+    height: 1.6,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  TextStyle get bodySuperSmallRegular => TextStyle(
+    fontSize: isTablet ? 12.sp : 10.sp,
+    fontWeight: FontWeight.w400,
+    fontFamily: "Inter",
+    height: 1.6,
+    fontStyle: FontStyle.normal,
+    decoration: TextDecoration.none,
+  );
+
+  @override
+  AppTextTheme1 copyWith({BuildContext? context, bool? isTablet}) {
+    return AppTextTheme1(
+      context: context ?? this.context,
+      isTablet: isTablet ?? this.isTablet,
+    );
+  }
+
+  @override
+  AppTextTheme1 lerp(ThemeExtension<AppTextTheme1>? other, double t) {
+    if (other is! AppTextTheme) return this;
+    return this;
+  }
 }
+
+extension AppTextThemeExtension on BuildContext {
+  AppTextTheme1 get textTheme => AppTextTheme1(context: this);
+}
+*/
 
 @immutable
 class AppTextTheme extends ThemeExtension<AppTextTheme> {

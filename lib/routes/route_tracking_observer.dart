@@ -18,9 +18,7 @@ class RouteTrackingObserver extends NavigatorObserver {
   }
 
   void saveCurrentRoute(String? routeName) async {
-    if (routeName == null ||
-        routeName.contains('callback') ||
-        routeName.contains('reset-password')) {
+    if (routeName == null || routeName.contains('register-user') || routeName.contains('reset-password')) {
       return;
     }
     SharedPreferencesService.saveLastRoute(routeName);

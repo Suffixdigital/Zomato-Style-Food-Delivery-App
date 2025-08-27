@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:smart_flutter/firebase_options.dart';
 import 'package:smart_flutter/routes/app_routes.dart';
 import 'package:smart_flutter/services/deep_link_service.dart';
 import 'package:smart_flutter/services/shared_preferences_service.dart';
+import 'package:smart_flutter/theme/app_theme.dart';
+import 'package:smart_flutter/viewmodels/settings_viewmodel.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
@@ -58,17 +61,26 @@ class _MyAppState extends ConsumerState<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(useMaterial3: true),
-      routerConfig: ref.watch(appRouterProvider),
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        DefaultWidgetsLocalizations.delegate,
-      ],
-
-      supportedLocales: const [Locale('en')],
+    final bool isTablet = MediaQuery.of(context).size.shortestSide >= 600;
+    final provider = ref.watch(settingsViewModelProvider);
+    return ScreenUtilInit(
+      designSize: Size(375, 812), // your design base size
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (_, __) {
+        return MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme(isTablet: isTablet),
+          darkTheme: AppTheme.darkTheme(isTablet: isTablet),
+          themeMode: provider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+          routerConfig: ref.watch(appRouterProvider),
+          localizationsDelegates: const [GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, DefaultWidgetsLocalizations.delegate],
+          supportedLocales: [Locale('en')],
+          builder: (context, child) {
+            return child!;
+          },
+        );
+      },
     );
   }
 }

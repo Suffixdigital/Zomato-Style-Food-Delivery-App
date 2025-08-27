@@ -1,16 +1,4 @@
-import '../../model/category.dart';
 import '../../model/food_item.dart';
-
-final categories = [
-  Category(name: "Burger", icon: "🍔"),
-  Category(name: "Taco", icon: "🌮"),
-  Category(name: "Drink", icon: "🥤"),
-  Category(name: "Pizza", icon: "🍕"),
-  Category(name: "Burger", icon: "🍔"),
-  Category(name: "Taco", icon: "🌮"),
-  Category(name: "Drink", icon: "🥤"),
-  Category(name: "Pizza", icon: "🍕"),
-];
 
 final foodItems = [
   FoodItem(

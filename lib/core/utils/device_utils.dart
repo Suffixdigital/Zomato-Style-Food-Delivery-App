@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -47,15 +49,9 @@ class DeviceUtils {
     return MediaQuery.of(context).textScaleFactor;
   }
 
-  static TextStyle titleStyle = const TextStyle(
-    fontSize: 28,
-    fontWeight: FontWeight.bold,
-  );
+  static TextStyle titleStyle = const TextStyle(fontSize: 28, fontWeight: FontWeight.bold);
 
-  static TextStyle subtitleStyle = const TextStyle(
-    fontSize: 16,
-    color: Colors.grey,
-  );
+  static TextStyle subtitleStyle = const TextStyle(fontSize: 16, color: Colors.grey);
 
   static RegExp passwordRegex = RegExp(
     r'^(?=.*\d)' // at least one digit
@@ -67,20 +63,20 @@ class DeviceUtils {
     r'.{8,32}$', // 8 to 32 characters
   );
 
-  static Widget socialIcon(String assetPath) {
+  static Widget socialIcon(String assetPath, Color iconColor) {
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: AppColors.neutral40, // border color
+          color: iconColor, // border color
           width: 1.w, // border width
         ),
       ),
       child: CircleAvatar(
-        radius: 22.r,
-        backgroundColor: AppColors.neutral0,
+        radius: 24.r,
+        backgroundColor: iconColor,
         //child: Image.asset(assetPath, width: 24.w, height: 24.h),
-        child: SvgPicture.asset(assetPath, width: 26.w, height: 26.h),
+        child: SvgPicture.asset(assetPath, width: 36.w, height: 36.h),
       ),
     );
   }
@@ -98,22 +94,17 @@ class DeviceUtils {
         radius: size.r,
         backgroundColor: Colors.transparent,
         //child: Image.asset(assetPath, width: 24.w, height: 24.h),
-        child: SvgPicture.asset(
-          assetPath,
-          width: size.w,
-          height: size.h,
-          colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
-        ),
+        child: SvgPicture.asset(assetPath, width: size.w, height: size.h, colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn)),
       ),
     );
   }
 
-  static Widget homeScreenIcon(String assetPath) {
+  static Widget homeScreenIcon(String assetPath, Color iconColor) {
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: AppColors.neutral0, // border color
+          color: iconColor, // border color
           width: 1.w, // border width
         ),
       ),
@@ -124,5 +115,11 @@ class DeviceUtils {
         child: SvgPicture.asset(assetPath, width: 16.w, height: 16.h),
       ),
     );
+  }
+
+  static String generateTempPassword() {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#\$%';
+    final rand = Random.secure();
+    return List.generate(12, (index) => chars[rand.nextInt(chars.length)]).join();
   }
 }

@@ -3,14 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
-import 'package:smart_flutter/core/data/dummy_data.dart';
 import 'package:smart_flutter/core/utils/device_utils.dart';
+import 'package:smart_flutter/model/CategoryItem.dart';
+import 'package:smart_flutter/model/category.dart';
 import 'package:smart_flutter/model/food_item.dart';
 import 'package:smart_flutter/routes/tab_controller_notifier.dart';
 import 'package:smart_flutter/screens/link_expired_dialog.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:smart_flutter/theme/app_colors.dart';
+import 'package:smart_flutter/viewmodels/home_viewmodel.dart';
+import 'package:smart_flutter/views/widgets/ShimmerGridLoader.dart';
+import 'package:smart_flutter/views/widgets/shimmer_loader.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -21,27 +24,19 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int? selectedIndex = 0;
-  List<Map<String, dynamic>> categories = [];
-
-  Future<void> fetchCategories() async {
-    final data = await Supabase.instance.client
-        .from('category')
-        .select()
-        .order('display_order', ascending: true); // optional sort
-
-    categories = List<Map<String, dynamic>>.from(data);
-    setState(() {});
-  }
+  List<FoodItem> currentItems = [];
+  bool hasLoadedFirstCategoryItems = false;
 
   @override
   void initState() {
-    fetchCategories();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     final message = ref.read(linkExpiredMessage);
+    final homeStateAsync = ref.watch(homeViewModelProvider);
+    final textTheme = Theme.of(context).extension<AppTextTheme>()!;
 
     if (message.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -49,8 +44,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ref.watch(linkExpiredMessage.notifier).state = '';
       });
     }
+
     return ScreenUtilInit(
-      designSize: const Size(375, 812),
+      designSize: Size(375, 812),
       builder:
           (context, child) => LayoutBuilder(
             builder: (context, constraints) {
@@ -63,207 +59,250 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       : 2;
 
               return Scaffold(
-                body: CustomScrollView(
-                  slivers: [
-                    SliverAppBar(
-                      expandedHeight: 220.h,
-                      pinned: true,
-                      backgroundColor: AppColors.primaryAccent,
-                      flexibleSpace: FlexibleSpaceBar(
-                        titlePadding: EdgeInsets.only(
-                          left: 16.w,
-                          top: 40.h,
-                          bottom: 16.h,
-                          right: 40.w,
-                        ),
-                        title: Text(
-                          'Provide the best food for you',
-                          style: AppTextTheme.fallback(isTablet: false)
-                              .headingH5SemiBold!
-                              .copyWith(color: AppColors.neutral0),
-                        ),
-                        background: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            Image.asset(
-                              'assets/images/header_background.png',
-                              fit: BoxFit.fill,
+                body: homeStateAsync.when(
+                  error: (err, stack) => Center(child: Text('Error: $err')),
+                  loading: () => Center(child: ShimmerLoader()),
+                  data: (homeState) {
+                    final categories = homeState.categories;
+                    final items = homeState.items;
+                    final selectedIndex = homeState.selectedIndex;
+
+                    if (categories.isEmpty) {
+                      return const Center(child: Text('No categories found.'));
+                    }
+
+                    return CustomScrollView(
+                      slivers: [
+                        SliverAppBar(
+                          expandedHeight: 220.h,
+                          pinned: true,
+                          backgroundColor: context.colors.primary,
+                          flexibleSpace: FlexibleSpaceBar(
+                            titlePadding: EdgeInsets.only(
+                              left: 16.w,
+                              top: 40.h,
+                              bottom: 16.h,
+                              right: 40.w,
                             ),
-                            Container(
-                              color: AppColors.neutral100.withValues(
-                                alpha: 0.3,
-                              ), // Optional overlay for readability
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 20.w,
-                                vertical: 50.h,
+                            title: Text(
+                              'Provide the best food for you',
+                              style: textTheme.headingH5SemiBold!.copyWith(
+                                color: context.colors.defaultWhite,
                               ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                            ),
+                            background: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                Image.asset(
+                                  'assets/images/header_background.png',
+                                  fit: BoxFit.fill,
+                                ),
+                                Container(
+                                  color: context.colors.defaultBlack.withValues(
+                                    alpha: 0.1,
+                                  ), // Optional overlay for readability
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 20.w,
+                                    vertical: 50.h,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
-                                            "Your Location",
-                                            style: AppTextTheme.fallback(
-                                              isTablet: false,
-                                            ).bodyMediumRegular!.copyWith(
-                                              color: AppColors.neutral0,
-                                            ),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "Your Location",
+                                                style: textTheme
+                                                    .bodyMediumRegular!
+                                                    .copyWith(
+                                                      color:
+                                                          context
+                                                              .colors
+                                                              .defaultGrayEEEEEE,
+                                                    ),
+                                              ),
+                                              SizedBox(height: 5.h),
+                                              Row(
+                                                children: [
+                                                  SvgPicture.asset(
+                                                    "assets/icons/location_on.svg",
+                                                    width: 20.w,
+                                                    height: 24.h,
+                                                    colorFilter:
+                                                        ColorFilter.mode(
+                                                          context
+                                                              .colors
+                                                              .defaultGrayEEEEEE,
+                                                          BlendMode.srcIn,
+                                                        ),
+                                                  ),
+                                                  SizedBox(width: 8.w),
+                                                  Text(
+                                                    "New York City",
+                                                    style: textTheme
+                                                        .bodyMediumSemiBold!
+                                                        .copyWith(
+                                                          color:
+                                                              context
+                                                                  .colors
+                                                                  .defaultGrayEEEEEE,
+                                                        ),
+                                                  ),
+                                                  SizedBox(width: 4.w),
+                                                  Icon(
+                                                    Icons
+                                                        .keyboard_arrow_down_rounded,
+                                                    color:
+                                                        context
+                                                            .colors
+                                                            .defaultGrayEEEEEE,
+                                                    size: 18.sp,
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
                                           ),
-                                          SizedBox(height: 5.h),
                                           Row(
                                             children: [
-                                              SvgPicture.asset(
-                                                "assets/icons/location_on.svg",
-                                                width: 20.w,
-                                                height: 24.h,
-                                                colorFilter: ColorFilter.mode(
-                                                  AppColors.neutral0,
-                                                  BlendMode.srcIn,
-                                                ),
+                                              DeviceUtils.homeScreenIcon(
+                                                "assets/icons/search.svg",
+                                                context
+                                                    .colors
+                                                    .defaultGrayEEEEEE,
                                               ),
-                                              SizedBox(width: 8.w),
-                                              Text(
-                                                "New York City",
-                                                style: AppTextTheme.fallback(
-                                                  isTablet: false,
-                                                ).bodyMediumSemiBold!.copyWith(
-                                                  color: AppColors.neutral0,
-                                                ),
-                                              ),
-                                              SizedBox(width: 4.w),
-                                              Icon(
-                                                Icons
-                                                    .keyboard_arrow_down_rounded,
-                                                color: AppColors.neutral0,
-                                                size: 18.sp,
+                                              SizedBox(width: 10.w),
+                                              DeviceUtils.homeScreenIcon(
+                                                "assets/icons/notification_bell.svg",
+                                                context
+                                                    .colors
+                                                    .defaultGrayEEEEEE,
                                               ),
                                             ],
                                           ),
                                         ],
                                       ),
-                                      Row(
-                                        children: [
-                                          DeviceUtils.homeScreenIcon(
-                                            "assets/icons/search.svg",
-                                          ),
-                                          SizedBox(width: 10.w),
-                                          DeviceUtils.homeScreenIcon(
-                                            "assets/icons/notification_bell.svg",
-                                          ),
-                                        ],
-                                      ),
                                     ],
                                   ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                          left: 16.w,
-                          right: 16.h,
-                          top: 20.h,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Find by Category",
-                              style: AppTextTheme.fallback(isTablet: false)
-                                  .bodyLargeSemiBold!
-                                  .copyWith(color: AppColors.neutral100),
-                            ),
-                            Text(
-                              "See All",
-                              style: AppTextTheme.fallback(isTablet: false)
-                                  .bodyMediumMedium!
-                                  .copyWith(color: AppColors.primaryAccent),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    // Category Scroll
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 20.h,
-                          horizontal: 14.w,
-                        ),
-                        child: SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.1,
-                          child: ListView.separated(
-                            scrollDirection: Axis.horizontal,
-                            padding: EdgeInsets.symmetric(horizontal: 4.w),
-                            itemCount: categories.length,
-                            separatorBuilder: (_, __) => SizedBox(width: 12.w),
-                            itemBuilder: (context, index) {
-                              final item = categories[index];
-                              return GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    selectedIndex =
-                                        selectedIndex == index ? null : index;
-                                  });
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.only(
-                                    top: 5.h,
-                                    bottom: 5.h,
-                                  ),
-                                  child: SizedBox(
-                                    width: 65.w,
-                                    child: _buildCategoryIcon(
-                                      item['icon']!,
-                                      item['label']!,
-                                      selectedIndex == index,
-                                    ),
-                                  ),
                                 ),
-                              );
-                            },
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ),
 
-                    // Burger Grid Items
-                    SliverPadding(
-                      padding: EdgeInsets.only(
-                        left: 16.w,
-                        right: 16.w,
-                        top: 4.h,
-                        bottom: 24.h,
-                      ),
-                      sliver: SliverGrid(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) =>
-                              _buildBurgerCard(foodItems[index]),
-                          childCount: foodItems.length,
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              left: 16.w,
+                              right: 16.h,
+                              top: 20.h,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Find by Category",
+                                  style: textTheme.bodyLargeSemiBold!.copyWith(
+                                    color: context.colors.generalText,
+                                  ),
+                                ),
+                                Text(
+                                  "See All",
+                                  style: textTheme.bodyMediumMedium!.copyWith(
+                                    color: context.colors.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: crossAxisCount,
-                          childAspectRatio: 0.7,
-                          crossAxisSpacing: 12.w,
-                          mainAxisSpacing: 12.h,
+
+                        // Category Scroll
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              vertical: 14.h,
+                              horizontal: 14.w,
+                            ),
+                            child: SizedBox(
+                              height: 100.h,
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                padding: EdgeInsets.symmetric(horizontal: 4.w),
+                                itemCount: categories.length,
+                                separatorBuilder:
+                                    (_, __) => SizedBox(width: 12.w),
+                                itemBuilder: (context, index) {
+                                  final category = categories[index];
+                                  return GestureDetector(
+                                    onTap: () {
+                                      ref
+                                          .read(homeViewModelProvider.notifier)
+                                          .selectCategory(index);
+                                    },
+                                    child: Container(
+                                      margin: EdgeInsets.only(
+                                        top: 2.h,
+                                        bottom: 2.h,
+                                      ),
+                                      child: SizedBox(
+                                        width: 74.w,
+                                        child: _buildCategoryIcon(
+                                          category,
+                                          selectedIndex == index,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
+
+                        /// Items Grid
+                        if (homeState.isLoadingItems)
+                          ShimmerGridLoader()
+                        else if (items.isEmpty)
+                          SliverToBoxAdapter(
+                            child: Center(child: Text("No items available")),
+                          )
+                        else
+                          SliverPadding(
+                            padding: EdgeInsets.only(
+                              left: 16.w,
+                              right: 16.w,
+                              top: 4.h,
+                              bottom: 24.h,
+                            ),
+                            sliver: SliverGrid(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) =>
+                                    _buildBurgerCard(items[index]),
+                                childCount: items.length,
+                              ),
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: crossAxisCount,
+                                    childAspectRatio: 0.7,
+                                    crossAxisSpacing: 12.w,
+                                    mainAxisSpacing: 12.h,
+                                  ),
+                            ),
+                          ),
+
+                        // Burger Grid Items
+                      ],
+                    );
+                  },
                 ),
               );
             },
@@ -271,18 +310,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildCategoryIcon(String icon, String label, bool selected) {
+  Widget _buildCategoryIcon(Category category, bool selected) {
+    final textTheme = Theme.of(context).extension<AppTextTheme>()!;
     return Container(
-      padding: EdgeInsets.all(8.w),
+      padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
-        color: selected ? AppColors.primaryAccent : AppColors.neutral0,
+        color: selected ? context.colors.primary : context.colors.background,
         borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(
+          color:
+              selected
+                  ? context.colors.primary
+                  : context.colors.defaultGrayEEEEEE,
+          width: 1.w,
+        ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.neutral20,
-            spreadRadius: 2.r,
-            blurRadius: 2.r,
-            blurStyle: BlurStyle.solid,
+            color:
+                selected
+                    ? context.colors.primary
+                    : context.colors.defaultGrayEEEEEE,
+            blurRadius: 1.r,
             offset: Offset(0, 1),
           ),
         ],
@@ -291,19 +339,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Image.network(
-            icon,
+            category.icon,
             width: 28.w,
             height: 28.w,
-            errorBuilder:
-                (_, __, ___) => const Icon(Icons.broken_image, size: 28),
+            errorBuilder: (_, __, ___) => Icon(Icons.broken_image, size: 28.w),
           ),
           SizedBox(height: 6.h),
-          Text(
-            label,
-            style: AppTextTheme.fallback(
-              isTablet: false,
-            ).bodyMediumMedium!.copyWith(
-              color: selected ? AppColors.neutral0 : AppColors.neutral60,
+          SizedBox(
+            height: 36.h,
+            child: Text(
+              category.label,
+              maxLines: 2,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              style: textTheme.bodyMediumMedium!.copyWith(
+                color:
+                    selected
+                        ? context.colors.defaultWhite
+                        : context.colors.defaultGray878787,
+              ),
             ),
           ),
         ],
@@ -311,28 +365,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildBurgerCard(FoodItem foodItem) {
+  Widget _buildBurgerCard(CategoryItem categoryItem) {
+    final textTheme = Theme.of(context).extension<AppTextTheme>()!;
     return GestureDetector(
       onTap: () {
         context.pushNamed(
           'productDetails',
           pathParameters: {
-            'id': foodItem.id.toString(), // just for route uniqueness
+            'id': categoryItem.id.toString(), // just for route uniqueness
           },
-          extra: foodItem,
+          extra: categoryItem,
         );
       },
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10.r),
-          color: AppColors.neutral0,
+          color: context.colors.background,
+          border: Border.all(
+            color: context.colors.defaultGrayEEEEEE,
+            width: 1.w,
+          ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.neutral20,
-              spreadRadius: 1.r,
-              blurRadius: 2.r,
-              blurStyle: BlurStyle.solid,
-              offset: Offset(0, 1.5),
+              color: context.colors.defaultGrayEEEEEE,
+              blurRadius: 1.r,
+              blurStyle: BlurStyle.outer,
+              offset: Offset(0, 1),
             ),
           ],
         ),
@@ -342,11 +400,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Stack(
               children: [
                 Padding(
-                  padding: EdgeInsets.all(8.w),
+                  padding: EdgeInsets.only(
+                    left: 8.w,
+                    right: 8.w,
+                    top: 8.h,
+                    bottom: 4.h,
+                  ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10.r),
-                    child: Image.asset(
-                      foodItem.imageUrl,
+                    child: Image.network(
+                      categoryItem.image,
                       height: 145.h,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -358,13 +421,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   right: 15.w,
                   child: CircleAvatar(
                     radius: 14.r,
-                    backgroundColor: AppColors.neutral0,
+                    backgroundColor: context.colors.defaultWhite,
                     child: SvgPicture.asset(
                       "assets/icons/favorite.svg",
                       width: 16.w,
                       height: 16.h,
                       colorFilter: ColorFilter.mode(
-                        AppColors.errorBase,
+                        context.colors.error,
                         BlendMode.srcIn,
                       ),
                     ),
@@ -378,37 +441,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    foodItem.title,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14.sp,
+                    categoryItem.name,
+                    style: textTheme.bodyLargeBold!.copyWith(
+                      color: context.colors.generalText,
                     ),
                   ),
-                  SizedBox(height: 5.h),
+                  SizedBox(height: 4.h),
                   Row(
                     children: [
                       Icon(
                         Icons.star,
-                        color: AppColors.primaryAccent,
+                        color: context.colors.primary,
                         size: 14.sp,
                       ),
-                      Text('4.9', style: TextStyle(fontSize: 12.sp)),
-                      SizedBox(width: 10.w),
+                      Text(
+                        '4.9',
+                        style: textTheme.bodySmallRegular!.copyWith(
+                          color: context.colors.generalText,
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
                       Icon(
                         Icons.location_on,
                         size: 14.sp,
-                        color: AppColors.primaryAccent,
+                        color: context.colors.primary,
                       ),
-                      Text('190m', style: TextStyle(fontSize: 12.sp)),
+                      Text(
+                        '190m',
+                        style: textTheme.bodySmallRegular!.copyWith(
+                          color: context.colors.generalText,
+                        ),
+                      ),
                     ],
                   ),
-                  SizedBox(height: 5.h),
+                  SizedBox(height: 4.h),
                   Text(
                     '\$ 17,230',
-                    style: TextStyle(
-                      color: AppColors.primaryAccent,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14.sp,
+                    style: textTheme.bodyMediumBold!.copyWith(
+                      color: context.colors.primary,
                     ),
                   ),
                 ],
@@ -416,94 +486,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class CategorySelector extends StatefulWidget {
-  const CategorySelector({super.key});
-
-  @override
-  State<CategorySelector> createState() => _CategorySelectorState();
-}
-
-class _CategorySelectorState extends State<CategorySelector> {
-  int? selectedIndex = 0;
-
-  final List<Map<String, dynamic>> categories = [
-    {"icon": 'assets/images/burger.png', "label": "Burger"},
-    {"icon": 'assets/images/taco.png', "label": "Taco"},
-    {"icon": 'assets/images/drink.png', "label": "Drink"},
-    {"icon": 'assets/images/pizza.png', "label": "Pizza"},
-    {"icon": 'assets/images/burger.png', "label": "Burger"},
-    {"icon": 'assets/images/taco.png', "label": "Taco"},
-    {"icon": 'assets/images/drink.png', "label": "Drink"},
-    {"icon": 'assets/images/pizza.png', "label": "Pizza"},
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height:
-          MediaQuery.of(context).size.height * 0.095, // Adjust height as needed
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.symmetric(vertical: 2.w),
-        itemCount: categories.length,
-        separatorBuilder: (_, __) => SizedBox(width: 12.w),
-        itemBuilder: (context, index) {
-          final item = categories[index];
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                selectedIndex = selectedIndex == index ? null : index;
-              });
-            },
-            child: SizedBox(
-              width: 65.w,
-              child: _buildCategoryIcon(
-                item["icon"],
-                item["label"],
-                selectedIndex == index,
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildCategoryIcon(String iconPath, String label, bool selected) {
-    return Container(
-      padding: EdgeInsets.all(8.w),
-      decoration: BoxDecoration(
-        color:
-            selected
-                ? AppColors.primaryAccent.withOpacity(0.8)
-                : AppColors.neutral0,
-        borderRadius: BorderRadius.circular(10.r),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            iconPath,
-            width: 24.sp,
-            height: 24.sp,
-            fit: BoxFit.contain,
-          ),
-
-          SizedBox(height: 5.h),
-          Text(
-            label,
-            style: AppTextTheme.fallback(
-              isTablet: false,
-            ).bodyMediumMedium!.copyWith(
-              color: selected ? AppColors.neutral0 : AppColors.neutral60,
-            ),
-          ),
-        ],
       ),
     );
   }

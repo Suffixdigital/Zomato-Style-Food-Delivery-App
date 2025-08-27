@@ -1,29 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
+import 'package:smart_flutter/theme/app_colors.dart';
 
-class CustomFormField extends StatelessWidget {
+class CustomFormField extends StatefulWidget {
   final TextEditingController controller;
-
   final String hintText;
   final bool isPassword;
   final bool obscureText;
-
   final bool readOnly;
   final TextInputType keyboardType;
   final VoidCallback? onVisibilityTap;
   final VoidCallback onTap;
-
   final ValueChanged<String>? onChanged;
-
   final String? errorText;
-
-  final String? Function(dynamic value) validator;
+  final String? Function(String? value)? validator;
+  final FocusNode focusNode;
 
   const CustomFormField({
     super.key,
     required this.controller,
+    required this.focusNode,
     required this.hintText,
     this.isPassword = false,
     this.obscureText = false,
@@ -33,60 +30,106 @@ class CustomFormField extends StatelessWidget {
     this.onVisibilityTap,
     this.onChanged,
     this.errorText,
-    required this.validator,
+    this.validator,
   });
 
   @override
+  State<CustomFormField> createState() => _CustomFormFieldState();
+}
+
+class _CustomFormFieldState extends State<CustomFormField> {
+  late bool _hasFocus;
+
+  @override
+  void initState() {
+    super.initState();
+    _hasFocus = widget.focusNode.hasFocus;
+
+    widget.focusNode.addListener(() {
+      setState(() {
+        _hasFocus = widget.focusNode.hasFocus;
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
-    final bool isTablet = screenSize.shortestSide >= 600;
+    final textTheme = Theme.of(context).extension<AppTextTheme>()!;
+
+    final double borderWidth = 1.2.w;
 
     return TextFormField(
-      controller: controller,
-      obscureText: isPassword && obscureText,
-      keyboardType: keyboardType,
-      cursorColor: AppColors.primaryAccent,
+      controller: widget.controller,
+      obscureText: widget.isPassword && widget.obscureText,
+      keyboardType: widget.keyboardType,
+      cursorColor: context.colors.primary,
       obscuringCharacter: "*",
-      readOnly: readOnly,
-      onTap: onTap,
-      onChanged: onChanged,
-      validator: validator,
+      readOnly: widget.readOnly,
+      focusNode: widget.focusNode,
+      onTap: widget.onTap,
+      onChanged: widget.onChanged,
+      validator: widget.validator,
+      style: textTheme.bodyMediumMedium,
       decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: AppTextTheme.fallback(
-          isTablet: isTablet,
-        ).bodyMediumMedium!.copyWith(color: AppColors.neutral60),
+        hintText: widget.hintText,
+        hintStyle: textTheme.bodyMediumMedium!.copyWith(
+          color: context.colors.defaultGray878787,
+        ),
         filled: true,
-        fillColor: AppColors.neutral0,
+        fillColor: context.colors.background,
+        errorText: widget.errorText,
+        errorMaxLines: 3,
+        errorStyle: textTheme.bodyMediumMedium!.copyWith(
+          color: context.colors.error,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: AppColors.neutral30, width: 1.2.w),
+          borderSide: BorderSide(
+            color:
+                _hasFocus
+                    ? context.colors.primary
+                    : context.colors.defaultGray878787,
+            width: borderWidth,
+          ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: AppColors.neutral30, width: 1.2.w),
+          borderSide: BorderSide(
+            color: context.colors.defaultGray878787,
+            width: borderWidth,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: AppColors.neutral50, width: 1.2.w),
+          borderSide: BorderSide(
+            color: context.colors.primary,
+            width: borderWidth + 0.5,
+          ),
         ),
-        errorText: errorText,
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: Colors.red, width: 1.2.w),
+          borderSide: BorderSide(
+            color: context.colors.error,
+            width: borderWidth,
+          ),
         ),
-        errorStyle: AppTextTheme.fallback(
-          isTablet: isTablet,
-        ).bodyMediumMedium!.copyWith(color: Colors.red),
-        errorMaxLines: 4,
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: BorderSide(
+            color: context.colors.error,
+            width: borderWidth + 0.2,
+          ),
+        ),
         suffixIcon:
-            isPassword
+            widget.isPassword
                 ? IconButton(
                   icon: Icon(
-                    obscureText ? Icons.visibility_off : Icons.visibility,
-                    color: AppColors.neutral100,
+                    widget.obscureText
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                    color: context.colors.generalText,
                   ),
-                  onPressed: onVisibilityTap,
+                  onPressed: widget.onVisibilityTap,
                 )
                 : null,
       ),

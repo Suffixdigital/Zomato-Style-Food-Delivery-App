@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
+import 'package:smart_flutter/theme/app_colors.dart';
 
 class EmptyCartView extends StatelessWidget {
-  final bool isTablet;
-
-  const EmptyCartView({super.key, required this.isTablet});
+  const EmptyCartView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).extension<AppTextTheme>()!;
     return Center(
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -25,9 +24,9 @@ class EmptyCartView extends StatelessWidget {
             SizedBox(height: 30.h),
             Text(
               "Ouch! Hungry",
-              style: AppTextTheme.fallback(
-                isTablet: isTablet,
-              ).headingH5Bold!.copyWith(color: AppColors.neutral100),
+              style: textTheme.headingH5Bold!.copyWith(
+                color: context.colors.generalText,
+              ),
             ),
             SizedBox(height: 10.h),
             Padding(
@@ -35,9 +34,9 @@ class EmptyCartView extends StatelessWidget {
               child: Text(
                 "Seems like you have not ordered any food yet",
                 textAlign: TextAlign.center,
-                style: AppTextTheme.fallback(
-                  isTablet: isTablet,
-                ).bodyLargeRegular!.copyWith(color: AppColors.neutral60),
+                style: textTheme.bodyLargeRegular!.copyWith(
+                  color: context.colors.defaultGray878787,
+                ),
               ),
             ),
             SizedBox(height: 30.h),
@@ -46,7 +45,7 @@ class EmptyCartView extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
+                  backgroundColor: context.colors.primary,
                   padding: EdgeInsets.symmetric(vertical: 16.h),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30.r),
@@ -54,9 +53,9 @@ class EmptyCartView extends StatelessWidget {
                 ),
                 child: Text(
                   "Find Foods",
-                  style: AppTextTheme.fallback(
-                    isTablet: isTablet,
-                  ).bodyMediumSemiBold!.copyWith(color: AppColors.neutral0),
+                  style: textTheme.bodyMediumSemiBold!.copyWith(
+                    color: context.colors.defaultWhite,
+                  ),
                 ),
               ),
             ),

@@ -3,138 +3,148 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_flutter/core/utils/unifiedAuthResult.dart';
 import 'package:smart_flutter/routes/app_routes.dart';
 import 'package:smart_flutter/routes/tab_controller_notifier.dart';
 import 'package:smart_flutter/services/shared_preferences_service.dart';
+import 'package:smart_flutter/viewmodels/personal_data_viewmodel.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uni_links/uni_links.dart';
-
-import '../viewmodels/personal_data_viewmodel.dart';
 
 final deepLinkServiceProvider = Provider((ref) => DeepLinkService(ref));
 
 class DeepLinkService {
-  StreamSubscription? _sub;
+  StreamSubscription? sub;
   final Ref ref;
 
   DeepLinkService(this.ref);
 
   void init() {
-    getInitialUri().then(_handleUri);
-    _sub = uriLinkStream.listen(_handleUri);
+    getInitialUri().then(handleUri);
+    sub = uriLinkStream.listen(handleUri);
   }
 
-  Future<void> _handleUri(Uri? uri) async {
-    final supabase = Supabase.instance.client;
+  Future<void> handleUri(Uri? uri) async {
+    if (!isValidUri(uri)) return;
 
-    if (uri == null ||
-        !(uri.path.contains('callback') ||
-            uri.path.contains('reset-password'))) {
+    debugPrint('[DeepLink] Handling URI: $uri');
+
+    try {
+      final authResult = await handleAuthUri(uri!);
+
+      if (authResult.isSuccess) {
+        await processSuccess(uri, authResult);
+      } else {
+        await processError(authResult.errorMessage.toString());
+        debugPrint('[DeepLink] Auth failed: ${authResult.errorMessage}');
+      }
+    } on AuthException catch (e) {
+      await processError(e.toString());
+    }
+  }
+
+  /// Handle successful deep link auth
+  Future<void> processSuccess(Uri uri, UnifiedAuthResult authResult) async {
+    final supabase = Supabase.instance.client;
+    final ctx = navigatorKey.currentContext;
+
+    // Set session in Supabase
+    await supabase.auth.setSession(authResult.session!.refreshToken.toString());
+
+    // Clear expired link message
+    ref.read(linkExpiredMessage.notifier).state = '';
+
+    // Store login/reset state
+    final metadata = authResult.session!.user.userMetadata;
+    final isSocialLogin = isOAuth(metadata);
+    final isResetPassword = uri.path.contains("reset-password");
+    final isNewPassword = uri.path.contains("register-user");
+    SharedPreferencesService.setUserLoggedIn(isSocialLogin);
+    SharedPreferencesService.setResetPassword(isResetPassword);
+    SharedPreferencesService.setNewPassword(isNewPassword);
+
+    debugPrint('[DeepLink] User logged in: ${authResult.user?.email}');
+    debugPrint('[DeepLink] Metadata: $metadata, isSocialLogin=$isSocialLogin, isResetPassword=$isResetPassword');
+
+    // Handle navigation
+    if (ctx != null && ctx.mounted) {
+      if (uri.path.contains("reset-password")) {
+        navigate(ctx, 'resetPassword');
+      } else if (uri.path.contains("social-media-login")) {
+        ref.invalidate(personalDataProvider);
+        navigate(ctx, 'home');
+      } else if (uri.path.contains('register-user')) {
+        navigate(ctx, 'set-password');
+      }
+    }
+  }
+
+  /// Handle errors (expired/invalid link)
+  Future<void> processError(String errorMessage) async {
+    debugPrint('[DeepLink] Error: $errorMessage');
+
+    final supabase = Supabase.instance.client;
+    final session = supabase.auth.currentSession;
+
+    if (session != null) {
+      // Recover state from existing session
+      final metadata = session.user.userMetadata;
+      final isSocialLogin = isOAuth(metadata);
+
+      ref.read(linkExpiredMessage.notifier).state = '';
+      SharedPreferencesService.setUserLoggedIn(isSocialLogin);
+      SharedPreferencesService.setPhoneOTPAuthenticated(false);
+
+      debugPrint('[DeepLink] Fallback: metadata=$metadata, isSocialLogin=$isSocialLogin');
+
+      // Try refreshing session
+      try {
+        await supabase.auth.refreshSession();
+      } catch (refreshError) {
+        debugPrint('[DeepLink] Session refresh failed: $refreshError');
+      }
+    }
+
+    // Show expired link message
+    ref.read(linkExpiredMessage.notifier).state = errorMessage;
+
+    // Redirect back to last route or login
+    final ctx = navigatorKey.currentContext;
+    if (ctx == null || !ctx.mounted) {
+      debugPrint('[DeepLink] Context not found in exception');
       return;
     }
 
-    debugPrint('[DeepLink] Processing: $uri');
-    final uriStr = uri.toString();
-    try {
-      final response = await Supabase.instance.client.auth.getSessionFromUrl(
-        uri,
-      );
-      final session = response.session;
-      if (session.refreshToken != null) {
-        await supabase.auth.setSession(session.refreshToken!);
-        ref.watch(linkExpiredMessage.notifier).state = '';
+    Future.delayed(const Duration(milliseconds: 300), () {
+      final lastRoute = SharedPreferencesService.getLastRoute();
+      debugPrint('[DeepLink] Redirecting from /callback → $lastRoute');
 
-        final ctx = navigatorKey.currentContext;
-        if (ctx != null && ctx.mounted) {
-          final metadata = session.user.userMetadata;
-          final isSocialLogin = isOAuth(metadata);
-          final isPasswordSet = metadata?['password_set'] == true;
-          final isResetPassword = uriStr.contains('reset-password');
-          SharedPreferencesService.setResetPassword(isResetPassword);
-          SharedPreferencesService.setUserLoggedIn(isSocialLogin);
-
-          if (isSocialLogin) {
-            ref.invalidate(personalDataProvider);
-          }
-
-          debugPrint(
-            '[DeepLink] Try block: metadata: $metadata  isSocialLogin: $isSocialLogin isPasswordSet: $isPasswordSet',
-          );
-
-          Future.microtask(() {
-            ctx.goNamed(
-              isResetPassword
-                  ? 'resetPassword'
-                  : isSocialLogin
-                  ? 'home'
-                  : (isPasswordSet ? 'home' : 'set-password'),
-            );
-          });
-        }
+      if (lastRoute.isNotEmpty) {
+        ctx.goNamed(lastRoute);
       } else {
-        debugPrint('[DeepLink] No refresh token in session');
+        ctx.goNamed('login');
       }
-    } catch (e) {
-      debugPrint('[DeepLink] Error: $e');
-
-      final session = supabase.auth.currentSession;
-
-      if (session != null) {
-        final ctx = navigatorKey.currentContext;
-        final metadata = session.user.userMetadata;
-        final isSocialLogin = isOAuth(metadata);
-        final isPasswordSet = metadata?['password_set'] == true;
-
-        if (ctx != null && ctx.mounted) {
-          ref.watch(linkExpiredMessage.notifier).state = ''; // Clear error
-
-          SharedPreferencesService.setUserLoggedIn(isSocialLogin);
-
-          debugPrint(
-            '[DeepLink] Catch block: metadata: $metadata  isSocialLogin: $isSocialLogin isPasswordSet: $isPasswordSet',
-          );
-        }
-      }
-
-      // Session is null → fallback to login
-      if (session != null) {
-        try {
-          await supabase.auth.refreshSession();
-        } catch (refreshError) {
-          debugPrint('[DeepLink] Session refresh failed: $refreshError');
-        }
-      }
-
-      ref.watch(linkExpiredMessage.notifier).state = e.toString();
-
-      final ctx = navigatorKey.currentContext;
-      if (ctx == null || !ctx.mounted) {
-        debugPrint('[DeepLink] Context not found in exception');
-        return;
-      }
-
-      Future.delayed(const Duration(milliseconds: 300), () {
-        final lastRoute = SharedPreferencesService.getLastRoute();
-        debugPrint('Redirecting from /callback to lastRoute: $lastRoute');
-
-        // Use pushReplacementNamed to cleanly replace /callback
-        if (lastRoute.isNotEmpty) {
-          ctx.goNamed(lastRoute);
-        } else {
-          ctx.goNamed('login');
-        }
-      });
-    }
+    });
   }
 
+  /// Navigate safely in microtask
+  void navigate(BuildContext ctx, String routeName) {
+    Future.microtask(() => ctx.goNamed(routeName));
+  }
+
+  /// Check if deep link is valid
+  bool isValidUri(Uri? uri) {
+    if (uri == null) return false;
+    final path = uri.path.toLowerCase();
+    return path.contains('social-media-login') || path.contains('register-user') || path.contains('reset-password');
+  }
+
+  /// Detect if login was OAuth
   bool isOAuth(Map<String, dynamic>? metadata) {
     if (metadata == null) return false;
-
     final iss = metadata['iss']?.toString() ?? '';
-    return iss.contains('google.com') ||
-        iss.contains('facebook.com') ||
-        iss.contains('twitter.com');
+    return iss.contains('google.com') || iss.contains('facebook.com') || iss.contains('twitter.com');
   }
 
-  void dispose() => _sub?.cancel();
+  void dispose() => sub?.cancel();
 }

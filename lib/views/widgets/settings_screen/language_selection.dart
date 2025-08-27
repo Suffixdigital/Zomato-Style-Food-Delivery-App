@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/core/data/language_details.dart';
+import 'package:smart_flutter/theme/app_colors.dart';
 import 'package:smart_flutter/viewmodels/settings_viewmodel.dart';
 
 class LanguageSelection extends ConsumerStatefulWidget {
@@ -31,10 +31,9 @@ class _LanguageSelectionState extends ConsumerState<LanguageSelection> {
 
   @override
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
-    final bool isTablet = screenSize.shortestSide >= 600;
+    final textTheme = Theme.of(context).extension<AppTextTheme>()!;
     return Scaffold(
-      backgroundColor: AppColors.neutral100.withValues(alpha: 0.5),
+      backgroundColor: context.colors.defaultBlack.withValues(alpha: 0.5),
       // Blurred background illusion
       body: Align(
         alignment: Alignment.bottomCenter,
@@ -42,7 +41,7 @@ class _LanguageSelectionState extends ConsumerState<LanguageSelection> {
           width: double.infinity,
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
           decoration: BoxDecoration(
-            color: AppColors.neutral0,
+            color: context.colors.background,
             borderRadius: BorderRadius.vertical(top: Radius.circular(36.r)),
           ),
           child: Column(
@@ -54,7 +53,7 @@ class _LanguageSelectionState extends ConsumerState<LanguageSelection> {
                   width: 60.w,
                   height: 4.h,
                   decoration: BoxDecoration(
-                    color: AppColors.neutral40,
+                    color: context.colors.defaultGray878787,
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                 ),
@@ -62,9 +61,9 @@ class _LanguageSelectionState extends ConsumerState<LanguageSelection> {
               SizedBox(height: 20.h),
               Text(
                 "Select Language",
-                style: AppTextTheme.fallback(
-                  isTablet: isTablet,
-                ).bodyLargeSemiBold!.copyWith(color: AppColors.neutral100),
+                style: textTheme.bodyLargeSemiBold!.copyWith(
+                  color: context.colors.generalText,
+                ),
               ),
               SizedBox(height: 24.h),
 
@@ -82,25 +81,26 @@ class _LanguageSelectionState extends ConsumerState<LanguageSelection> {
                       border: Border.all(
                         color:
                             isSelected
-                                ? AppColors.primaryAccent
-                                : AppColors.neutral30,
-                        width: 1.5,
+                                ? context.colors.primary
+                                : context.colors.defaultGray878787,
+                        width: 1.w,
                       ),
                       borderRadius: BorderRadius.circular(16.r),
                       color:
                           isSelected
-                              ? AppColors.primaryAccent.withValues(alpha: 0.04)
-                              : AppColors.neutral0,
+                              ? context.colors.primary.withValues(alpha: 0.04)
+                              : context.colors.background,
                     ),
                     child: Row(
                       children: [
                         CircleAvatar(
-                          backgroundColor: AppColors.neutral30,
+                          backgroundColor: context.colors.defaultGrayEEEEEE
+                              .withValues(alpha: 0.5),
                           radius: 16.r,
                           child: Image.asset(
                             option['icon'].toString(),
-                            width: 14.w,
-                            height: 14.h,
+                            width: 18.w,
+                            height: 18.h,
                           ),
                         ),
                         SizedBox(width: 12.w),
@@ -110,9 +110,9 @@ class _LanguageSelectionState extends ConsumerState<LanguageSelection> {
                             children: [
                               Text(
                                 option['language'].toString(),
-                                style: AppTextTheme.fallback(isTablet: isTablet)
-                                    .bodyMediumSemiBold!
-                                    .copyWith(color: AppColors.neutral100),
+                                style: textTheme.bodyMediumSemiBold!.copyWith(
+                                  color: context.colors.generalText,
+                                ),
                               ),
                             ],
                           ),
@@ -120,7 +120,7 @@ class _LanguageSelectionState extends ConsumerState<LanguageSelection> {
                         if (isSelected)
                           Icon(
                             Icons.check_circle,
-                            color: AppColors.primaryAccent,
+                            color: context.colors.primary,
                             size: 24.sp,
                           ),
                       ],
@@ -136,11 +136,11 @@ class _LanguageSelectionState extends ConsumerState<LanguageSelection> {
                   onPressed: () {
                     ref
                         .read(settingsViewModelProvider.notifier)
-                        .selectLanguage(selectedIndex);
+                        .updateLanguage(selectedIndex);
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
+                    backgroundColor: context.colors.primary,
                     padding: EdgeInsets.symmetric(vertical: 16.h),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.r),
@@ -148,9 +148,9 @@ class _LanguageSelectionState extends ConsumerState<LanguageSelection> {
                   ),
                   child: Text(
                     "Select",
-                    style: AppTextTheme.fallback(
-                      isTablet: isTablet,
-                    ).bodyMediumSemiBold!.copyWith(color: AppColors.neutral0),
+                    style: textTheme.bodyMediumSemiBold!.copyWith(
+                      color: context.colors.defaultWhite,
+                    ),
                   ),
                 ),
               ),

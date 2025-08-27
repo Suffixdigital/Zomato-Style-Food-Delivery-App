@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/routes/tab_controller_notifier.dart';
+import 'package:smart_flutter/theme/app_colors.dart';
 import 'package:smart_flutter/viewmodels/credit_card_viewmodel.dart';
 import 'package:smart_flutter/views/widgets/credit_card_screen/card_list_tile.dart';
 import 'package:smart_flutter/views/widgets/credit_card_screen/credit_card_header.dart';
@@ -29,15 +29,13 @@ class _CreditCardScreenState extends ConsumerState<CreditCardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
-    final bool isTablet = screenSize.shortestSide >= 600;
-
-    final cards = ref.watch(creditCardListProvider);
+    final textTheme = Theme.of(context).extension<AppTextTheme>()!;
+    final cards = ref.watch(creditCardViewModelProvider).getCreditCards();
 
     return WillPopScope(
       onWillPop: onBackPressed,
       child: ScreenUtilInit(
-        designSize: const Size(375, 812),
+        designSize: Size(375, 812),
         minTextAdapt: true,
         builder:
             (context, child) => Scaffold(
@@ -45,23 +43,17 @@ class _CreditCardScreenState extends ConsumerState<CreditCardScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CreditCardHeader(
-                      isTablet: isTablet,
-                      onBackPressed: onBackPressed,
-                    ),
+                    CreditCardHeader(onBackPressed: onBackPressed),
                     SizedBox(height: 15.h),
-                    CreditCardWidget(
-                      isTablet: isTablet,
-                      card: cards[selectedIndex],
-                    ),
+                    CreditCardWidget(card: cards[selectedIndex]),
                     SizedBox(height: 15.h),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.w),
                       child: Text(
                         "Credit card",
-                        style: AppTextTheme.fallback(isTablet: isTablet)
-                            .bodyLargeMedium!
-                            .copyWith(color: AppColors.neutral100),
+                        style: textTheme.bodyLargeMedium!.copyWith(
+                          color: context.colors.generalText,
+                        ),
                       ),
                     ),
                     SizedBox(height: 15.h),
@@ -96,7 +88,7 @@ class _CreditCardScreenState extends ConsumerState<CreditCardScreen> {
                     child: ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryAccent,
+                        backgroundColor: context.colors.primary,
                         padding: EdgeInsets.symmetric(vertical: 16.h),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.r),
@@ -104,9 +96,9 @@ class _CreditCardScreenState extends ConsumerState<CreditCardScreen> {
                       ),
                       child: Text(
                         "Add New Card",
-                        style: AppTextTheme.fallback(isTablet: isTablet)
-                            .bodyMediumSemiBold!
-                            .copyWith(color: AppColors.neutral0),
+                        style: textTheme.bodyMediumSemiBold!.copyWith(
+                          color: context.colors.defaultWhite,
+                        ),
                       ),
                     ),
                   ),

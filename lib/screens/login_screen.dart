@@ -8,13 +8,11 @@ import 'package:smart_flutter/core/utils/device_utils.dart';
 import 'package:smart_flutter/routes/tab_controller_notifier.dart';
 import 'package:smart_flutter/screens/link_expired_dialog.dart';
 import 'package:smart_flutter/services/shared_preferences_service.dart';
+import 'package:smart_flutter/theme/app_colors.dart';
+import 'package:smart_flutter/viewmodels/personal_data_viewmodel.dart';
 import 'package:smart_flutter/viewmodels/register_viewmodel.dart';
 import 'package:smart_flutter/views/widgets/login_screen/custom_form_field.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import '../core/constants/app_colors.dart';
-import '../viewmodels/personal_data_viewmodel.dart';
-import 'forgot_password_contact_details_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -25,20 +23,62 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
+  final phoneLoginFormKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+
+  final TextEditingController phoneNumberController = TextEditingController();
 
   final emailRegex = RegExp(r"^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$");
   bool obscureText = true;
 
   bool isFormValid = false;
+  bool isPhoneLoginFormValid = false;
+  bool isValidPhoneNumber = false;
 
-  // bool hasShowingShet = false;
+  bool isEmailValid = false;
+  bool isPasswordValid = false;
+
+  final FocusNode emailFocus = FocusNode();
+  final FocusNode passwordFocus = FocusNode();
+
+  final FocusNode phoneNumberFocus = FocusNode();
+
+  bool phoneNumberTouched = false;
+
+  bool emailTouched = false;
+  bool passwordTouched = false;
+
+  bool isPhoneLogin = false;
 
   @override
   void initState() {
     emailController.addListener(validateForm);
     passwordController.addListener(validateForm);
+    phoneNumberController.addListener(validatePhoneLoginForm);
+    emailFocus.addListener(() {
+      if (!emailFocus.hasFocus) {
+        setState(() {
+          emailTouched = true;
+        });
+      }
+    });
+
+    passwordFocus.addListener(() {
+      if (!passwordFocus.hasFocus) {
+        setState(() {
+          passwordTouched = true;
+        });
+      }
+    });
+
+    phoneNumberFocus.addListener(() {
+      if (!phoneNumberFocus.hasFocus) {
+        setState(() {
+          phoneNumberTouched = true;
+        });
+      }
+    });
     super.initState();
   }
 
@@ -46,36 +86,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void dispose() {
     passwordController.dispose();
     emailController.dispose();
+    phoneNumberController.dispose();
     super.dispose();
+  }
+
+  void validatePhoneLoginForm() {
+    final isValid = phoneLoginFormKey.currentState?.validate() ?? false;
+    setState(() => isPhoneLoginFormValid = isValid && isValidPhoneNumber);
   }
 
   void validateForm() {
     final isValid = _formKey.currentState?.validate() ?? false;
-    setState(() => isFormValid = isValid);
+    setState(() => isFormValid = isValid && isEmailValid && isPasswordValid);
   }
 
-  void loginProcess() async {
-    if (!isFormValid) return;
+  void phoneLoginProcess() async {
+    if (!isPhoneLoginFormValid) return;
 
     // Call the ViewModel
-    await ref
-        .read(registerViewModelProvider.notifier)
-        .login(email: emailController.text, password: passwordController.text);
+    await ref.read(registerViewModelProvider.notifier).phoneLogin(phoneNumber: phoneNumberController.text);
 
     final result = ref.read(registerViewModelProvider);
 
     result.when(
       data: (_) {
-        SharedPreferencesService.setUserLoggedIn(true);
-        ref.read(tabIndexProvider.notifier).state = 0;
-        ref.invalidate(personalDataProvider);
-        // Go to home screen
-        context.goNamed('home');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('OTP sent on ${phoneNumberController.text}')));
+        context.goNamed('phoneOtpVerification', pathParameters: {'phone': phoneNumberController.text});
       },
       error: (error, _) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $error')));
+        print('Error: $error');
+        //context.goNamed('phoneOtpVerification', pathParameters: {'phone': phoneNumberController.text});
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $error')));
       },
       loading: () {
         // UI already shows CircularProgressIndicator
@@ -83,41 +124,60 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Future<void> signInWithProvider(
-    OAuthProvider provider,
-    BuildContext context,
-  ) async {
+  void loginProcess() async {
+    if (!isFormValid) return;
+
+    // Call the ViewModel
+    await ref.read(registerViewModelProvider.notifier).login(email: emailController.text, password: passwordController.text);
+
+    final result = ref.read(registerViewModelProvider);
+
+    result.when(
+      data: (_) {
+        SharedPreferencesService.setUserLoggedIn(true);
+        SharedPreferencesService.setPhoneOTPAuthenticated(false);
+        ref.read(tabIndexProvider.notifier).state = 0;
+        ref.invalidate(personalDataProvider);
+        // Go to home screen
+        context.goNamed('home');
+      },
+      error: (error, _) {
+        print('Error: $error');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $error')));
+      },
+      loading: () {
+        // UI already shows CircularProgressIndicator
+      },
+    );
+  }
+
+  Future<void> signInWithProvider(OAuthProvider provider, BuildContext context) async {
     final supabase = Supabase.instance.client;
 
     try {
-      // 🌐 Web platform
+      // Web platform
       if (kIsWeb) {
-        await supabase.auth.signInWithOAuth(
-          provider,
-          redirectTo: 'https://<your-project-ref>.supabase.co/auth/v1/callback',
-        );
+        await supabase.auth.signInWithOAuth(provider, redirectTo: 'io.supabase.flutterquickstart://callback/social-media-login');
       }
-      // 📱 Mobile platforms (Android/iOS)
+      // Mobile platforms (Android/iOS)
       else {
         await supabase.auth.signInWithOAuth(
           provider,
-          authScreenLaunchMode: LaunchMode.externalApplication,
-          redirectTo:
-              'https://jpi.nub.mybluehostin.me/callback', // matches your scheme
+          authScreenLaunchMode: LaunchMode.inAppBrowserView,
+          redirectTo: 'io.supabase.flutterquickstart://callback/social-media-login', // matches your scheme
         );
       }
     } catch (e) {
       debugPrint('OAuth SignIn Error: $e');
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Login failed: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login failed: $e')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final message = ref.read(linkExpiredMessage);
-
+    final textTheme = Theme.of(context).extension<AppTextTheme>()!;
+    final String iconPath = isPhoneLogin ? 'assets/icons/email_password.svg' : 'assets/icons/otp_icon.svg';
     if (message.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         LinkExpiredDialog.show(context, message);
@@ -125,167 +185,178 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       });
     }
     final state = ref.watch(registerViewModelProvider);
-    final Size screenSize = MediaQuery.of(context).size;
-    final bool isTablet = screenSize.shortestSide >= 600;
-    final shouldShow = ref.read(showResetPasswordSheetProvider);
-
-    print('didChangeDependencies() called $shouldShow');
-    if (shouldShow) {
-      Future.delayed(Duration.zero, () {
-        ref.read(showResetPasswordSheetProvider.notifier).state = false;
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          builder: (_) => ForgotPasswordContactDetailsScreen(context: context),
-        );
-      });
-    }
 
     return ScreenUtilInit(
-      designSize: const Size(375, 812),
+      designSize: Size(375, 812),
       builder:
           (_, __) => Scaffold(
             body: SafeArea(
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   return SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 24.w,
-                      vertical: 24.h,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
                     child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: constraints.minHeight,
-                      ),
+                      constraints: BoxConstraints(minHeight: constraints.minHeight),
                       child: IntrinsicHeight(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(height: 20.h),
-                            Text(
-                              "Login to your\naccount.",
-                              style: AppTextTheme.fallback(isTablet: isTablet)
-                                  .headingH4SemiBold!
-                                  .copyWith(color: AppColors.neutral100),
-                            ),
+                            Text("Login to your\naccount.", style: textTheme.headingH4SemiBold!.copyWith(color: context.colors.generalText)),
                             SizedBox(height: 8.h),
-                            Text(
-                              "Please sign in to your account",
-                              style: AppTextTheme.fallback(isTablet: isTablet)
-                                  .bodyMediumMedium!
-                                  .copyWith(color: AppColors.neutral60),
-                            ),
+                            Text("Please sign in to your account", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.defaultGray878787)),
                             SizedBox(height: 32.h),
 
-                            Form(
-                              key: _formKey,
-                              onChanged: validateForm,
-                              // Re-validate on any change
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Email Address",
-                                    style: AppTextTheme.fallback(
-                                      isTablet: isTablet,
-                                    ).bodyMediumMedium!.copyWith(
-                                      color: AppColors.neutral100,
+                            if (isPhoneLogin)
+                              Form(
+                                key: phoneLoginFormKey,
+                                onChanged: validatePhoneLoginForm,
+                                autovalidateMode: AutovalidateMode.disabled,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text("Phone Number", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
+                                    SizedBox(height: 8.h),
+                                    CustomFormField(
+                                      controller: phoneNumberController,
+                                      focusNode: phoneNumberFocus,
+                                      hintText: "Enter your phone number",
+                                      keyboardType: TextInputType.phone,
+                                      onTap: () {
+                                        if (!phoneNumberTouched) {
+                                          setState(() {
+                                            phoneNumberTouched = true;
+                                          });
+                                        }
+                                      },
+                                      validator: (value) {
+                                        if (!phoneNumberTouched) {
+                                          return null;
+                                        }
+                                        if (value == null || value.isEmpty) {
+                                          isValidPhoneNumber = false;
+                                          return '⦿ Phone number is required';
+                                        } else if (value.length < 10) {
+                                          isValidPhoneNumber = false;
+                                          return '⦿ Enter a valid phone number';
+                                        }
+                                        isValidPhoneNumber = true;
+                                        return null;
+                                      },
                                     ),
-                                  ),
-                                  SizedBox(height: 8.h),
-                                  CustomFormField(
-                                    controller: emailController,
-                                    hintText: "Enter Email",
-                                    keyboardType: TextInputType.emailAddress,
-                                    onTap: () {},
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return '• Email is required';
-                                      }
-                                      if (!emailRegex.hasMatch(value)) {
-                                        return '• Enter a valid email';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                  SizedBox(height: 16.h),
-                                  Text(
-                                    "Password",
-                                    style: AppTextTheme.fallback(
-                                      isTablet: isTablet,
-                                    ).bodyMediumMedium!.copyWith(
-                                      color: AppColors.neutral100,
+                                    SizedBox(height: 16.h),
+                                  ],
+                                ),
+                              )
+                            else
+                              Form(
+                                key: _formKey,
+                                onChanged: validateForm,
+                                autovalidateMode: AutovalidateMode.disabled,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text("Email Address", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
+                                    SizedBox(height: 8.h),
+                                    CustomFormField(
+                                      controller: emailController,
+                                      focusNode: emailFocus,
+                                      hintText: "Enter Email",
+                                      keyboardType: TextInputType.emailAddress,
+                                      onTap: () {
+                                        if (!emailTouched) {
+                                          setState(() {
+                                            emailTouched = true;
+                                          });
+                                        }
+                                      },
+                                      validator: (value) {
+                                        if (!emailTouched) return null;
+                                        if (value == null || value.isEmpty) {
+                                          isEmailValid = false;
+                                          return '⦿ Email is required';
+                                        }
+                                        if (!emailRegex.hasMatch(value)) {
+                                          isEmailValid = false;
+                                          return '⦿ Enter a valid email';
+                                        }
+                                        isEmailValid = true;
+                                        return null;
+                                      },
                                     ),
-                                  ),
-                                  SizedBox(height: 8.h),
-                                  CustomFormField(
-                                    controller: passwordController,
-                                    hintText: "Password",
-                                    isPassword: true,
-                                    obscureText: obscureText,
-                                    keyboardType: TextInputType.visiblePassword,
-                                    onVisibilityTap: () {
-                                      setState(() {
-                                        obscureText = !obscureText;
-                                      });
-                                    },
-                                    onTap: () {},
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return '• Password is required';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton(
-                                onPressed: () {
-                                  // context.goNamed('forgotPassword');
-                                  context.pushNamed('forgotPassword');
-                                },
-                                child: Text(
-                                  "Forgot password?",
-
-                                  style: AppTextTheme.fallback(
-                                    isTablet: isTablet,
-                                  ).bodyMediumSemiBold!.copyWith(
-                                    color: AppColors.primaryAccent,
-                                  ),
+                                    SizedBox(height: 16.h),
+                                    Text("Password", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
+                                    SizedBox(height: 8.h),
+                                    CustomFormField(
+                                      controller: passwordController,
+                                      focusNode: passwordFocus,
+                                      hintText: "Password",
+                                      isPassword: true,
+                                      obscureText: obscureText,
+                                      keyboardType: TextInputType.visiblePassword,
+                                      onVisibilityTap: () {
+                                        setState(() {
+                                          obscureText = !obscureText;
+                                        });
+                                      },
+                                      onTap: () {
+                                        if (!passwordTouched) {
+                                          setState(() {
+                                            passwordTouched = true;
+                                          });
+                                        }
+                                      },
+                                      validator: (value) {
+                                        if (!passwordTouched) return null;
+                                        if (value == null || value.isEmpty) {
+                                          isPasswordValid = false;
+                                          return '⦿ Password is required';
+                                        }
+                                        isPasswordValid = true;
+                                        return null;
+                                      },
+                                    ),
+                                    SizedBox(height: 4.h),
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: TextButton(
+                                        onPressed: () {
+                                          context.pushNamed('forgotPassword');
+                                        },
+                                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                                        child: Text("Forgot password?", style: textTheme.bodyMediumSemiBold!.copyWith(color: context.colors.primary)),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ),
+
                             SizedBox(height: 16.h),
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
                                 onPressed:
-                                    state.isLoading || !isFormValid
+                                    state.isLoading || !(isPhoneLogin ? isPhoneLoginFormValid : isFormValid)
                                         ? null
+                                        : isPhoneLogin
+                                        ? phoneLoginProcess
                                         : loginProcess,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.orange,
+                                  backgroundColor:
+                                      (isPhoneLogin ? isPhoneLoginFormValid : isFormValid) ? context.colors.primary : context.colors.defaultGrayEEEEEE,
                                   padding: EdgeInsets.symmetric(vertical: 16.h),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30.r),
-                                  ),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.r)),
                                 ),
                                 child:
                                     state.isLoading
-                                        ? const CircularProgressIndicator()
+                                        ? CircularProgressIndicator()
                                         : Text(
-                                          "Sign In",
-                                          style: AppTextTheme.fallback(
-                                            isTablet: isTablet,
-                                          ).bodyMediumSemiBold!.copyWith(
-                                            color: AppColors.neutral0,
+                                          isPhoneLogin ? "Proceed" : "Sign In",
+                                          style: textTheme.bodyMediumSemiBold!.copyWith(
+                                            color:
+                                                (isPhoneLogin ? isPhoneLoginFormValid : isFormValid)
+                                                    ? context.colors.defaultWhite
+                                                    : context.colors.defaultGray878787,
                                           ),
                                         ),
                               ),
@@ -293,25 +364,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             SizedBox(height: 16.h),
                             Row(
                               children: [
-                                Expanded(
-                                  child: Divider(color: AppColors.neutral60),
-                                ),
+                                Expanded(child: Divider(color: context.colors.defaultGray878787)),
                                 Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 10.w,
-                                  ),
-                                  child: Text(
-                                    "Or sign in with",
-                                    style: AppTextTheme.fallback(
-                                      isTablet: isTablet,
-                                    ).bodyMediumMedium!.copyWith(
-                                      color: AppColors.neutral60,
-                                    ),
-                                  ),
+                                  padding: EdgeInsets.symmetric(horizontal: 10.w),
+                                  child: Text("Or sign in with", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.defaultGray878787)),
                                 ),
-                                Expanded(
-                                  child: Divider(color: AppColors.neutral60),
-                                ),
+                                Expanded(child: Divider(color: context.colors.defaultGray878787)),
                               ],
                             ),
                             SizedBox(height: 16.h),
@@ -320,38 +378,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               children: [
                                 GestureDetector(
                                   onTap: () {
-                                    signInWithProvider(
-                                      OAuthProvider.google,
-                                      context,
-                                    );
+                                    setState(() => isPhoneLogin = !isPhoneLogin);
                                   },
-                                  child: DeviceUtils.socialIcon(
-                                    "assets/icons/google.svg",
-                                  ),
+                                  child: DeviceUtils.socialIcon(iconPath, context.colors.defaultGrayEEEEEE),
                                 ),
                                 SizedBox(width: 16.w),
                                 GestureDetector(
                                   onTap: () {
-                                    signInWithProvider(
-                                      OAuthProvider.twitter,
-                                      context,
-                                    );
+                                    signInWithProvider(OAuthProvider.google, context);
                                   },
-                                  child: DeviceUtils.socialIcon(
-                                    "assets/icons/twitter.svg",
-                                  ),
+                                  child: DeviceUtils.socialIcon("assets/icons/google.svg", context.colors.defaultGrayEEEEEE),
                                 ),
                                 SizedBox(width: 16.w),
                                 GestureDetector(
                                   onTap: () {
-                                    signInWithProvider(
-                                      OAuthProvider.facebook,
-                                      context,
-                                    );
+                                    signInWithProvider(OAuthProvider.twitter, context);
                                   },
-                                  child: DeviceUtils.socialIcon(
-                                    "assets/icons/facebook.svg",
-                                  ),
+                                  child: DeviceUtils.socialIcon("assets/icons/twitter.svg", context.colors.defaultGrayEEEEEE),
+                                ),
+                                SizedBox(width: 16.w),
+                                GestureDetector(
+                                  onTap: () {
+                                    signInWithProvider(OAuthProvider.facebook, context);
+                                  },
+                                  child: DeviceUtils.socialIcon("assets/icons/facebook.svg", context.colors.defaultGrayEEEEEE),
                                 ),
                               ],
                             ),
@@ -366,21 +416,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   child: RichText(
                                     text: TextSpan(
                                       text: "Don't have an account? ",
-                                      style: AppTextTheme.fallback(
-                                        isTablet: isTablet,
-                                      ).bodyMediumMedium!.copyWith(
-                                        color: AppColors.neutral100,
-                                      ),
-                                      children: [
-                                        TextSpan(
-                                          text: "Register",
-                                          style: AppTextTheme.fallback(
-                                            isTablet: isTablet,
-                                          ).bodyMediumSemiBold!.copyWith(
-                                            color: AppColors.primaryAccent,
-                                          ),
-                                        ),
-                                      ],
+                                      style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText),
+                                      children: [TextSpan(text: "Register", style: textTheme.bodyMediumSemiBold!.copyWith(color: context.colors.primary))],
                                     ),
                                   ),
                                 ),

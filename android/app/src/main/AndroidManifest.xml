@@ -1,6 +1,26 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Location -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Camera -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- Notifications (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Optional for storage or microphone -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+
+    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
@@ -34,42 +54,68 @@
             </intent-filter>
 
 
-            <!--<intent-filter
-                android:autoVerify="true"
-                tools:ignore="AppLinkUrlError">
+            <!-- App Link for HTTPS -->
+            <!-- <intent-filter android:autoVerify="true">
+                 <action android:name="android.intent.action.VIEW" />
+
+                 <category android:name="android.intent.category.DEFAULT" />
+                 <category android:name="android.intent.category.BROWSABLE" />
+
+                 <data
+                     android:host="jpi.nub.mybluehostin.me"
+                     android:pathPrefix="/callback"
+                     android:scheme="https" />
+             </intent-filter>
+
+             <intent-filter android:autoVerify="true">
+                 <action android:name="android.intent.action.VIEW" />
+
+                 <category android:name="android.intent.category.DEFAULT" />
+                 <category android:name="android.intent.category.BROWSABLE" />
+
+                 <data
+                     android:host="jpi.nub.mybluehostin.me"
+                     android:pathPrefix="/reset-password"
+                     android:scheme="https" />
+             </intent-filter>-->
+
+            <!--For new user sign-up email confirmation-->
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
+                <!-- Accepts URIs that begin with YOUR_SCHEME://YOUR_HOST -->
                 <data
                     android:host="callback"
-                    android:scheme="io.supabase.flutter" />
-            </intent-filter>-->
-
-            <!-- App Link for HTTPS -->
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="jpi.nub.mybluehostin.me"
-                    android:pathPrefix="/callback"
-                    android:scheme="https" />
+                    android:pathPrefix="/register-user"
+                    android:scheme="io.supabase.flutterquickstart" />
             </intent-filter>
 
-            <intent-filter android:autoVerify="true">
+            <!--For forgot password callback-->
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
+                <!-- Accepts URIs that begin with YOUR_SCHEME://YOUR_HOST -->
                 <data
-                    android:host="jpi.nub.mybluehostin.me"
+                    android:host="callback"
                     android:pathPrefix="/reset-password"
-                    android:scheme="https" />
+                    android:scheme="io.supabase.flutterquickstart" />
+            </intent-filter>
+
+            <!--For social media login callback-->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Accepts URIs that begin with YOUR_SCHEME://YOUR_HOST -->
+                <data
+                    android:host="callback"
+                    android:pathPrefix="/social-media-login"
+                    android:scheme="io.supabase.flutterquickstart" />
             </intent-filter>
 
         </activity>

@@ -46,7 +46,11 @@ class TextIconButton extends StatelessWidget {
               : Center(
                 child: Text(
                   textLabel,
-                  style: AppTextStyles.buttonText(isTablet),
+                  style: TextStyle(
+                    color: AppColors.neutral0,
+                    fontSize: isTablet ? 24.sp : 18.sp,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
     );

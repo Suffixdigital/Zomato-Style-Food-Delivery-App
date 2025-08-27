@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -29,7 +31,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Widget build(BuildContext context) {
     final message = ref.read(linkExpiredMessage);
 
-    print('linkExpiredMessage $message');
     if (message.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         LinkExpiredDialog.show(context, message);
@@ -37,7 +38,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       });
     }
     return ScreenUtilInit(
-      designSize: const Size(375, 812),
+      designSize: Size(375, 812),
       builder:
           (context, child) => Scaffold(
             extendBodyBehindAppBar: true,
@@ -49,18 +50,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               itemCount: pages.length,
               itemBuilder: (ctx, index) {
                 return OnboardingCard(
-                  // pageDetail: pages[index],
-                  // isLast: index == images.length - 1,
                   currentIndex: currentPage,
                   onNext: () {
                     if (currentPage < pages.length - 1) {
-                      controller.nextPage(
-                        duration: const Duration(milliseconds: 400),
-                        curve: Curves.easeInOut,
-                      );
+                      controller.nextPage(duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
                     } else {
                       SharedPreferencesService.markOnboardingCompleted();
-                      context.goNamed('login', extra: false);
+                      // --- Platform-specific permission onboarding ---
+                      final isMobilePlatform = Platform.isAndroid || Platform.isIOS;
+                      if (isMobilePlatform) {
+                        context.goNamed('permissions');
+                      } else {
+                        SharedPreferencesService.setPermissionDone(true);
+                        context.goNamed('login');
+                      }
                     }
                   },
                   onSkip: () {

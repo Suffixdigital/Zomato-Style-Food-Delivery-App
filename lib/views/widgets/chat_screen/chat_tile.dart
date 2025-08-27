@@ -2,28 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/model/chat_model.dart';
+import 'package:smart_flutter/theme/app_colors.dart';
 
 class ChatTile extends ConsumerWidget {
   final ChatModel chat;
-  final bool isTablet;
 
-  const ChatTile({super.key, required this.isTablet, required this.chat});
+  const ChatTile({super.key, required this.chat});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final textTheme = Theme.of(context).extension<AppTextTheme>()!;
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       decoration: BoxDecoration(
-        color: AppColors.neutral0,
+        color: context.colors.background,
         borderRadius: BorderRadius.circular(8.r),
         boxShadow: [
           BoxShadow(
-            color: AppColors.neutral40,
-            blurRadius: 4.r,
-            offset: Offset(0, 2),
+            color: context.colors.defaultGrayEEEEEE.withValues(alpha: 0.5),
+            blurRadius: 2.r,
+            spreadRadius: 2.r,
+            offset: Offset(0, 1),
           ),
         ],
       ),
@@ -40,16 +41,16 @@ class ChatTile extends ConsumerWidget {
             children: [
               Text(
                 chat.name,
-                style: AppTextTheme.fallback(
-                  isTablet: isTablet,
-                ).bodyMediumSemiBold!.copyWith(color: AppColors.neutral100),
+                style: textTheme.bodyMediumSemiBold!.copyWith(
+                  color: context.colors.generalText,
+                ),
               ),
               SizedBox(height: 2.h),
               Text(
                 chat.message,
-                style: AppTextTheme.fallback(
-                  isTablet: isTablet,
-                ).bodySmallMedium!.copyWith(color: AppColors.neutral60),
+                style: textTheme.bodySmallMedium!.copyWith(
+                  color: context.colors.defaultGray878787,
+                ),
               ),
             ],
           ),
@@ -60,9 +61,9 @@ class ChatTile extends ConsumerWidget {
             children: [
               Text(
                 chat.time,
-                style: AppTextTheme.fallback(
-                  isTablet: isTablet,
-                ).bodySmallMedium!.copyWith(color: AppColors.neutral60),
+                style: textTheme.bodySmallMedium!.copyWith(
+                  color: context.colors.defaultGray878787,
+                ),
               ),
               SizedBox(height: 2.h),
               if (chat.isDelivered)
@@ -70,13 +71,16 @@ class ChatTile extends ConsumerWidget {
               else if (chat.unreadCount > 0)
                 Container(
                   padding: EdgeInsets.all(4.w),
-                  decoration: const BoxDecoration(
-                    color: AppColors.primaryAccent,
+                  decoration: BoxDecoration(
+                    color: context.colors.primary,
                     shape: BoxShape.circle,
                   ),
                   child: Text(
                     chat.unreadCount.toString(),
-                    style: TextStyle(color: Colors.white, fontSize: 10.sp),
+                    style: TextStyle(
+                      color: context.colors.defaultWhite,
+                      fontSize: 10.sp,
+                    ),
                   ),
                 ),
             ],

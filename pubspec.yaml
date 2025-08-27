@@ -61,7 +61,15 @@ dependencies:
   retrofit: ^4.0.1
   json_annotation: ^4.8.1
   riverpod: ^2.5.1
+  auto_size_text: ^3.0.0
+  shimmer: ^3.0.0
+  dynamic_color: ^1.7.0
 
+
+
+  flutter_localizations:
+    sdk: flutter
+  permission_handler: ^12.0.1
 
 
 dev_dependencies:
@@ -89,16 +97,16 @@ flutter_icons:
 
 
 flutter_native_splash:
+  android: true
+  ios: true
+  web: false
   color: "#FFFFFF"
   image: assets/icons/app_icons.png
-  color_dark: "#FFFFFF"
-  image_dark: assets/icons/app_icons.png
-
+  background_image: assets/images/splash_bg.png
   android_12:
     image: assets/icons/app_icons.png
-    icon_background_color: "#FFFFFF"
-    image_dark: assets/icons/app_icons.png
-    icon_background_color_dark: "#FFFFFF"
+    color: "#ffffff"
+
 
 
 
@@ -118,6 +126,7 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/animation/
+    - assets/lottie/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

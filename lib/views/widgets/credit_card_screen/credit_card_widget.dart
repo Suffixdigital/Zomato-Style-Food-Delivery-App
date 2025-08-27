@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:smart_flutter/core/constants/app_colors.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/model/credit_card_model.dart';
+import 'package:smart_flutter/theme/app_colors.dart';
 
 class CreditCardWidget extends StatelessWidget {
   final CreditCardModel card;
-  final bool isTablet;
 
-  CreditCardWidget({required this.card, super.key, required this.isTablet});
+  const CreditCardWidget({required this.card, super.key});
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).extension<AppTextTheme>()!;
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.w),
       width: double.infinity,
@@ -36,17 +36,17 @@ class CreditCardWidget extends StatelessWidget {
               children: [
                 Text(
                   card.brand,
-                  style: AppTextTheme.fallback(
-                    isTablet: isTablet,
-                  ).headingH6SemiBold!.copyWith(color: AppColors.neutral0),
+                  style: textTheme.headingH6SemiBold!.copyWith(
+                    color: context.colors.generalText,
+                  ),
                 ),
                 Spacer(),
                 Text(
                   "••• •••• •••• ${card.last4Digits}",
                   textScaler: TextScaler.linear(1.5),
-                  style: AppTextTheme.fallback(
-                    isTablet: isTablet,
-                  ).headingH5Medium!.copyWith(color: AppColors.neutral0),
+                  style: textTheme.headingH5Medium!.copyWith(
+                    color: context.colors.generalText,
+                  ),
                 ),
                 Spacer(),
                 Row(
@@ -58,16 +58,16 @@ class CreditCardWidget extends StatelessWidget {
                       children: [
                         Text(
                           "Card holder name",
-                          style: AppTextTheme.fallback(isTablet: isTablet)
-                              .bodySuperSmallRegular!
-                              .copyWith(color: AppColors.neutral0),
+                          style: textTheme.bodySuperSmallRegular!.copyWith(
+                            color: context.colors.generalText,
+                          ),
                         ),
                         Text(
                           "•••• ••••",
                           textScaler: TextScaler.linear(1.5),
-                          style: AppTextTheme.fallback(isTablet: isTablet)
-                              .bodyMediumMedium!
-                              .copyWith(color: AppColors.neutral0),
+                          style: textTheme.bodyMediumMedium!.copyWith(
+                            color: context.colors.generalText,
+                          ),
                         ),
                       ],
                     ),
@@ -77,16 +77,16 @@ class CreditCardWidget extends StatelessWidget {
                       children: [
                         Text(
                           "Expiry date",
-                          style: AppTextTheme.fallback(isTablet: isTablet)
-                              .bodySuperSmallRegular!
-                              .copyWith(color: AppColors.neutral0),
+                          style: textTheme.bodySuperSmallRegular!.copyWith(
+                            color: context.colors.generalText,
+                          ),
                         ),
                         Text(
                           "•••/•••",
                           textScaler: TextScaler.linear(1.5),
-                          style: AppTextTheme.fallback(isTablet: isTablet)
-                              .bodyMediumMedium!
-                              .copyWith(color: AppColors.neutral0),
+                          style: textTheme.bodyMediumMedium!.copyWith(
+                            color: context.colors.generalText,
+                          ),
                         ),
                       ],
                     ),

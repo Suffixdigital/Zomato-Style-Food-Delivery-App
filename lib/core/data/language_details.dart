@@ -1,13 +1,13 @@
 final List<Map<String, dynamic>> languageDetails = [
   {
-    'icon': 'assets/images/indonesia.png',
-    'language': 'Indonesia',
-    'selectedLanguage': 'Indonesia',
-  },
-  {
     'icon': 'assets/images/english.png',
     'language': 'English (US)',
     'selectedLanguage': 'English',
+  },
+  {
+    'icon': 'assets/images/indonesia.png',
+    'language': 'Indonesia',
+    'selectedLanguage': 'Indonesia',
   },
   {
     'icon': 'assets/images/thailand.png',

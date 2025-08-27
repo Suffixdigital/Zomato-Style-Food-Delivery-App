@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:smart_flutter/core/constants/app_colors.dart';
+import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/core/data/page_data.dart';
+import 'package:smart_flutter/theme/app_colors.dart';
 import 'package:smart_flutter/views/widgets/onboarding_screen/text_button.dart';
 
-import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/text_styles.dart';
 import 'animated_button.dart';
 
 class OnboardingCard extends StatelessWidget {
@@ -59,7 +60,7 @@ class OnboardingCard extends StatelessWidget {
                   vertical: isTablet ? 36.h : 24.h,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryAccent,
+                  color: context.colors.primary,
                   borderRadius: BorderRadius.circular(52.r),
                 ),
                 child: Column(
