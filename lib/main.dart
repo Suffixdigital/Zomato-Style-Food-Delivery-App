@@ -1,3 +1,4 @@
+import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -35,7 +36,7 @@ void main() async {
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2cXZlb3RzY29vdHVhYXJ1cGxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5MTg4NjQsImV4cCI6MjA2NjQ5NDg2NH0.HKn7JP4qvnMCQLW8guV4uzWrzv5ft_gBZo_HKeFDW3U',
   );
 
-  runApp(const ProviderScope(child: MyApp()));
+  runApp(DevicePreview(builder: (context) => const ProviderScope(child: MyApp()), isToolbarVisible: true, enabled: false));
 }
 
 class MyApp extends ConsumerStatefulWidget {

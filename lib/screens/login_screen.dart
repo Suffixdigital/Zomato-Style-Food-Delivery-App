@@ -202,7 +202,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(height: 20.h),
-                            Text("Login to your\naccount.", style: textTheme.headingH4SemiBold!.copyWith(color: context.colors.generalText)),
+                            Text("Login to your account.", style: textTheme.headingH4SemiBold!.copyWith(color: context.colors.generalText)),
                             SizedBox(height: 8.h),
                             Text("Please sign in to your account", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.defaultGray878787)),
                             SizedBox(height: 32.h),

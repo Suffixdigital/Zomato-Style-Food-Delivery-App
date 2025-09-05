@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:smart_flutter/model/CategoryItem.dart';
 import 'package:smart_flutter/routes/route_tracking_observer.dart';
 import 'package:smart_flutter/screens/EmailOtpVerificationScreen.dart';
+import 'package:smart_flutter/screens/address_lilst_screen.dart';
 import 'package:smart_flutter/screens/cart_screen.dart';
 import 'package:smart_flutter/screens/chat_screen.dart';
 import 'package:smart_flutter/screens/credit_card_screen.dart';
@@ -159,6 +160,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/profileData', name: 'profileData', builder: (_, __) => const ProfileDataScreen()),
       GoRoute(path: '/settings', name: 'settings', builder: (_, __) => const SettingsScreen()),
       GoRoute(path: '/credit_card', name: 'credit_card', builder: (_, __) => const CreditCardScreen()),
+      GoRoute(path: '/addressList', name: 'addressList', builder: (_, __) => const AddressListScreen()),
     ],
     errorBuilder: (_, state) => Scaffold(body: Center(child: Text('404: Page not found\n${state.uri}'))),
   );

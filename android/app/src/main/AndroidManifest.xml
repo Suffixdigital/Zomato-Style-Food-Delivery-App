@@ -54,31 +54,6 @@
             </intent-filter>
 
 
-            <!-- App Link for HTTPS -->
-            <!-- <intent-filter android:autoVerify="true">
-                 <action android:name="android.intent.action.VIEW" />
-
-                 <category android:name="android.intent.category.DEFAULT" />
-                 <category android:name="android.intent.category.BROWSABLE" />
-
-                 <data
-                     android:host="jpi.nub.mybluehostin.me"
-                     android:pathPrefix="/callback"
-                     android:scheme="https" />
-             </intent-filter>
-
-             <intent-filter android:autoVerify="true">
-                 <action android:name="android.intent.action.VIEW" />
-
-                 <category android:name="android.intent.category.DEFAULT" />
-                 <category android:name="android.intent.category.BROWSABLE" />
-
-                 <data
-                     android:host="jpi.nub.mybluehostin.me"
-                     android:pathPrefix="/reset-password"
-                     android:scheme="https" />
-             </intent-filter>-->
-
             <!--For new user sign-up email confirmation-->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -124,6 +99,10 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCIbhoav7LkswHHY6oGwj9gpwVliD6nm_Y" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

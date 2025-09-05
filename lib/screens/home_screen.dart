@@ -78,114 +78,58 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           pinned: true,
                           backgroundColor: context.colors.primary,
                           flexibleSpace: FlexibleSpaceBar(
-                            titlePadding: EdgeInsets.only(
-                              left: 16.w,
-                              top: 40.h,
-                              bottom: 16.h,
-                              right: 40.w,
-                            ),
-                            title: Text(
-                              'Provide the best food for you',
-                              style: textTheme.headingH5SemiBold!.copyWith(
-                                color: context.colors.defaultWhite,
-                              ),
-                            ),
+                            titlePadding: EdgeInsets.only(left: 16.w, top: 40.h, bottom: 16.h, right: 40.w),
+                            title: Text('Provide the best food for you', style: textTheme.headingH5SemiBold!.copyWith(color: context.colors.defaultWhite)),
                             background: Stack(
                               fit: StackFit.expand,
                               children: [
-                                Image.asset(
-                                  'assets/images/header_background.png',
-                                  fit: BoxFit.fill,
-                                ),
+                                Image.asset('assets/images/header_background.png', fit: BoxFit.fill),
                                 Container(
-                                  color: context.colors.defaultBlack.withValues(
-                                    alpha: 0.1,
-                                  ), // Optional overlay for readability
+                                  color: context.colors.defaultBlack.withValues(alpha: 0.1), // Optional overlay for readability
                                 ),
                                 Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 20.w,
-                                    vertical: 50.h,
-                                  ),
+                                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 50.h),
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                "Your Location",
-                                                style: textTheme
-                                                    .bodyMediumRegular!
-                                                    .copyWith(
-                                                      color:
-                                                          context
-                                                              .colors
-                                                              .defaultGrayEEEEEE,
+                                          GestureDetector(
+                                            onTap: () {
+                                              context.pushNamed('addressList');
+                                            },
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text("Your Location", style: textTheme.bodyMediumRegular!.copyWith(color: context.colors.defaultGrayEEEEEE)),
+                                                SizedBox(height: 5.h),
+                                                Row(
+                                                  children: [
+                                                    SvgPicture.asset(
+                                                      "assets/icons/location_on.svg",
+                                                      width: 20.w,
+                                                      height: 24.h,
+                                                      colorFilter: ColorFilter.mode(context.colors.defaultGrayEEEEEE, BlendMode.srcIn),
                                                     ),
-                                              ),
-                                              SizedBox(height: 5.h),
-                                              Row(
-                                                children: [
-                                                  SvgPicture.asset(
-                                                    "assets/icons/location_on.svg",
-                                                    width: 20.w,
-                                                    height: 24.h,
-                                                    colorFilter:
-                                                        ColorFilter.mode(
-                                                          context
-                                                              .colors
-                                                              .defaultGrayEEEEEE,
-                                                          BlendMode.srcIn,
-                                                        ),
-                                                  ),
-                                                  SizedBox(width: 8.w),
-                                                  Text(
-                                                    "New York City",
-                                                    style: textTheme
-                                                        .bodyMediumSemiBold!
-                                                        .copyWith(
-                                                          color:
-                                                              context
-                                                                  .colors
-                                                                  .defaultGrayEEEEEE,
-                                                        ),
-                                                  ),
-                                                  SizedBox(width: 4.w),
-                                                  Icon(
-                                                    Icons
-                                                        .keyboard_arrow_down_rounded,
-                                                    color:
-                                                        context
-                                                            .colors
-                                                            .defaultGrayEEEEEE,
-                                                    size: 18.sp,
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
+                                                    SizedBox(width: 8.w),
+                                                    Text(
+                                                      "New York City",
+                                                      style: textTheme.bodyMediumSemiBold!.copyWith(color: context.colors.defaultGrayEEEEEE),
+                                                    ),
+                                                    SizedBox(width: 4.w),
+                                                    Icon(Icons.keyboard_arrow_down_rounded, color: context.colors.defaultGrayEEEEEE, size: 18.sp),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
                                           ),
+
                                           Row(
                                             children: [
-                                              DeviceUtils.homeScreenIcon(
-                                                "assets/icons/search.svg",
-                                                context
-                                                    .colors
-                                                    .defaultGrayEEEEEE,
-                                              ),
+                                              DeviceUtils.homeScreenIcon("assets/icons/search.svg", context.colors.defaultGrayEEEEEE),
                                               SizedBox(width: 10.w),
-                                              DeviceUtils.homeScreenIcon(
-                                                "assets/icons/notification_bell.svg",
-                                                context
-                                                    .colors
-                                                    .defaultGrayEEEEEE,
-                                              ),
+                                              DeviceUtils.homeScreenIcon("assets/icons/notification_bell.svg", context.colors.defaultGrayEEEEEE),
                                             ],
                                           ),
                                         ],
@@ -200,26 +144,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                         SliverToBoxAdapter(
                           child: Padding(
-                            padding: EdgeInsets.only(
-                              left: 16.w,
-                              right: 16.h,
-                              top: 20.h,
-                            ),
+                            padding: EdgeInsets.only(left: 16.w, right: 16.h, top: 20.h),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  "Find by Category",
-                                  style: textTheme.bodyLargeSemiBold!.copyWith(
-                                    color: context.colors.generalText,
-                                  ),
-                                ),
-                                Text(
-                                  "See All",
-                                  style: textTheme.bodyMediumMedium!.copyWith(
-                                    color: context.colors.primary,
-                                  ),
-                                ),
+                                Text("Find by Category", style: textTheme.bodyLargeSemiBold!.copyWith(color: context.colors.generalText)),
+                                Text("See All", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.primary)),
                               ],
                             ),
                           ),
@@ -228,38 +158,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         // Category Scroll
                         SliverToBoxAdapter(
                           child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              vertical: 14.h,
-                              horizontal: 14.w,
-                            ),
+                            padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 14.w),
                             child: SizedBox(
                               height: 100.h,
                               child: ListView.separated(
                                 scrollDirection: Axis.horizontal,
                                 padding: EdgeInsets.symmetric(horizontal: 4.w),
                                 itemCount: categories.length,
-                                separatorBuilder:
-                                    (_, __) => SizedBox(width: 12.w),
+                                separatorBuilder: (_, __) => SizedBox(width: 12.w),
                                 itemBuilder: (context, index) {
                                   final category = categories[index];
                                   return GestureDetector(
                                     onTap: () {
-                                      ref
-                                          .read(homeViewModelProvider.notifier)
-                                          .selectCategory(index);
+                                      ref.read(homeViewModelProvider.notifier).selectCategory(index);
                                     },
                                     child: Container(
-                                      margin: EdgeInsets.only(
-                                        top: 2.h,
-                                        bottom: 2.h,
-                                      ),
-                                      child: SizedBox(
-                                        width: 74.w,
-                                        child: _buildCategoryIcon(
-                                          category,
-                                          selectedIndex == index,
-                                        ),
-                                      ),
+                                      margin: EdgeInsets.only(top: 2.h, bottom: 2.h),
+                                      child: SizedBox(width: 74.w, child: _buildCategoryIcon(category, selectedIndex == index)),
                                     ),
                                   );
                                 },
@@ -272,30 +187,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         if (homeState.isLoadingItems)
                           ShimmerGridLoader()
                         else if (items.isEmpty)
-                          SliverToBoxAdapter(
-                            child: Center(child: Text("No items available")),
-                          )
+                          SliverToBoxAdapter(child: Center(child: Text("No items available")))
                         else
                           SliverPadding(
-                            padding: EdgeInsets.only(
-                              left: 16.w,
-                              right: 16.w,
-                              top: 4.h,
-                              bottom: 24.h,
-                            ),
+                            padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 4.h, bottom: 24.h),
                             sliver: SliverGrid(
-                              delegate: SliverChildBuilderDelegate(
-                                (context, index) =>
-                                    _buildBurgerCard(items[index]),
-                                childCount: items.length,
+                              delegate: SliverChildBuilderDelegate((context, index) => _buildBurgerCard(items[index]), childCount: items.length),
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: crossAxisCount,
+                                childAspectRatio: 0.7,
+                                crossAxisSpacing: 12.w,
+                                mainAxisSpacing: 12.h,
                               ),
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: crossAxisCount,
-                                    childAspectRatio: 0.7,
-                                    crossAxisSpacing: 12.w,
-                                    mainAxisSpacing: 12.h,
-                                  ),
                             ),
                           ),
 
@@ -317,33 +220,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       decoration: BoxDecoration(
         color: selected ? context.colors.primary : context.colors.background,
         borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(
-          color:
-              selected
-                  ? context.colors.primary
-                  : context.colors.defaultGrayEEEEEE,
-          width: 1.w,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color:
-                selected
-                    ? context.colors.primary
-                    : context.colors.defaultGrayEEEEEE,
-            blurRadius: 1.r,
-            offset: Offset(0, 1),
-          ),
-        ],
+        border: Border.all(color: selected ? context.colors.primary : context.colors.defaultGrayEEEEEE, width: 1.w),
+        boxShadow: [BoxShadow(color: selected ? context.colors.primary : context.colors.defaultGrayEEEEEE, blurRadius: 1.r, offset: Offset(0, 1))],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.network(
-            category.icon,
-            width: 28.w,
-            height: 28.w,
-            errorBuilder: (_, __, ___) => Icon(Icons.broken_image, size: 28.w),
-          ),
+          Image.network(category.icon, width: 28.w, height: 28.w, errorBuilder: (_, __, ___) => Icon(Icons.broken_image, size: 28.w)),
           SizedBox(height: 6.h),
           SizedBox(
             height: 36.h,
@@ -352,12 +235,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               maxLines: 2,
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
-              style: textTheme.bodyMediumMedium!.copyWith(
-                color:
-                    selected
-                        ? context.colors.defaultWhite
-                        : context.colors.defaultGray878787,
-              ),
+              style: textTheme.bodyMediumMedium!.copyWith(color: selected ? context.colors.defaultWhite : context.colors.defaultGray878787),
             ),
           ),
         ],
@@ -381,18 +259,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10.r),
           color: context.colors.background,
-          border: Border.all(
-            color: context.colors.defaultGrayEEEEEE,
-            width: 1.w,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: context.colors.defaultGrayEEEEEE,
-              blurRadius: 1.r,
-              blurStyle: BlurStyle.outer,
-              offset: Offset(0, 1),
-            ),
-          ],
+          border: Border.all(color: context.colors.defaultGrayEEEEEE, width: 1.w),
+          boxShadow: [BoxShadow(color: context.colors.defaultGrayEEEEEE, blurRadius: 1.r, blurStyle: BlurStyle.outer, offset: Offset(0, 1))],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -400,20 +268,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Stack(
               children: [
                 Padding(
-                  padding: EdgeInsets.only(
-                    left: 8.w,
-                    right: 8.w,
-                    top: 8.h,
-                    bottom: 4.h,
-                  ),
+                  padding: EdgeInsets.only(left: 8.w, right: 8.w, top: 8.h, bottom: 4.h),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10.r),
-                    child: Image.network(
-                      categoryItem.image,
-                      height: 145.h,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
+                    child: Image.network(categoryItem.image, height: 145.h, width: double.infinity, fit: BoxFit.cover),
                   ),
                 ),
                 Positioned(
@@ -426,10 +284,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       "assets/icons/favorite.svg",
                       width: 16.w,
                       height: 16.h,
-                      colorFilter: ColorFilter.mode(
-                        context.colors.error,
-                        BlendMode.srcIn,
-                      ),
+                      colorFilter: ColorFilter.mode(context.colors.error, BlendMode.srcIn),
                     ),
                   ),
                 ),
@@ -440,47 +295,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    categoryItem.name,
-                    style: textTheme.bodyLargeBold!.copyWith(
-                      color: context.colors.generalText,
-                    ),
-                  ),
+                  Text(categoryItem.name, style: textTheme.bodyLargeBold!.copyWith(color: context.colors.generalText)),
                   SizedBox(height: 4.h),
                   Row(
                     children: [
-                      Icon(
-                        Icons.star,
-                        color: context.colors.primary,
-                        size: 14.sp,
-                      ),
-                      Text(
-                        '4.9',
-                        style: textTheme.bodySmallRegular!.copyWith(
-                          color: context.colors.generalText,
-                        ),
-                      ),
+                      Icon(Icons.star, color: context.colors.primary, size: 14.sp),
+                      Text('4.9', style: textTheme.bodySmallRegular!.copyWith(color: context.colors.generalText)),
                       SizedBox(width: 8.w),
-                      Icon(
-                        Icons.location_on,
-                        size: 14.sp,
-                        color: context.colors.primary,
-                      ),
-                      Text(
-                        '190m',
-                        style: textTheme.bodySmallRegular!.copyWith(
-                          color: context.colors.generalText,
-                        ),
-                      ),
+                      Icon(Icons.location_on, size: 14.sp, color: context.colors.primary),
+                      Text('190m', style: textTheme.bodySmallRegular!.copyWith(color: context.colors.generalText)),
                     ],
                   ),
                   SizedBox(height: 4.h),
-                  Text(
-                    '\$ 17,230',
-                    style: textTheme.bodyMediumBold!.copyWith(
-                      color: context.colors.primary,
-                    ),
-                  ),
+                  Text('\$ 17,230', style: textTheme.bodyMediumBold!.copyWith(color: context.colors.primary)),
                 ],
               ),
             ),
