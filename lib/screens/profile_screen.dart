@@ -7,7 +7,6 @@ import 'package:shimmer/shimmer.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/model/user_model.dart';
 import 'package:smart_flutter/routes/tab_controller_notifier.dart';
-import 'package:smart_flutter/services/shared_preferences_service.dart';
 import 'package:smart_flutter/theme/app_colors.dart';
 import 'package:smart_flutter/viewmodels/personal_data_viewmodel.dart';
 import 'package:smart_flutter/viewmodels/profile_viewmodel.dart';
@@ -28,10 +27,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   void handleSignOut(BuildContext context) async {
     ref.read(tabIndexProvider.notifier).state = 0;
-    SharedPreferencesService.setUserLoggedIn(false);
-    SharedPreferencesService.setPhoneOTPAuthenticated(false);
     await Supabase.instance.client.auth.signOut();
-    await Supabase.instance.client.auth.signOut(scope: SignOutScope.local);
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Signed out successfully')));
     context.goNamed('login');
   }

@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_flutter/core/utils/device_utils.dart';
-import 'package:smart_flutter/services/shared_preferences_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final registerViewModelProvider = AsyncNotifierProvider<RegisterViewModel, void>(RegisterViewModel.new);
@@ -28,10 +27,9 @@ class RegisterViewModel extends AsyncNotifier<void> {
     state = const AsyncLoading();
     try {
       // await SharedPreferencesService.setCachedEmail(email);
-      SharedPreferencesService.setUserLoggedIn(false);
-      SharedPreferencesService.setPhoneOTPAuthenticated(false);
-      Supabase.instance.client.auth.signOut();
-      Supabase.instance.client.auth.signOut(scope: SignOutScope.local);
+      // SharedPreferencesService.setUserLoggedIn(false);
+      // SharedPreferencesService.setPhoneOTPAuthenticated(false);
+      await Supabase.instance.client.auth.signOut();
 
       await supabase.auth.signUp(
         email: email,
@@ -43,7 +41,13 @@ class RegisterViewModel extends AsyncNotifier<void> {
       print("Supabase user id: ${supabase.auth.currentUser?.id} email: ${supabase.auth.currentUser?.email}");
       state = const AsyncData(null); // Success
     } on AuthException catch (e) {
-      state = AsyncError(Exception('Auth error: ${e.message}'), StackTrace.current);
+      if (e.message.contains('ERR_DUPLICATE_EMAIL')) {
+        state = AsyncError(Exception('Auth error: This email is already registered.'), StackTrace.current);
+      } else if (e.message.contains('ERR_DUPLICATE_PHONE')) {
+        state = AsyncError(Exception('Auth error: This phone number is already registered.'), StackTrace.current);
+      } else {
+        state = AsyncError(Exception('Auth error: ${e.message}'), StackTrace.current);
+      }
     } on SocketException catch (_) {
       state = AsyncError(Exception('No internet connection.'), StackTrace.current);
     } catch (e, stack) {

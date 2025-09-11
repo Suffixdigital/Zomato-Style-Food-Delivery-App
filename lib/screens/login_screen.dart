@@ -134,8 +134,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     result.when(
       data: (_) {
-        SharedPreferencesService.setUserLoggedIn(true);
-        SharedPreferencesService.setPhoneOTPAuthenticated(false);
+        SharedPreferencesService.updateAuthFlags(userLoggedIn: true);
+        // SharedPreferencesService.setUserLoggedIn(true);
+        // SharedPreferencesService.setPhoneOTPAuthenticated(false);
         ref.read(tabIndexProvider.notifier).state = 0;
         ref.invalidate(personalDataProvider);
         // Go to home screen

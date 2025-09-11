@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/core/utils/device_utils.dart';
+import 'package:smart_flutter/routes/tab_controller_notifier.dart';
 import 'package:smart_flutter/screens/confirmation_dialog.dart';
+import 'package:smart_flutter/screens/link_expired_dialog.dart';
 import 'package:smart_flutter/services/shared_preferences_service.dart';
 import 'package:smart_flutter/theme/app_colors.dart';
 import 'package:smart_flutter/viewmodels/register_viewmodel.dart';
@@ -144,6 +146,13 @@ class _SetPasswordScreenState extends ConsumerState<SetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final message = ref.read(linkExpiredMessage);
+    if (message.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        LinkExpiredDialog.show(context, message);
+        ref.watch(linkExpiredMessage.notifier).state = '';
+      });
+    }
     final textTheme = Theme.of(context).extension<AppTextTheme>()!;
     final state = ref.watch(registerViewModelProvider);
     return WillPopScope(

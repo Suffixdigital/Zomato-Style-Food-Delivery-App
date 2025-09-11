@@ -11,33 +11,6 @@ class UnifiedAuthResult {
   bool get isSuccess => session != null && user != null;
 }
 
-/*Future<UnifiedAuthResult> handleAuthUri(Uri uri) async {
-  try {
-    final response = await Supabase.instance.client.auth.getSessionFromUrl(uri);
-
-    // ---- Old SDK: AuthResponse ----
-    if (response is AuthResponse) {
-      return UnifiedAuthResult(session: response.session, user: response.user, errorMessage: response.error?.message);
-    }
-
-    // ---- New SDK: AuthSessionUrlResponse ----
-    if (response is AuthSessionUrlResponse) {
-      return UnifiedAuthResult(
-        session: response.session,
-        user: response.user, // ✅ extension provides this
-        errorMessage: response.error?.message, // ✅ extension provides this
-      );
-    }
-
-    // ---- Future-proof ----
-    return UnifiedAuthResult(errorMessage: 'Unsupported Supabase response type');
-  } on AuthException catch (e) {
-    return UnifiedAuthResult(errorMessage: e.message);
-  } catch (e) {
-    return UnifiedAuthResult(errorMessage: e.toString());
-  }
-}*/
-
 Future<UnifiedAuthResult> handleAuthUri(Uri uri) async {
   try {
     // Case: Reset password link

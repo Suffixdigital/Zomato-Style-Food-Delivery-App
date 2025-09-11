@@ -53,7 +53,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           try {
             await Supabase.instance.client.auth.resetPasswordForEmail(
               emailController.text,
-              redirectTo: 'io.supabase.flutterquickstart://callback/reset-password?email=${emailController.text}',
+              redirectTo: 'io.supabase.flutterquickstart://callback/reset-password',
             );
 
             if (!context.mounted) {

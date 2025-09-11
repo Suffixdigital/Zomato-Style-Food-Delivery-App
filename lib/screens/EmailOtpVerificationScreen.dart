@@ -54,8 +54,9 @@ class _PhoneOtpVerificationScreenState extends ConsumerState<PhoneOtpVerificatio
 
       result.when(
         data: (_) {
-          SharedPreferencesService.setUserLoggedIn(true);
-          SharedPreferencesService.setPhoneOTPAuthenticated(true);
+          SharedPreferencesService.updateAuthFlags(userLoggedIn: true, phoneOTPAuthenticated: true);
+          // SharedPreferencesService.setUserLoggedIn(true);
+          // SharedPreferencesService.setPhoneOTPAuthenticated(true);
           ref.read(tabIndexProvider.notifier).state = 0;
           ref.invalidate(personalDataProvider);
           // Go to home screen

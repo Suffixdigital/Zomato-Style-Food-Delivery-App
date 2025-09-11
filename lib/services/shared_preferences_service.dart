@@ -4,6 +4,8 @@ import 'package:smart_flutter/viewmodels/settings_viewmodel.dart';
 class SharedPreferencesService {
   static late SharedPreferences prefs;
 
+  static const authFlagKeys = ['userLoggedIn', 'phoneOTPAuthenticated', 'resetPassword', 'newPassword'];
+
   // Define all keys
   static const keys = {
     'pushNotification': 'pushNotification',
@@ -13,7 +15,6 @@ class SharedPreferencesService {
     'lastRoute': 'lastRoute',
     'onboardingCompleted': 'onboardingCompleted',
     'resetPassword': 'resetPassword',
-    'emailLinkUsed': 'emailLinkUsed',
     'userLoggedIn': 'isUserLoggedIn',
     'permissionDone': 'permissionDone',
     'phoneOTPAuthenticated': 'isPhoneOTPAuthenticated',
@@ -81,18 +82,6 @@ class SharedPreferencesService {
     return prefs.getBool(keys['resetPassword']!) ?? false;
   }
 
-  static Future<void> markLinkUsed() async {
-    await prefs.setBool(keys['emailLinkUsed']!, true);
-  }
-
-  static bool isLinkAlreadyUsed() {
-    return prefs.getBool(keys['emailLinkUsed']!) ?? false;
-  }
-
-  static Future<void> clearLinkUsage() async {
-    await prefs.remove(keys['emailLinkUsed']!);
-  }
-
   static Future<void> setUserLoggedIn(bool isUserLoggedIn) async {
     await prefs.setBool(keys['userLoggedIn']!, isUserLoggedIn);
   }
@@ -123,5 +112,31 @@ class SharedPreferencesService {
 
   static bool isNewPassword() {
     return prefs.getBool(keys['newPassword']!) ?? false;
+  }
+
+  /// Update auth flags safely:
+  /// - Clears all existing flags first
+  /// - Applies only the flags you specify
+  static Future<void> updateAuthFlags({
+    bool userLoggedIn = false,
+    bool phoneOTPAuthenticated = false,
+    bool resetPassword = false,
+    bool newPassword = false,
+  }) async {
+    // 1. Clear everything first
+    // await resetAuthFlags();
+
+    // 2. Apply only given flags
+    await prefs.setBool(keys['userLoggedIn']!, userLoggedIn);
+    await prefs.setBool(keys['phoneOTPAuthenticated']!, phoneOTPAuthenticated);
+    await prefs.setBool(keys['resetPassword']!, resetPassword);
+    await prefs.setBool(keys['newPassword']!, newPassword);
+  }
+
+  static Future<void> resetAuthFlags() async {
+    for (final flag in authFlagKeys) {
+      final key = keys[flag]!;
+      await prefs.remove(key); // removes it completely (default = false)
+    }
   }
 }
