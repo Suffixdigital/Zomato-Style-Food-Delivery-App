@@ -56,7 +56,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         "location:$location isCallbackScreen:$isCallbackScreen",
       );
 
-      // 🔹 let deep link callbacks resolve themselves
+      // let deep link callbacks resolve themselves
       if (isCallbackScreen) return null;
 
       if (onboardingDone) {
@@ -64,17 +64,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return '/permissions';
         }
 
-        // 🔹 handle reset-password flow
+        // handle reset-password flow
         if (isResetPassword) {
           return '/resetPassword';
         }
 
-        // 🔹 handle new-password flow
+        // handle new-password flow
         if (isNewPassword) {
           return '/set-password';
         }
 
-        // 🔹 handle logged-in vs logged-out
+        // handle logged-in vs logged-out
         if (isUserLoggedIn || isPhoneOTPAuthenticated) {
           if (!isOnboardingScreen) {
             return null;
@@ -88,7 +88,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return '/login';
         }
       } else {
-        // 🔹 handle onboarding
+        // handle onboarding
         return '/onboarding';
       }
     },

@@ -21,7 +21,11 @@ class SettingsScreen extends ConsumerStatefulWidget {
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<bool> onBackPressed() async {
     ref.read(tabIndexProvider.notifier).state = 3;
-    context.pop();
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.goNamed('home');
+    }
     return false;
   }
 
@@ -46,38 +50,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'General',
-                              style: textTheme.bodyMediumMedium!.copyWith(
-                                color: context.colors.defaultGray878787,
-                              ),
-                              textAlign: TextAlign.start,
-                            ),
+                            Text('General', style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.defaultGray878787), textAlign: TextAlign.start),
 
                             SizedBox(height: 15.h),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  "Dark Mode",
-                                  style: textTheme.bodyMediumMedium!.copyWith(
-                                    color: context.colors.generalText,
-                                  ),
-                                ),
+                                Text("Dark Mode", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
                                 Transform.scale(
                                   alignment: Alignment.centerRight,
                                   scale: 0.9,
                                   child: customSwitch(
                                     value: vm.isDarkMode,
                                     onChanged: (val) {
-                                      setState(
-                                        () => ref
-                                            .read(
-                                              settingsViewModelProvider
-                                                  .notifier,
-                                            )
-                                            .updateDarkMode(val),
-                                      );
+                                      setState(() => ref.read(settingsViewModelProvider.notifier).updateDarkMode(val));
                                     },
                                   ),
                                 ),
@@ -87,26 +73,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  "Push Notification",
-                                  style: textTheme.bodyMediumMedium!.copyWith(
-                                    color: context.colors.generalText,
-                                  ),
-                                ),
+                                Text("Push Notification", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
                                 Transform.scale(
                                   alignment: Alignment.centerRight,
                                   scale: 0.9,
                                   child: customSwitch(
                                     value: vm.pushNotification,
                                     onChanged: (val) {
-                                      setState(
-                                        () => ref
-                                            .read(
-                                              settingsViewModelProvider
-                                                  .notifier,
-                                            )
-                                            .updatePushNotification(val),
-                                      );
+                                      setState(() => ref.read(settingsViewModelProvider.notifier).updatePushNotification(val));
                                     },
                                   ),
                                 ),
@@ -116,26 +90,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  "Location",
-                                  style: textTheme.bodyMediumMedium!.copyWith(
-                                    color: context.colors.generalText,
-                                  ),
-                                ),
+                                Text("Location", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
                                 Transform.scale(
                                   alignment: Alignment.centerRight,
                                   scale: 0.9,
                                   child: customSwitch(
                                     value: vm.locationEnabled,
                                     onChanged: (val) {
-                                      setState(
-                                        () => ref
-                                            .read(
-                                              settingsViewModelProvider
-                                                  .notifier,
-                                            )
-                                            .updateLocation(val),
-                                      );
+                                      setState(() => ref.read(settingsViewModelProvider.notifier).updateLocation(val));
                                     },
                                   ),
                                 ),
@@ -158,28 +120,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      "Language",
-                                      style: textTheme.bodyMediumMedium!
-                                          .copyWith(
-                                            color: context.colors.generalText,
-                                          ),
-                                    ),
+                                    Text("Language", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
                                     Spacer(),
                                     Text(
-                                      languageDetails[vm
-                                          .languageIndex]['selectedLanguage'],
-                                      style: textTheme.bodyMediumMedium!
-                                          .copyWith(
-                                            color: context.colors.generalText,
-                                          ),
+                                      languageDetails[vm.languageIndex]['selectedLanguage'],
+                                      style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText),
                                     ),
                                     SizedBox(width: 20.w),
                                     SvgPicture.asset(
-                                      colorFilter: ColorFilter.mode(
-                                        context.colors.generalText,
-                                        BlendMode.srcIn,
-                                      ),
+                                      colorFilter: ColorFilter.mode(context.colors.generalText, BlendMode.srcIn),
                                       'assets/icons/next.svg',
                                       width: 16.w,
                                       height: 16.h,
@@ -189,20 +138,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               ),
                             ),
                             SizedBox(height: 10.h),
-                            Text(
-                              'Other',
-                              style: textTheme.bodyMediumMedium!.copyWith(
-                                color: context.colors.defaultGray878787,
-                              ),
-                              textAlign: TextAlign.start,
-                            ),
+                            Text('Other', style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.defaultGray878787), textAlign: TextAlign.start),
                             SizedBox(height: 15.h),
                             buildListTile("About Smart Food", onPressed: () {}),
                             buildListTile("Privacy Policy", onPressed: () {}),
-                            buildListTile(
-                              "Terms and Conditions",
-                              onPressed: () {},
-                            ),
+                            buildListTile("Terms and Conditions", onPressed: () {}),
                             SizedBox(height: 15.h),
                           ],
                         ),
@@ -225,32 +165,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text(
-              title,
-              style: textTheme.bodyMediumMedium!.copyWith(
-                color: context.colors.generalText,
-              ),
-            ),
+            Text(title, style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
             Spacer(),
-            SvgPicture.asset(
-              colorFilter: ColorFilter.mode(
-                context.colors.generalText,
-                BlendMode.srcIn,
-              ),
-              'assets/icons/next.svg',
-              width: 16.w,
-              height: 16.h,
-            ),
+            SvgPicture.asset(colorFilter: ColorFilter.mode(context.colors.generalText, BlendMode.srcIn), 'assets/icons/next.svg', width: 16.w, height: 16.h),
           ],
         ),
       ),
     );
   }
 
-  Widget customSwitch({
-    required bool value,
-    required Function(dynamic val) onChanged,
-  }) {
+  Widget customSwitch({required bool value, required Function(dynamic val) onChanged}) {
     return GestureDetector(
       onTap: () => onChanged(!value),
       child: AnimatedContainer(
@@ -261,25 +185,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         decoration: BoxDecoration(
           color: value ? context.colors.primary : context.colors.background,
           borderRadius: BorderRadius.circular(20.r),
-          border: Border.all(
-            color:
-                value
-                    ? context.colors.primary
-                    : context.colors.defaultGray878787.withOpacity(0.5),
-            width: 1.2.w,
-          ),
+          border: Border.all(color: value ? context.colors.primary : context.colors.defaultGray878787.withOpacity(0.5), width: 1.2.w),
         ),
         alignment: value ? Alignment.centerRight : Alignment.centerLeft,
         child: Container(
           width: 25.w,
           height: 25.h,
-          decoration: BoxDecoration(
-            color:
-                value
-                    ? context.colors.defaultWhite
-                    : context.colors.defaultGray878787,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: value ? context.colors.defaultWhite : context.colors.defaultGray878787, shape: BoxShape.circle),
         ),
       ),
     );

@@ -23,7 +23,11 @@ class _CreditCardScreenState extends ConsumerState<CreditCardScreen> {
   Future<bool> onBackPressed() async {
     print("back pressed");
     ref.read(tabIndexProvider.notifier).state = 3;
-    context.pop();
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.goNamed('home');
+    }
     return false;
   }
 
@@ -49,12 +53,7 @@ class _CreditCardScreenState extends ConsumerState<CreditCardScreen> {
                     SizedBox(height: 15.h),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      child: Text(
-                        "Credit card",
-                        style: textTheme.bodyLargeMedium!.copyWith(
-                          color: context.colors.generalText,
-                        ),
-                      ),
+                      child: Text("Credit card", style: textTheme.bodyLargeMedium!.copyWith(color: context.colors.generalText)),
                     ),
                     SizedBox(height: 15.h),
                     Expanded(
@@ -65,10 +64,7 @@ class _CreditCardScreenState extends ConsumerState<CreditCardScreen> {
                               onTap: () {
                                 setState(() => selectedIndex = i);
                               },
-                              child: CardListTile(
-                                card: cards[i],
-                                isSelected: selectedIndex == i,
-                              ),
+                              child: CardListTile(card: cards[i], isSelected: selectedIndex == i),
                             ),
                       ),
                     ),
@@ -77,12 +73,7 @@ class _CreditCardScreenState extends ConsumerState<CreditCardScreen> {
               ),
               bottomNavigationBar: SafeArea(
                 child: Padding(
-                  padding: EdgeInsets.only(
-                    left: 16.w,
-                    right: 16.w,
-                    bottom: 10.h,
-                    top: 10.h,
-                  ),
+                  padding: EdgeInsets.only(left: 16.w, right: 16.w, bottom: 10.h, top: 10.h),
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -90,16 +81,9 @@ class _CreditCardScreenState extends ConsumerState<CreditCardScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: context.colors.primary,
                         padding: EdgeInsets.symmetric(vertical: 16.h),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.r),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.r)),
                       ),
-                      child: Text(
-                        "Add New Card",
-                        style: textTheme.bodyMediumSemiBold!.copyWith(
-                          color: context.colors.defaultWhite,
-                        ),
-                      ),
+                      child: Text("Add New Card", style: textTheme.bodyMediumSemiBold!.copyWith(color: context.colors.defaultWhite)),
                     ),
                   ),
                 ),

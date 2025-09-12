@@ -39,22 +39,15 @@ class DeepLinkService {
           final hasPassword = metadata?['has_password'] ?? false;
           final emailConfirmed = session?.user.confirmedAt != null;
 
-          await SharedPreferencesService.updateAuthFlags(userLoggedIn: isSocialLogin);
-
+          debugPrint('[AuthState] isSocialLogin=$isSocialLogin, hasPassword=$hasPassword, emailConfirmed=$emailConfirmed');
           if (isSocialLogin) {
+            await SharedPreferencesService.updateAuthFlags(userLoggedIn: true);
             // Social login → go home
             ref.invalidate(personalDataProvider);
             safeNavigate('home');
           } else if (!emailConfirmed) {
             // Email link expired/invalid (not verified)
             processError('Email verification link is invalid or expired. Please request a new verification email.');
-          } else if (!hasPassword) {
-            // Newly verified user → set password
-            SharedPreferencesService.updateAuthFlags(newPassword: true);
-            safeNavigate('set-password');
-          } else {
-            // Normal login → go home
-            safeNavigate('home');
           }
           break;
 
@@ -85,10 +78,10 @@ class DeepLinkService {
       }
     } on AuthException catch (e) {
       debugPrint('[DeepLink] AuthException: ${e.message} (${e.code})');
-      return processError('Link is invalid or expired. Please request a new one.');
+      return processError(e.message);
     } catch (e) {
       debugPrint('[DeepLink] Unknown error: $e');
-      return processError('An unexpected error occurred while processing the link.');
+      return processError(e.toString());
     }
   }
 
@@ -110,10 +103,10 @@ class DeepLinkService {
       safeNavigate('resetPassword');
     } on AuthException catch (e) {
       debugPrint('[DeepLink] AuthException: ${e.message} (${e.code})');
-      return processError('Reset password link is invalid or expired.');
+      return processError(e.message);
     } catch (e) {
       debugPrint('[DeepLink] Unknown error: $e');
-      return processError('An unexpected error occurred while processing the link.');
+      return processError(e.toString());
     }
   }
 
@@ -127,13 +120,16 @@ class DeepLinkService {
       }
 
       // Successful verification handled automatically via onAuthStateChange
+      SharedPreferencesService.updateAuthFlags(newPassword: true);
+      ref.read(linkExpiredMessage.notifier).state = '';
+      safeNavigate('set-password');
       debugPrint('[DeepLink] register-user link successfully processed.');
     } on AuthException catch (e) {
       debugPrint('[DeepLink] AuthException: ${e.message} (${e.code})');
-      return processError('Email verification link is invalid or expired.');
+      return processError(e.message);
     } catch (e) {
       debugPrint('[DeepLink] Unknown error: $e');
-      return processError('An unexpected error occurred while processing the link.');
+      return processError(e.toString());
     }
   }
 

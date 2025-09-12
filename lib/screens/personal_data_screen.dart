@@ -272,12 +272,20 @@ class _ProfileDataScreenState extends ConsumerState<ProfileDataScreen> {
   void saveAndPop() {
     saveProfile();
     ref.read(tabIndexProvider.notifier).state = 3;
-    context.pop();
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.goNamed('home');
+    }
   }
 
   void discardAndPop() {
     ref.read(tabIndexProvider.notifier).state = 3;
-    context.pop();
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.goNamed('home');
+    }
   }
 
   @override
