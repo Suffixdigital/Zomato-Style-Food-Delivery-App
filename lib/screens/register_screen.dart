@@ -81,7 +81,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Email link sent successfully!')));
       },
       error: (error, _) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $error')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$error')));
       },
       loading: () {
         // UI already shows CircularProgressIndicator

@@ -78,7 +78,13 @@ class _MyAppState extends ConsumerState<MyApp> {
           localizationsDelegates: const [GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, DefaultWidgetsLocalizations.delegate],
           supportedLocales: [Locale('en')],
           builder: (context, child) {
-            return child!;
+            return MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                textScaler: TextScaler.linear(1.0), // ✅ lock text scaling
+                devicePixelRatio: 1.0, // optional: lock density
+              ),
+              child: child!,
+            );
           },
         );
       },

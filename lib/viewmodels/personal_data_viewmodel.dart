@@ -59,11 +59,11 @@ class PersonalDataViewModel extends AsyncNotifier<UserModel> {
 
       state = AsyncData(updatedUser); // Success
     } on AuthException catch (e) {
-      state = AsyncError(Exception('Auth error: ${e.message}'), StackTrace.current);
+      state = AsyncError('Auth error: ${e.message}', StackTrace.current);
     } on SocketException catch (_) {
-      state = AsyncError(Exception('No internet connection.'), StackTrace.current);
+      state = AsyncError('Error: No internet connection.', StackTrace.current);
     } catch (e, stack) {
-      state = AsyncError(Exception('Unexpected error: $e'), stack);
+      state = AsyncError('Unexpected error: $e', stack);
     }
 
     //notifyListeners();

@@ -116,7 +116,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       error: (error, _) {
         print('Error: $error');
         //context.goNamed('phoneOtpVerification', pathParameters: {'phone': phoneNumberController.text});
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $error')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$error')));
       },
       loading: () {
         // UI already shows CircularProgressIndicator
@@ -144,7 +144,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       },
       error: (error, _) {
         print('Error: $error');
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $error')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$error')));
       },
       loading: () {
         // UI already shows CircularProgressIndicator

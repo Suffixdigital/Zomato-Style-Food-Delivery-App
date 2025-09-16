@@ -133,7 +133,7 @@ class _ProfileDataScreenState extends ConsumerState<ProfileDataScreen> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Profile Saved")));
       },
       error: (error, _) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error $error')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$error')));
       },
       loading: () {
         // UI already shows CircularProgressIndicator

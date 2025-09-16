@@ -42,16 +42,16 @@ class RegisterViewModel extends AsyncNotifier<void> {
       state = const AsyncData(null); // Success
     } on AuthException catch (e) {
       if (e.message.contains('ERR_DUPLICATE_EMAIL')) {
-        state = AsyncError(Exception('Auth error: This email is already registered.'), StackTrace.current);
+        state = AsyncError('Auth error: This email is already registered.', StackTrace.current);
       } else if (e.message.contains('ERR_DUPLICATE_PHONE')) {
-        state = AsyncError(Exception('Auth error: This phone number is already registered.'), StackTrace.current);
+        state = AsyncError('Auth error: This phone number is already registered.', StackTrace.current);
       } else {
-        state = AsyncError(Exception('Auth error: ${e.message}'), StackTrace.current);
+        state = AsyncError('Auth error: ${e.message}', StackTrace.current);
       }
     } on SocketException catch (_) {
-      state = AsyncError(Exception('No internet connection.'), StackTrace.current);
+      state = AsyncError('Error: No internet connection.', StackTrace.current);
     } catch (e, stack) {
-      state = AsyncError(Exception('Unexpected error: $e'), stack);
+      state = AsyncError('Unexpected error: $e', stack);
     }
   }
 
@@ -68,11 +68,11 @@ class RegisterViewModel extends AsyncNotifier<void> {
 
       state = const AsyncData(null); // Success
     } on AuthException catch (e) {
-      state = AsyncError(Exception('Auth error: ${e.message}'), StackTrace.current);
+      state = AsyncError('Auth error: ${e.message}', StackTrace.current);
     } on SocketException catch (_) {
-      state = AsyncError(Exception('No internet connection.'), StackTrace.current);
+      state = AsyncError('Error: No internet connection.', StackTrace.current);
     } catch (e, stack) {
-      state = AsyncError(Exception('Unexpected error: $e'), stack);
+      state = AsyncError('Unexpected error: $e', stack);
     }
   }
 
@@ -85,11 +85,11 @@ class RegisterViewModel extends AsyncNotifier<void> {
 
       state = const AsyncData(null); // Success
     } on AuthException catch (e) {
-      state = AsyncError(Exception('Auth error: ${e.message}'), StackTrace.current);
+      state = AsyncError('Auth error: ${e.message}', StackTrace.current);
     } on SocketException catch (_) {
-      state = AsyncError(Exception('No internet connection.'), StackTrace.current);
+      state = AsyncError('Error: No internet connection.', StackTrace.current);
     } catch (e, stack) {
-      state = AsyncError(Exception('Unexpected error: $e'), stack);
+      state = AsyncError('Unexpected error: $e', stack);
     }
   }
 
@@ -100,11 +100,11 @@ class RegisterViewModel extends AsyncNotifier<void> {
 
       state = const AsyncData(null); // Success
     } on AuthException catch (e) {
-      state = AsyncError(Exception('Auth error: ${e.message}'), StackTrace.current);
+      state = AsyncError('Auth error: ${e.message}', StackTrace.current);
     } on SocketException catch (_) {
-      state = AsyncError(Exception('No internet connection.'), StackTrace.current);
+      state = AsyncError('Error: No internet connection.', StackTrace.current);
     } catch (e, stack) {
-      state = AsyncError(Exception('Unexpected error: $e'), stack);
+      state = AsyncError('Unexpected error: $e', stack);
     }
   }
 
@@ -117,11 +117,11 @@ class RegisterViewModel extends AsyncNotifier<void> {
 
       state = const AsyncData(null); // Success
     } on AuthException catch (e) {
-      state = AsyncError(Exception('Auth error: ${e.message}'), StackTrace.current);
+      state = AsyncError('Auth error: ${e.message}', StackTrace.current);
     } on SocketException catch (_) {
-      state = AsyncError(Exception('No internet connection.'), StackTrace.current);
+      state = AsyncError('Error: No internet connection.', StackTrace.current);
     } catch (e, stack) {
-      state = AsyncError(Exception('Unexpected error: $e'), stack);
+      state = AsyncError('Unexpected error: $e', stack);
     }
   }
 }

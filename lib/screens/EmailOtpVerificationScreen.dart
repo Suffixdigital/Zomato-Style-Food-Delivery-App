@@ -64,7 +64,7 @@ class _PhoneOtpVerificationScreenState extends ConsumerState<PhoneOtpVerificatio
         },
         error: (error, _) {
           print('Error: $error');
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $error')));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$error')));
         },
         loading: () {
           // UI already shows CircularProgressIndicator
