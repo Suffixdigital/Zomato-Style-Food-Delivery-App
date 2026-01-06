@@ -1,149 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Privacy Policy | Smart Food</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      line-height: 1.6;
-      margin: 0;
-      padding: 0;
-      background: #f9f9f9;
-      color: #333;
-    }
-    .container {
-      max-width: 900px;
-      margin: 40px auto;
-      background: #ffffff;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    h1, h2 {
-      color: #222;
-    }
-    h1 {
-      margin-bottom: 10px;
-    }
-    h2 {
-      margin-top: 30px;
-    }
-    p, li {
-      font-size: 15px;
-    }
-    ul {
-      padding-left: 20px;
-    }
-    footer {
-      margin-top: 40px;
-      font-size: 14px;
-      color: #666;
-    }
-    a {
-      color: #0a73ff;
-      text-decoration: none;
-    }
-  </style>
+<meta charset="UTF-8" />
+<title>Privacy Policy | Smart Food</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+:root {
+  --bg: #ffffff;
+  --text: #222;
+  --card: #f5f5f5;
+}
+[data-theme="dark"] {
+  --bg: #121212;
+  --text: #ffffff;
+  --card: #1e1e1e;
+}
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 24px;
+}
+.header {
+  background: var(--card);
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+select {
+  padding: 6px;
+  margin-right: 10px;
+}
+.section {
+  margin-bottom: 28px;
+}
+h1, h2 {
+  color: var(--text);
+}
+p, li {
+  font-size: 15px;
+  line-height: 1.6;
+}
+ul {
+  padding-left: 20px;
+}
+.footer {
+  font-size: 14px;
+  color: #777;
+  margin-top: 40px;
+}
+</style>
 </head>
-<body>
-  <div class="container">
-    <h1>Privacy Policy</h1>
-    <p><strong>Effective Date:</strong> [DD/MM/YYYY]</p>
 
+<body data-theme="system">
+<div class="container">
+
+  <div class="header">
+    <h1>Privacy Policy – Smart Food</h1>
+
+    <label>Language:</label>
+    <select id="lang">
+      <option value="en">English</option>
+      <option value="hi">हिन्दी</option>
+      <option value="gu">ગુજરાતી</option>
+    </select>
+
+    <label>Theme:</label>
+    <select id="theme">
+      <option value="system">System</option>
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
+  </div>
+
+  <!-- ENGLISH -->
+  <div class="section lang en">
+    <h2>1. Introduction</h2>
     <p>
-      Smart Food ("we", "our", or "us") operates the Smart Food mobile application
-      (the "App"). This Privacy Policy explains how we collect, use, disclose,
-      and safeguard your information when you use our App.
+      Smart Food ("we", "our", or "us") operates the Smart Food mobile application.
+      This Privacy Policy explains how we collect, use, store, and protect your
+      personal information when you use our application.
     </p>
 
-    <h2>1. Information We Collect</h2>
-    <p>We may collect the following types of information:</p>
+    <h2>2. Information We Collect</h2>
     <ul>
-      <li><strong>Personal Information:</strong> Name, email address, phone number</li>
-      <li><strong>Authentication Data:</strong> Login credentials, social login identifiers</li>
-      <li><strong>Usage Data:</strong> App interactions, preferences, and session data</li>
-      <li><strong>Device Information:</strong> Device model, OS version, app version</li>
+      <li>Email address</li>
+      <li>Phone number</li>
+      <li>User ID and authentication metadata</li>
+      <li>Device information (OS version, app version)</li>
+      <li>Usage data related to app features</li>
     </ul>
 
-    <h2>2. Authentication & Backend Services</h2>
+    <h2>3. Authentication & Backend Services</h2>
     <p>
-      Smart Food uses <strong>Supabase</strong> as a backend service provider for:
+      Smart Food uses <strong>Supabase</strong> for:
     </p>
     <ul>
-      <li>User authentication (Email/Password, Phone OTP, Social Login)</li>
+      <li>Email & password authentication</li>
+      <li>Phone number authentication (OTP)</li>
+      <li>Social login (Google and other providers)</li>
       <li>Secure database storage</li>
-      <li>Session and account management</li>
     </ul>
-    <p>
-      All authentication data is securely transmitted and stored using encryption.
-    </p>
 
-    <h2>3. How We Use Your Information</h2>
+    <h2>4. How We Use Your Data</h2>
     <ul>
-      <li>To create and manage user accounts</li>
       <li>To authenticate users securely</li>
-      <li>To provide food ordering and browsing functionality</li>
-      <li>To improve app performance and user experience</li>
-      <li>To communicate important updates or support messages</li>
+      <li>To manage user accounts</li>
+      <li>To enable food browsing and ordering features</li>
+      <li>To improve app performance and stability</li>
     </ul>
 
-    <h2>4. Data Sharing & Disclosure</h2>
+    <h2>5. Data Sharing</h2>
     <p>
-      We do not sell or rent your personal data. Information may be shared only:
-    </p>
-    <ul>
-      <li>With trusted service providers (e.g., Supabase) for app functionality</li>
-      <li>To comply with legal obligations</li>
-      <li>To protect the rights, safety, or security of users</li>
-    </ul>
-
-    <h2>5. Data Security</h2>
-    <p>
-      We implement reasonable administrative and technical security measures to
-      protect your personal information. However, no method of transmission over
-      the internet is 100% secure.
+      We do not sell or rent user data. Data is shared only with trusted
+      infrastructure providers such as Supabase for core app functionality.
     </p>
 
-    <h2>6. User Rights</h2>
-    <p>You have the right to:</p>
-    <ul>
-      <li>Access and update your personal information</li>
-      <li>Request deletion of your account and data</li>
-      <li>Withdraw consent for certain data usage</li>
-    </ul>
+    <h2>6. Data Security</h2>
+    <p>
+      All data is encrypted in transit using HTTPS. Access to data is restricted
+      and protected using industry-standard security practices.
+    </p>
 
     <h2>7. Account Deletion</h2>
     <p>
       Users can request account deletion directly within the app or by contacting
-      us via email. Upon request, all associated personal data will be permanently
-      removed from our systems, except where required by law.
+      us via email. Upon deletion, all personal data associated with the account
+      is permanently removed from our systems, except where required by law.
     </p>
 
     <h2>8. Children’s Privacy</h2>
     <p>
-      Smart Food is not intended for children under the age of 13. We do not knowingly
-      collect personal data from children.
+      Smart Food is not intended for children under the age of 13. We do not
+      knowingly collect personal data from children.
     </p>
 
     <h2>9. Changes to This Policy</h2>
     <p>
-      We may update this Privacy Policy from time to time. Any changes will be posted
+      This Privacy Policy may be updated periodically. Changes will be reflected
       on this page with an updated effective date.
     </p>
 
     <h2>10. Contact Us</h2>
     <p>
-      If you have any questions or concerns about this Privacy Policy, please contact us:
+      Email: <a href="mailto:team.suffixdigital@gmail.com">
+      Suffix Digital - Mobile App</a>
+    </p>
+  </div>
+
+  <!-- HINDI -->
+  <div class="section lang hi" style="display:none">
+    <h2>गोपनीयता नीति</h2>
+    <p>
+      Smart Food उपयोगकर्ता प्रमाणीकरण और खाता प्रबंधन के लिए ईमेल और मोबाइल नंबर
+      एकत्र करता है। हम Supabase का उपयोग सुरक्षित लॉगिन और डेटा स्टोरेज के लिए करते हैं।
     </p>
     <p>
-      📧 Email: <a href="mailto:suffixdifital@gmail.com">Suffix Digital</a>
+      उपयोगकर्ता किसी भी समय अपना खाता हटाने का अनुरोध कर सकते हैं।
     </p>
-
-    <footer>
-      <p>© 2026 Smart Food. All rights reserved.</p>
-    </footer>
   </div>
+
+  <!-- GUJARATI -->
+  <div class="section lang gu" style="display:none">
+    <h2>ગોપનીયતા નીતિ</h2>
+    <p>
+      Smart Food વપરાશકર્તાની ઓળખ માટે ઈમેલ અને ફોન નંબર એકત્ર કરે છે.
+      સુરક્ષિત લોગિન અને ડેટા સંગ્રહ માટે Supabase નો ઉપયોગ થાય છે.
+    </p>
+    <p>
+      વપરાશકર્તા કોઈપણ સમયે પોતાનું એકાઉન્ટ કાઢી શકે છે.
+    </p>
+  </div>
+
+  <div class="footer">
+    <p>Effective Date: 01/01/2026</p>
+    <p>© Smart Food. All rights reserved.</p>
+  </div>
+
+</div>
+
+<script>
+const langSelect = document.getElementById("lang");
+const themeSelect = document.getElementById("theme");
+
+langSelect.onchange = () => {
+  document.querySelectorAll(".lang").forEach(el => el.style.display = "none");
+  document.querySelector(`.lang.${langSelect.value}`).style.display = "block";
+};
+
+themeSelect.onchange = () => {
+  document.body.setAttribute("data-theme", themeSelect.value);
+};
+</script>
+
 </body>
 </html>
