@@ -102,6 +102,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   }
 
   Future<void> onVerifyPressed() async {
+    FocusScope.of(context).unfocus();
     if (!isFormValid) return;
 
     await ref.read(registerViewModelProvider.notifier).setUserPassword(password: newPasswordController.text);
@@ -138,122 +139,129 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
         designSize: const Size(375, 812),
         builder:
             (_, __) => Scaffold(
-              body: SafeArea(
-                child: LayoutBuilder(
-                  builder:
-                      (context, constraints) => SingleChildScrollView(
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(minHeight: constraints.minHeight),
-                          child: IntrinsicHeight(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 10.h),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Top App Bar
-                                  Stack(
-                                    alignment: Alignment.center,
-                                    children: [
-                                      Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: IconButton(
-                                          padding: EdgeInsets.only(left: 20.w),
-                                          icon: DeviceUtils.backIcon('assets/icons/back.svg', context.colors.generalText, 16),
-                                          onPressed: () => onBackPressed(),
-                                        ),
-                                      ),
-                                      Text('Reset Password', style: textTheme.bodyLargeSemiBold!.copyWith(color: context.colors.generalText)),
-                                    ],
-                                  ),
-
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 24.w),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+              body: GestureDetector(
+                onTap: () => FocusScope.of(context).unfocus(),
+                child: SafeArea(
+                  child: LayoutBuilder(
+                    builder:
+                        (context, constraints) => SingleChildScrollView(
+                          reverse: true,
+                          physics: const BouncingScrollPhysics(),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(minHeight: constraints.minHeight),
+                            child: IntrinsicHeight(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: 10.h),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Top App Bar
+                                    Stack(
+                                      alignment: Alignment.center,
                                       children: [
-                                        SizedBox(height: 15.h),
-                                        Text('Reset Password', style: textTheme.headingH4SemiBold!.copyWith(color: context.colors.generalText)),
-                                        SizedBox(height: 10.h),
-                                        Text(
-                                          'Your new password must be different from the previously used password',
-                                          style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.defaultGray878787),
-                                        ),
-                                        SizedBox(height: 35.h),
-
-                                        // Password Form
-                                        Form(
-                                          key: _formKey,
-                                          onChanged: validateForm,
-                                          autovalidateMode: AutovalidateMode.disabled,
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text("New Password", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
-                                              SizedBox(height: 8.h),
-                                              CustomFormField(
-                                                controller: newPasswordController,
-                                                focusNode: passwordFocus,
-                                                hintText: "Enter New Password",
-                                                isPassword: true,
-                                                obscureText: obscureNew,
-                                                keyboardType: TextInputType.visiblePassword,
-                                                onVisibilityTap: () => toggleVisibility(isConfirm: false),
-                                                onTap: () => setState(() => passwordTouched = true),
-                                                validator: (value) => passwordValidator(value, isConfirm: false),
-                                              ),
-
-                                              SizedBox(height: 24.h),
-
-                                              Text("Confirm Password", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
-                                              SizedBox(height: 8.h),
-                                              CustomFormField(
-                                                controller: confirmPasswordController,
-                                                focusNode: confirmPasswordFocus,
-                                                hintText: "Enter Confirm Password",
-                                                isPassword: true,
-                                                obscureText: obscureConfirm,
-                                                keyboardType: TextInputType.visiblePassword,
-                                                onVisibilityTap: () => toggleVisibility(isConfirm: true),
-                                                onTap: () => setState(() => confirmPasswordTouched = true),
-                                                validator: (value) => passwordValidator(value, isConfirm: true),
-                                              ),
-                                            ],
+                                        Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: IconButton(
+                                            padding: EdgeInsets.only(left: 20.w),
+                                            icon: DeviceUtils.backIcon('assets/icons/back.svg', context.colors.generalText, 16),
+                                            onPressed: () => onBackPressed(),
                                           ),
                                         ),
-
-                                        SizedBox(height: 30.h),
-
-                                        // Submit Button
-                                        SizedBox(
-                                          width: double.infinity,
-                                          child: ElevatedButton(
-                                            onPressed: state.isLoading || !isFormValid ? null : onVerifyPressed,
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: isFormValid ? context.colors.primary : context.colors.defaultGrayEEEEEE,
-                                              padding: EdgeInsets.symmetric(vertical: 16.h),
-                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.r)),
-                                            ),
-                                            child:
-                                                state.isLoading
-                                                    ? const CircularProgressIndicator()
-                                                    : Text(
-                                                      "Continue",
-                                                      style: textTheme.bodyMediumSemiBold!.copyWith(
-                                                        color: isFormValid ? context.colors.defaultWhite : context.colors.defaultGray878787,
-                                                      ),
-                                                    ),
-                                          ),
-                                        ),
-                                        SizedBox(height: 20.h),
+                                        Text('Reset Password', style: textTheme.bodyLargeSemiBold!.copyWith(color: context.colors.generalText)),
                                       ],
                                     ),
-                                  ),
-                                ],
+
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 24.w),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          SizedBox(height: 15.h),
+                                          Text('Reset Password', style: textTheme.headingH4SemiBold!.copyWith(color: context.colors.generalText)),
+                                          SizedBox(height: 10.h),
+                                          Text(
+                                            'Your new password must be different from the previously used password',
+                                            style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.defaultGray878787),
+                                          ),
+                                          SizedBox(height: 35.h),
+
+                                          // Password Form
+                                          Form(
+                                            key: _formKey,
+                                            onChanged: validateForm,
+                                            autovalidateMode: AutovalidateMode.disabled,
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text("New Password", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
+                                                SizedBox(height: 8.h),
+                                                CustomFormField(
+                                                  controller: newPasswordController,
+                                                  focusNode: passwordFocus,
+                                                  hintText: "Enter New Password",
+                                                  isPassword: true,
+                                                  obscureText: obscureNew,
+                                                  keyboardType: TextInputType.visiblePassword,
+                                                  onVisibilityTap: () => toggleVisibility(isConfirm: false),
+                                                  onTap: () => setState(() => passwordTouched = true),
+                                                  validator: (value) => passwordValidator(value, isConfirm: false),
+                                                  textInputAction: TextInputAction.next,
+                                                ),
+
+                                                SizedBox(height: 24.h),
+
+                                                Text("Confirm Password", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
+                                                SizedBox(height: 8.h),
+                                                CustomFormField(
+                                                  controller: confirmPasswordController,
+                                                  focusNode: confirmPasswordFocus,
+                                                  hintText: "Enter Confirm Password",
+                                                  isPassword: true,
+                                                  obscureText: obscureConfirm,
+                                                  keyboardType: TextInputType.visiblePassword,
+                                                  onVisibilityTap: () => toggleVisibility(isConfirm: true),
+                                                  onTap: () => setState(() => confirmPasswordTouched = true),
+                                                  validator: (value) => passwordValidator(value, isConfirm: true),
+                                                  textInputAction: TextInputAction.done,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+
+                                          SizedBox(height: 30.h),
+
+                                          // Submit Button
+                                          SizedBox(
+                                            width: double.infinity,
+                                            child: ElevatedButton(
+                                              onPressed: state.isLoading || !isFormValid ? null : onVerifyPressed,
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: isFormValid ? context.colors.primary : context.colors.defaultGrayEEEEEE,
+                                                padding: EdgeInsets.symmetric(vertical: 16.h),
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.r)),
+                                              ),
+                                              child:
+                                                  state.isLoading
+                                                      ? const CircularProgressIndicator()
+                                                      : Text(
+                                                        "Continue",
+                                                        style: textTheme.bodyMediumSemiBold!.copyWith(
+                                                          color: isFormValid ? context.colors.defaultWhite : context.colors.defaultGray878787,
+                                                        ),
+                                                      ),
+                                            ),
+                                          ),
+                                          SizedBox(height: 20.h),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
+                  ),
                 ),
               ),
             ),

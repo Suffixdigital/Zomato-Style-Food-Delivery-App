@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:smart_flutter/core/constants/text_styles.dart';
 import 'package:smart_flutter/core/utils/device_utils.dart';
+import 'package:smart_flutter/model/email_phone_link_request.dart';
 import 'package:smart_flutter/routes/tab_controller_notifier.dart';
 import 'package:smart_flutter/screens/confirmation_dialog.dart';
 import 'package:smart_flutter/screens/link_expired_dialog.dart';
@@ -13,7 +14,9 @@ import 'package:smart_flutter/views/widgets/login_screen/custom_form_field.dart'
 import 'package:smart_flutter/views/widgets/reset_password_screen/reset_password_success.dart';
 
 class SetPasswordScreen extends ConsumerStatefulWidget {
-  const SetPasswordScreen({super.key});
+  final EmailPhoneLinkRequest? request;
+
+  const SetPasswordScreen({super.key, required this.request});
 
   @override
   ConsumerState<SetPasswordScreen> createState() => _SetPasswordScreenState();
@@ -104,6 +107,7 @@ class _SetPasswordScreenState extends ConsumerState<SetPasswordScreen> {
   }
 
   void onVerifyPressed() async {
+    FocusScope.of(context).unfocus();
     if (!isFormValid) return;
 
     await ref.read(registerViewModelProvider.notifier).setUserPassword(password: newPasswordController.text.toString());
@@ -161,120 +165,127 @@ class _SetPasswordScreenState extends ConsumerState<SetPasswordScreen> {
         designSize: Size(375, 812),
         builder:
             (_, __) => Scaffold(
-              body: SafeArea(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return SingleChildScrollView(
-                      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(minHeight: constraints.minHeight),
-                        child: IntrinsicHeight(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: 15.h),
-                              Text('Set Password', style: textTheme.headingH4SemiBold!.copyWith(color: context.colors.generalText)),
-                              SizedBox(height: 10.h),
-                              Text(
-                                'Set new password for your registered account',
-                                style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.defaultGray878787),
-                              ),
-                              SizedBox(height: 35.h),
-
-                              Form(
-                                key: _formKey,
-                                onChanged: validateForm,
-                                autovalidateMode: AutovalidateMode.disabled,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // New Password Field
-                                    Text("New Password", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
-                                    SizedBox(height: 8.h),
-                                    CustomFormField(
-                                      controller: newPasswordController,
-                                      focusNode: passwordFocus,
-                                      hintText: "Enter New Password",
-                                      isPassword: true,
-                                      obscureText: obscureNew,
-                                      keyboardType: TextInputType.visiblePassword,
-                                      onVisibilityTap: () => toggleVisibility(isConfirm: false),
-                                      onTap: () => setState(() => passwordTouched = true),
-                                      validator: (value) => passwordValidator(value, isConfirm: false),
-                                    ),
-
-                                    SizedBox(height: 24.h),
-
-                                    // Confirm Password Field
-                                    Text("Confirm Password", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
-                                    SizedBox(height: 8.h),
-                                    CustomFormField(
-                                      controller: confirmPasswordController,
-                                      focusNode: confirmPasswordFocus,
-                                      hintText: "Enter Confirm Password",
-                                      isPassword: true,
-                                      obscureText: obscureConfirm,
-                                      keyboardType: TextInputType.visiblePassword,
-                                      onVisibilityTap: () => toggleVisibility(isConfirm: true),
-                                      onTap: () => setState(() => confirmPasswordTouched = true),
-                                      validator: (value) => passwordValidator(value, isConfirm: true),
-                                    ),
-                                  ],
+              body: GestureDetector(
+                onTap: () => FocusScope.of(context).unfocus(),
+                child: SafeArea(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return SingleChildScrollView(
+                        reverse: true,
+                        physics: const BouncingScrollPhysics(),
+                        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(minHeight: constraints.minHeight),
+                          child: IntrinsicHeight(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(height: 15.h),
+                                Text('Set Password', style: textTheme.headingH4SemiBold!.copyWith(color: context.colors.generalText)),
+                                SizedBox(height: 10.h),
+                                Text(
+                                  'Set new password for your registered account',
+                                  style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.defaultGray878787),
                                 ),
-                              ),
+                                SizedBox(height: 35.h),
 
-                              // Verify Button
-                              SizedBox(height: 30.h),
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: state.isLoading || !isFormValid ? null : onVerifyPressed,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: isFormValid ? context.colors.primary : context.colors.defaultGrayEEEEEE,
-                                    padding: EdgeInsets.symmetric(vertical: 16.h),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.r)),
+                                Form(
+                                  key: _formKey,
+                                  onChanged: validateForm,
+                                  autovalidateMode: AutovalidateMode.disabled,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      // New Password Field
+                                      Text("New Password", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
+                                      SizedBox(height: 8.h),
+                                      CustomFormField(
+                                        controller: newPasswordController,
+                                        focusNode: passwordFocus,
+                                        hintText: "Enter New Password",
+                                        isPassword: true,
+                                        obscureText: obscureNew,
+                                        keyboardType: TextInputType.visiblePassword,
+                                        onVisibilityTap: () => toggleVisibility(isConfirm: false),
+                                        onTap: () => setState(() => passwordTouched = true),
+                                        validator: (value) => passwordValidator(value, isConfirm: false),
+                                        textInputAction: TextInputAction.next,
+                                      ),
+
+                                      SizedBox(height: 24.h),
+
+                                      // Confirm Password Field
+                                      Text("Confirm Password", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
+                                      SizedBox(height: 8.h),
+                                      CustomFormField(
+                                        controller: confirmPasswordController,
+                                        focusNode: confirmPasswordFocus,
+                                        hintText: "Enter Confirm Password",
+                                        isPassword: true,
+                                        obscureText: obscureConfirm,
+                                        keyboardType: TextInputType.visiblePassword,
+                                        onVisibilityTap: () => toggleVisibility(isConfirm: true),
+                                        onTap: () => setState(() => confirmPasswordTouched = true),
+                                        validator: (value) => passwordValidator(value, isConfirm: true),
+                                        textInputAction: TextInputAction.done,
+                                      ),
+                                    ],
                                   ),
-                                  child:
-                                      state.isLoading
-                                          ? const CircularProgressIndicator()
-                                          : Text(
-                                            "Set Password",
-                                            style: textTheme.bodyMediumSemiBold!.copyWith(
-                                              color: isFormValid ? context.colors.defaultWhite : context.colors.defaultGray878787,
-                                            ),
-                                          ),
                                 ),
-                              ),
-                              SizedBox(height: 30.h),
 
-                              Center(
-                                child: Padding(
-                                  padding: EdgeInsets.only(bottom: 16.h),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      ConfirmationDialog.show(
-                                        context,
-                                        'Confirmation!',
-                                        'Are you sure to open Login screen without set password for new registered account?',
-                                      );
-                                      //context.goNamed('login');
-                                    },
-                                    child: RichText(
-                                      text: TextSpan(
-                                        text: "Already register? ",
-                                        style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText),
-                                        children: [TextSpan(text: "Sign In", style: textTheme.bodyMediumSemiBold!.copyWith(color: context.colors.primary))],
+                                // Verify Button
+                                SizedBox(height: 30.h),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: state.isLoading || !isFormValid ? null : onVerifyPressed,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: isFormValid ? context.colors.primary : context.colors.defaultGrayEEEEEE,
+                                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.r)),
+                                    ),
+                                    child:
+                                        state.isLoading
+                                            ? const CircularProgressIndicator()
+                                            : Text(
+                                              "Set Password",
+                                              style: textTheme.bodyMediumSemiBold!.copyWith(
+                                                color: isFormValid ? context.colors.defaultWhite : context.colors.defaultGray878787,
+                                              ),
+                                            ),
+                                  ),
+                                ),
+                                SizedBox(height: 30.h),
+
+                                Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.only(bottom: 16.h),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        ConfirmationDialog.show(
+                                          context,
+                                          'Confirmation!',
+                                          'Are you sure to open Login screen without set password for new registered account?',
+                                        );
+                                        //context.goNamed('login');
+                                      },
+                                      child: RichText(
+                                        text: TextSpan(
+                                          text: "Already register? ",
+                                          style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText),
+                                          children: [TextSpan(text: "Sign In", style: textTheme.bodyMediumSemiBold!.copyWith(color: context.colors.primary))],
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
               ),
             ),

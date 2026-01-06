@@ -18,9 +18,6 @@
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
 
-    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"

@@ -59,6 +59,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ProfileHeader(),
                       Expanded(
                         child: SingleChildScrollView(
+                          reverse: true,
+                          physics: const BouncingScrollPhysics(),
                           padding: EdgeInsets.only(left: 20.w, right: 20.w, top: 10.h),
                           child: Column(
                             children: [

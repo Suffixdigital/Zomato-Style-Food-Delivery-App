@@ -45,6 +45,7 @@ class _PhoneOtpVerificationScreenState extends ConsumerState<PhoneOtpVerificatio
   void onContinuePressed() async {
     // Validate OTP and navigate
     final otp = otpController.text;
+    FocusScope.of(context).unfocus();
     if (otp.length == 6) {
       // Perform verification logic here
       // Call the ViewModel
@@ -98,124 +99,129 @@ class _PhoneOtpVerificationScreenState extends ConsumerState<PhoneOtpVerificatio
       designSize: const Size(375, 812),
       builder:
           (context, child) => Scaffold(
-            body: SafeArea(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(minHeight: constraints.minHeight),
-                      child: IntrinsicHeight(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: IconButton(
-                                    padding: EdgeInsets.only(left: 20.h),
-                                    icon: DeviceUtils.backIcon('assets/icons/back.svg', context.colors.generalText, 16),
-                                    onPressed: () => context.goNamed('login'),
-                                  ),
-                                ),
-
-                                Text('OTP Verification', style: textTheme.bodyLargeSemiBold!.copyWith(color: context.colors.generalText)),
-                              ],
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(left: 24.w, right: 24.w),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+            body: GestureDetector(
+              onTap: () => FocusScope.of(context).unfocus(),
+              child: SafeArea(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      reverse: true,
+                      physics: const BouncingScrollPhysics(),
+                      padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(minHeight: constraints.minHeight),
+                        child: IntrinsicHeight(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Stack(
+                                alignment: Alignment.center,
                                 children: [
-                                  SizedBox(height: 10.h),
-                                  Text(
-                                    'OTP Verification',
-                                    style: AppTextTheme.fallback(isTablet: isTablet).headingH4SemiBold!.copyWith(color: AppColors.neutral100),
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: IconButton(
+                                      padding: EdgeInsets.only(left: 20.h),
+                                      icon: DeviceUtils.backIcon('assets/icons/back.svg', context.colors.generalText, 16),
+                                      onPressed: () => context.goNamed('login'),
+                                    ),
                                   ),
-                                  SizedBox(height: 10.h),
-                                  Text(
-                                    'Enter the verification code we sent you on: +91${widget.phoneNumber}',
-                                    style: AppTextTheme.fallback(isTablet: isTablet).bodyMediumMedium!.copyWith(color: AppColors.neutral60),
-                                  ),
-                                  SizedBox(height: 35.h),
-                                  PinCodeTextField(
-                                    controller: otpController,
-                                    appContext: context,
-                                    length: 6,
-                                    keyboardType: TextInputType.number,
-                                    animationType: AnimationType.fade,
-                                    pinTheme: PinTheme(
-                                      shape: PinCodeFieldShape.circle,
 
-                                      fieldHeight: 48.h,
-                                      fieldWidth: 48.w,
-                                      activeFillColor: AppColors.neutral0,
-                                      selectedColor: AppColors.primaryAccent,
-                                      activeColor: AppColors.primaryAccent,
-                                      inactiveColor: AppColors.neutral40,
-                                      inactiveFillColor: AppColors.neutral0,
-                                      selectedFillColor: AppColors.primaryAccent,
-                                      borderWidth: 10.w,
-                                    ),
-                                    onChanged: (value) {},
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text("Didn't receive code?", style: textTheme.bodyMediumSemiBold!.copyWith(color: context.colors.defaultGray878787)),
-                                      TextButton(
-                                        onPressed: countdownSeconds == 0 ? onResendPressed : null,
-                                        child: Text(
-                                          'Resend',
-                                          style: AppTextTheme.fallback(isTablet: isTablet).bodyMediumSemiBold!.copyWith(
-                                            color: countdownSeconds == 0 ? AppColors.primaryAccent : AppColors.primaryAccent.withValues(alpha: 0.5),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 20.h),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(Icons.access_time_rounded, size: 18, color: AppColors.neutral60),
-                                      SizedBox(width: 8.w),
-                                      Text(
-                                        "${countdownSeconds.toString().padLeft(2, '0')}:00",
-                                        style: AppTextTheme.fallback(isTablet: isTablet).bodyMediumMedium!.copyWith(color: AppColors.neutral60),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 30.h),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: ElevatedButton(
-                                      onPressed: state.isLoading ? null : onContinuePressed,
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.orange,
-                                        padding: EdgeInsets.symmetric(vertical: 16.h),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.r)),
-                                      ),
-                                      child:
-                                          state.isLoading
-                                              ? CircularProgressIndicator()
-                                              : Text(
-                                                "Verify",
-                                                style: AppTextTheme.fallback(isTablet: isTablet).bodyMediumSemiBold!.copyWith(color: AppColors.neutral0),
-                                              ),
-                                    ),
-                                  ),
+                                  Text('OTP Verification', style: textTheme.bodyLargeSemiBold!.copyWith(color: context.colors.generalText)),
                                 ],
                               ),
-                            ),
-                          ],
+                              Padding(
+                                padding: EdgeInsets.only(left: 24.w, right: 24.w),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(height: 10.h),
+                                    Text(
+                                      'OTP Verification',
+                                      style: AppTextTheme.fallback(isTablet: isTablet).headingH4SemiBold!.copyWith(color: AppColors.neutral100),
+                                    ),
+                                    SizedBox(height: 10.h),
+                                    Text(
+                                      'Enter the verification code we sent you on: +91${widget.phoneNumber}',
+                                      style: AppTextTheme.fallback(isTablet: isTablet).bodyMediumMedium!.copyWith(color: AppColors.neutral60),
+                                    ),
+                                    SizedBox(height: 35.h),
+                                    PinCodeTextField(
+                                      controller: otpController,
+                                      appContext: context,
+                                      length: 6,
+                                      keyboardType: TextInputType.number,
+                                      animationType: AnimationType.fade,
+                                      pinTheme: PinTheme(
+                                        shape: PinCodeFieldShape.circle,
+
+                                        fieldHeight: 48.h,
+                                        fieldWidth: 48.w,
+                                        activeFillColor: AppColors.neutral0,
+                                        selectedColor: AppColors.primaryAccent,
+                                        activeColor: AppColors.primaryAccent,
+                                        inactiveColor: AppColors.neutral40,
+                                        inactiveFillColor: AppColors.neutral0,
+                                        selectedFillColor: AppColors.primaryAccent,
+                                        borderWidth: 10.w,
+                                      ),
+                                      onChanged: (value) {},
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text("Didn't receive code?", style: textTheme.bodyMediumSemiBold!.copyWith(color: context.colors.defaultGray878787)),
+                                        TextButton(
+                                          onPressed: countdownSeconds == 0 ? onResendPressed : null,
+                                          child: Text(
+                                            'Resend',
+                                            style: AppTextTheme.fallback(isTablet: isTablet).bodyMediumSemiBold!.copyWith(
+                                              color: countdownSeconds == 0 ? AppColors.primaryAccent : AppColors.primaryAccent.withValues(alpha: 0.5),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 20.h),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(Icons.access_time_rounded, size: 18, color: AppColors.neutral60),
+                                        SizedBox(width: 8.w),
+                                        Text(
+                                          "${countdownSeconds.toString().padLeft(2, '0')}:00",
+                                          style: AppTextTheme.fallback(isTablet: isTablet).bodyMediumMedium!.copyWith(color: AppColors.neutral60),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 30.h),
+                                    SizedBox(
+                                      width: double.infinity,
+                                      child: ElevatedButton(
+                                        onPressed: state.isLoading ? null : onContinuePressed,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.orange,
+                                          padding: EdgeInsets.symmetric(vertical: 16.h),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.r)),
+                                        ),
+                                        child:
+                                            state.isLoading
+                                                ? CircularProgressIndicator()
+                                                : Text(
+                                                  "Verify",
+                                                  style: AppTextTheme.fallback(isTablet: isTablet).bodyMediumSemiBold!.copyWith(color: AppColors.neutral0),
+                                                ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
           ),

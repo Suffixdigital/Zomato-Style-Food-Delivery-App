@@ -61,6 +61,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   bool dobTouched = false;
 
   void registerUser() async {
+    FocusScope.of(context).unfocus();
     if (!isFormValid) return;
 
     // Call the ViewModel
@@ -77,6 +78,33 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final result = ref.read(registerViewModelProvider);
 
     result.when(
+      /*data: (registerResult) {
+        final profileResult = registerResult?.profileCheckResult;
+        if (profileResult != null) {
+          final profileExists = profileResult.message != 'user not found';
+          final hasPassword = profileResult.hasPassword == true;
+          final hasPhoneNumber = profileResult.phone != null;
+          if (profileExists) {
+            if (!hasPhoneNumber && !hasPassword) {
+              final emailPhoneLinkRequest = EmailPhoneLinkRequest(
+                email: emailController.text.trim(),
+                fullName: fullNameController.text.trim(),
+                dob: dobController.text,
+                gender: selectedGender.toLowerCase(),
+                phone: phoneNumberController.text,
+                password: '',
+              );
+
+              context.goNamed('set-password', extra: emailPhoneLinkRequest);
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('User already exists. Please setup new password!')));
+            } else {
+              ProfileResultDialog.show(context, profileResult);
+            }
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Email link sent successfully!')));
+          }
+        }
+      },*/
       data: (_) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Email link sent successfully!')));
       },
@@ -99,6 +127,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       }
       // Mobile platforms (Android/iOS)
       else {
+        FocusScope.of(context).unfocus();
         await supabase.auth.signInWithOAuth(
           provider,
           redirectTo: 'io.supabase.flutterquickstart://callback/social-media-login', // matches your scheme
@@ -112,7 +141,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   Future<void> selectDate() async {
     final initialDate = dobController.text.isNotEmpty ? DateFormat('dd/MM/yyyy').parse(dobController.text) : DateTime.now();
-
+    FocusScope.of(context).unfocus();
     if (Platform.isAndroid) {
       DateTime? picked = await showDatePicker(
         cancelText: "Cancel",
@@ -275,6 +304,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   return SingleChildScrollView(
+                    reverse: true,
+                    physics: const BouncingScrollPhysics(),
                     padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
                     child: ConstrainedBox(
                       constraints: BoxConstraints(minHeight: constraints.minHeight),
@@ -327,6 +358,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                       isValidFullName = true;
                                       return null;
                                     },
+                                    textInputAction: TextInputAction.next,
                                   ),
                                   SizedBox(height: 16.h),
 
@@ -360,6 +392,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                       return null;
                                     },
                                     //label: "Email Address",
+                                    textInputAction: TextInputAction.next,
                                   ),
                                   SizedBox(height: 16.h),
 
@@ -391,6 +424,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                       isValidPhoneNumber = true;
                                       return null;
                                     },
+                                    textInputAction: TextInputAction.done,
                                   ),
                                   SizedBox(height: 16.h),
 
@@ -409,6 +443,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                       }
                                       return null;
                                     },
+                                    isDOB: true,
                                   ),
                                   SizedBox(height: 16.h),
                                   Text("Gender", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),

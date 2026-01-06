@@ -72,6 +72,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     }
 
                     return CustomScrollView(
+                      physics: const BouncingScrollPhysics(),
                       slivers: [
                         SliverAppBar(
                           expandedHeight: 220.h,
@@ -162,6 +163,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             child: SizedBox(
                               height: 100.h,
                               child: ListView.separated(
+                                physics: const BouncingScrollPhysics(),
                                 scrollDirection: Axis.horizontal,
                                 padding: EdgeInsets.symmetric(horizontal: 4.w),
                                 itemCount: categories.length,

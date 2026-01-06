@@ -53,7 +53,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   currentIndex: currentPage,
                   onNext: () {
                     if (currentPage < pages.length - 1) {
-                      controller.nextPage(duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
+                      controller.nextPage(duration: const Duration(milliseconds: 400), curve: Curves.bounceIn);
                     } else {
                       SharedPreferencesService.markOnboardingCompleted();
                       // --- Platform-specific permission onboarding ---

@@ -41,6 +41,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   }
 
   Future<void> onForgotPasswordTap() async {
+    FocusScope.of(context).unfocus();
     if (!isFormValid) return;
 
     await ref.read(emailValidationProvider.notifier).validate(emailController.text);
@@ -108,118 +109,126 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       designSize: Size(375, 812),
       builder:
           (context, child) => Scaffold(
-            body: SafeArea(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(minHeight: constraints.minHeight),
-                      child: IntrinsicHeight(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(height: 20.h),
-                            Text("Forgot Password?", style: textTheme.headingH4SemiBold!.copyWith(color: context.colors.generalText)),
-                            SizedBox(height: 8.h),
-                            Text(
-                              "Enter your email address and we’ll send you \nconfirmation code to reset your password",
-                              style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.defaultGray878787),
-                            ),
-                            SizedBox(height: 32.h),
+            body: GestureDetector(
+              onTap: () {
+                FocusScope.of(context).unfocus();
+              },
+              child: SafeArea(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      reverse: true,
+                      physics: const BouncingScrollPhysics(),
+                      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(minHeight: constraints.minHeight),
+                        child: IntrinsicHeight(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 20.h),
+                              Text("Forgot Password?", style: textTheme.headingH4SemiBold!.copyWith(color: context.colors.generalText)),
+                              SizedBox(height: 8.h),
+                              Text(
+                                "Enter your email address and we’ll send you \nconfirmation code to reset your password",
+                                style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.defaultGray878787),
+                              ),
+                              SizedBox(height: 32.h),
 
-                            Form(
-                              key: _formKey,
-                              onChanged: validateForm,
-                              // Re-validate on any change
-                              autovalidateMode: AutovalidateMode.onUserInteraction,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Email Address", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
-                                  SizedBox(height: 8.h),
+                              Form(
+                                key: _formKey,
+                                onChanged: validateForm,
+                                // Re-validate on any change
+                                autovalidateMode: AutovalidateMode.onUserInteraction,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text("Email Address", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
+                                    SizedBox(height: 8.h),
 
-                                  CustomFormField(
-                                    controller: emailController,
-                                    focusNode: emailFocus,
-                                    hintText: "Enter your email id",
-                                    keyboardType: TextInputType.emailAddress,
-                                    onTap: () {
-                                      if (!emailTouched) {
-                                        setState(() {
-                                          emailTouched = true;
-                                        });
-                                      }
-                                    },
-                                    validator: (value) {
-                                      if (!emailTouched) {
+                                    CustomFormField(
+                                      controller: emailController,
+                                      focusNode: emailFocus,
+                                      hintText: "Enter your email id",
+                                      keyboardType: TextInputType.emailAddress,
+                                      onTap: () {
+                                        if (!emailTouched) {
+                                          setState(() {
+                                            emailTouched = true;
+                                          });
+                                        }
+                                      },
+                                      validator: (value) {
+                                        if (!emailTouched) {
+                                          return null;
+                                        }
+                                        if (value == null || value.isEmpty) {
+                                          isValidEmail = false;
+                                          return '⦿ Email is required';
+                                        }
+                                        if (!emailRegex.hasMatch(value)) {
+                                          isValidEmail = false;
+                                          return '⦿ Enter a valid email';
+                                        }
+                                        isValidEmail = true;
                                         return null;
-                                      }
-                                      if (value == null || value.isEmpty) {
-                                        isValidEmail = false;
-                                        return '⦿ Email is required';
-                                      }
-                                      if (!emailRegex.hasMatch(value)) {
-                                        isValidEmail = false;
-                                        return '⦿ Enter a valid email';
-                                      }
-                                      isValidEmail = true;
-                                      return null;
-                                    },
-                                    //label: "Email Address",
-                                  ),
-                                  SizedBox(height: 30.h),
-                                ],
-                              ),
-                            ),
-
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: state.isLoading || !isFormValid ? null : onForgotPasswordTap,
-
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: isFormValid ? context.colors.primary : context.colors.defaultGrayEEEEEE,
-                                  padding: EdgeInsets.symmetric(vertical: 16.h),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.r)),
+                                      },
+                                      textInputAction: TextInputAction.done,
+                                      //label: "Email Address",
+                                    ),
+                                    SizedBox(height: 30.h),
+                                  ],
                                 ),
-                                child:
-                                    state.isLoading
-                                        ? CircularProgressIndicator()
-                                        : Text(
-                                          "Continue",
-                                          style: textTheme.bodyMediumSemiBold!.copyWith(
-                                            color: isFormValid ? context.colors.defaultWhite : context.colors.defaultGray878787,
-                                          ),
-                                        ),
                               ),
-                            ),
 
-                            SizedBox(height: 30.h),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: state.isLoading || !isFormValid ? null : onForgotPasswordTap,
 
-                            Center(
-                              child: Padding(
-                                padding: EdgeInsets.only(bottom: 16.h),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    context.goNamed('login');
-                                  },
-                                  child: RichText(
-                                    text: TextSpan(
-                                      text: "Already register? ",
-                                      style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText),
-                                      children: [TextSpan(text: "Sign In", style: textTheme.bodyMediumSemiBold!.copyWith(color: context.colors.primary))],
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: isFormValid ? context.colors.primary : context.colors.defaultGrayEEEEEE,
+                                    padding: EdgeInsets.symmetric(vertical: 16.h),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.r)),
+                                  ),
+                                  child:
+                                      state.isLoading
+                                          ? CircularProgressIndicator()
+                                          : Text(
+                                            "Continue",
+                                            style: textTheme.bodyMediumSemiBold!.copyWith(
+                                              color: isFormValid ? context.colors.defaultWhite : context.colors.defaultGray878787,
+                                            ),
+                                          ),
+                                ),
+                              ),
+
+                              SizedBox(height: 30.h),
+
+                              Center(
+                                child: Padding(
+                                  padding: EdgeInsets.only(bottom: 16.h),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      context.goNamed('login');
+                                    },
+                                    child: RichText(
+                                      text: TextSpan(
+                                        text: "Already register? ",
+                                        style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText),
+                                        children: [TextSpan(text: "Sign In", style: textTheme.bodyMediumSemiBold!.copyWith(color: context.colors.primary))],
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
           ),

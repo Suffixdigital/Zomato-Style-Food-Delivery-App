@@ -59,18 +59,16 @@ class ChatScreen extends ConsumerWidget {
                           child: Text(
                             "All Message",
                             textAlign: TextAlign.start,
-                            style: textTheme.bodyLargeSemiBold!.copyWith(
-                              color: context.colors.generalText,
-                            ),
+                            style: textTheme.bodyLargeSemiBold!.copyWith(color: context.colors.generalText),
                           ),
                         ),
                       ),
                       SizedBox(height: 8.h),
                       Expanded(
                         child: ListView.builder(
+                          physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
                           itemCount: chats.length,
-                          itemBuilder:
-                              (context, index) => ChatTile(chat: chats[index]),
+                          itemBuilder: (context, index) => ChatTile(chat: chats[index]),
                         ),
                       ),
                     ],

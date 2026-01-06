@@ -101,6 +101,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void phoneLoginProcess() async {
+    FocusScope.of(context).unfocus();
     if (!isPhoneLoginFormValid) return;
 
     // Call the ViewModel
@@ -125,6 +126,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void loginProcess() async {
+    FocusScope.of(context).unfocus();
     if (!isFormValid) return;
 
     // Call the ViewModel
@@ -162,6 +164,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
       // Mobile platforms (Android/iOS)
       else {
+        FocusScope.of(context).unfocus();
         await supabase.auth.signInWithOAuth(
           provider,
           authScreenLaunchMode: LaunchMode.inAppBrowserView,
@@ -191,245 +194,258 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       designSize: Size(375, 812),
       builder:
           (_, __) => Scaffold(
-            body: SafeArea(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(minHeight: constraints.minHeight),
-                      child: IntrinsicHeight(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(height: 20.h),
-                            Text("Login to your account.", style: textTheme.headingH4SemiBold!.copyWith(color: context.colors.generalText)),
-                            SizedBox(height: 8.h),
-                            Text("Please sign in to your account", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.defaultGray878787)),
-                            SizedBox(height: 32.h),
+            body: GestureDetector(
+              onTap: () {
+                FocusScope.of(context).unfocus();
+              },
+              child: SafeArea(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      reverse: true,
+                      physics: const BouncingScrollPhysics(),
+                      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(minHeight: constraints.minHeight),
+                        child: IntrinsicHeight(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 20.h),
+                              Text("Login to your account.", style: textTheme.headingH4SemiBold!.copyWith(color: context.colors.generalText)),
+                              SizedBox(height: 8.h),
+                              Text("Please sign in to your account", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.defaultGray878787)),
+                              SizedBox(height: 32.h),
 
-                            if (isPhoneLogin)
-                              Form(
-                                key: phoneLoginFormKey,
-                                onChanged: validatePhoneLoginForm,
-                                autovalidateMode: AutovalidateMode.disabled,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text("Phone Number", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
-                                    SizedBox(height: 8.h),
-                                    CustomFormField(
-                                      controller: phoneNumberController,
-                                      focusNode: phoneNumberFocus,
-                                      hintText: "Enter your phone number",
-                                      keyboardType: TextInputType.phone,
-                                      onTap: () {
-                                        if (!phoneNumberTouched) {
-                                          setState(() {
-                                            phoneNumberTouched = true;
-                                          });
-                                        }
-                                      },
-                                      validator: (value) {
-                                        if (!phoneNumberTouched) {
-                                          return null;
-                                        }
-                                        if (value == null || value.isEmpty) {
-                                          isValidPhoneNumber = false;
-                                          return '⦿ Phone number is required';
-                                        } else if (value.length < 10) {
-                                          isValidPhoneNumber = false;
-                                          return '⦿ Enter a valid phone number';
-                                        }
-                                        isValidPhoneNumber = true;
-                                        return null;
-                                      },
-                                    ),
-                                    SizedBox(height: 16.h),
-                                  ],
-                                ),
-                              )
-                            else
-                              Form(
-                                key: _formKey,
-                                onChanged: validateForm,
-                                autovalidateMode: AutovalidateMode.disabled,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text("Email Address", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
-                                    SizedBox(height: 8.h),
-                                    CustomFormField(
-                                      controller: emailController,
-                                      focusNode: emailFocus,
-                                      hintText: "Enter Email",
-                                      keyboardType: TextInputType.emailAddress,
-                                      onTap: () {
-                                        if (!emailTouched) {
-                                          setState(() {
-                                            emailTouched = true;
-                                          });
-                                        }
-                                      },
-                                      validator: (value) {
-                                        if (!emailTouched) return null;
-                                        if (value == null || value.isEmpty) {
-                                          isEmailValid = false;
-                                          return '⦿ Email is required';
-                                        }
-                                        if (!emailRegex.hasMatch(value)) {
-                                          isEmailValid = false;
-                                          return '⦿ Enter a valid email';
-                                        }
-                                        isEmailValid = true;
-                                        return null;
-                                      },
-                                    ),
-                                    SizedBox(height: 16.h),
-                                    Text("Password", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
-                                    SizedBox(height: 8.h),
-                                    CustomFormField(
-                                      controller: passwordController,
-                                      focusNode: passwordFocus,
-                                      hintText: "Password",
-                                      isPassword: true,
-                                      obscureText: obscureText,
-                                      keyboardType: TextInputType.visiblePassword,
-                                      onVisibilityTap: () {
-                                        setState(() {
-                                          obscureText = !obscureText;
-                                        });
-                                      },
-                                      onTap: () {
-                                        if (!passwordTouched) {
-                                          setState(() {
-                                            passwordTouched = true;
-                                          });
-                                        }
-                                      },
-                                      validator: (value) {
-                                        if (!passwordTouched) return null;
-                                        if (value == null || value.isEmpty) {
-                                          isPasswordValid = false;
-                                          return '⦿ Password is required';
-                                        }
-                                        isPasswordValid = true;
-                                        return null;
-                                      },
-                                    ),
-                                    SizedBox(height: 4.h),
-                                    Align(
-                                      alignment: Alignment.centerRight,
-                                      child: TextButton(
-                                        onPressed: () {
-                                          context.pushNamed('forgotPassword');
+                              if (isPhoneLogin)
+                                Form(
+                                  key: phoneLoginFormKey,
+                                  onChanged: validatePhoneLoginForm,
+                                  autovalidateMode: AutovalidateMode.disabled,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text("Phone Number", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
+                                      SizedBox(height: 8.h),
+                                      CustomFormField(
+                                        controller: phoneNumberController,
+                                        focusNode: phoneNumberFocus,
+                                        hintText: "Enter your phone number",
+                                        keyboardType: TextInputType.phone,
+                                        onTap: () {
+                                          if (!phoneNumberTouched) {
+                                            setState(() {
+                                              phoneNumberTouched = true;
+                                            });
+                                          }
                                         },
-                                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                                        child: Text("Forgot password?", style: textTheme.bodyMediumSemiBold!.copyWith(color: context.colors.primary)),
+                                        validator: (value) {
+                                          if (!phoneNumberTouched) {
+                                            return null;
+                                          }
+                                          if (value == null || value.isEmpty) {
+                                            isValidPhoneNumber = false;
+                                            return '⦿ Phone number is required';
+                                          } else if (value.length < 10) {
+                                            isValidPhoneNumber = false;
+                                            return '⦿ Enter a valid phone number';
+                                          }
+                                          isValidPhoneNumber = true;
+                                          return null;
+                                        },
+                                        textInputAction: TextInputAction.done,
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                            SizedBox(height: 16.h),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed:
-                                    state.isLoading || !(isPhoneLogin ? isPhoneLoginFormValid : isFormValid)
-                                        ? null
-                                        : isPhoneLogin
-                                        ? phoneLoginProcess
-                                        : loginProcess,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      (isPhoneLogin ? isPhoneLoginFormValid : isFormValid) ? context.colors.primary : context.colors.defaultGrayEEEEEE,
-                                  padding: EdgeInsets.symmetric(vertical: 16.h),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.r)),
-                                ),
-                                child:
-                                    state.isLoading
-                                        ? CircularProgressIndicator()
-                                        : Text(
-                                          isPhoneLogin ? "Proceed" : "Sign In",
-                                          style: textTheme.bodyMediumSemiBold!.copyWith(
-                                            color:
-                                                (isPhoneLogin ? isPhoneLoginFormValid : isFormValid)
-                                                    ? context.colors.defaultWhite
-                                                    : context.colors.defaultGray878787,
-                                          ),
+                                      SizedBox(height: 16.h),
+                                    ],
+                                  ),
+                                )
+                              else
+                                Form(
+                                  key: _formKey,
+                                  onChanged: validateForm,
+                                  autovalidateMode: AutovalidateMode.disabled,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text("Email Address", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
+                                      SizedBox(height: 8.h),
+                                      CustomFormField(
+                                        controller: emailController,
+                                        focusNode: emailFocus,
+                                        hintText: "Enter Email",
+                                        keyboardType: TextInputType.emailAddress,
+                                        onTap: () {
+                                          if (!emailTouched) {
+                                            setState(() {
+                                              emailTouched = true;
+                                            });
+                                          }
+                                        },
+                                        validator: (value) {
+                                          if (!emailTouched) return null;
+                                          if (value == null || value.isEmpty) {
+                                            isEmailValid = false;
+                                            return '⦿ Email is required';
+                                          }
+                                          if (!emailRegex.hasMatch(value)) {
+                                            isEmailValid = false;
+                                            return '⦿ Enter a valid email';
+                                          }
+                                          isEmailValid = true;
+                                          return null;
+                                        },
+                                        textInputAction: TextInputAction.next,
+                                      ),
+                                      SizedBox(height: 16.h),
+                                      Text("Password", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
+                                      SizedBox(height: 8.h),
+                                      CustomFormField(
+                                        controller: passwordController,
+                                        focusNode: passwordFocus,
+                                        hintText: "Password",
+                                        isPassword: true,
+                                        obscureText: obscureText,
+                                        keyboardType: TextInputType.visiblePassword,
+                                        onVisibilityTap: () {
+                                          setState(() {
+                                            obscureText = !obscureText;
+                                          });
+                                        },
+                                        onTap: () {
+                                          if (!passwordTouched) {
+                                            setState(() {
+                                              passwordTouched = true;
+                                            });
+                                          }
+                                        },
+                                        validator: (value) {
+                                          if (!passwordTouched) return null;
+                                          if (value == null || value.isEmpty) {
+                                            isPasswordValid = false;
+                                            return '⦿ Password is required';
+                                          }
+                                          isPasswordValid = true;
+                                          return null;
+                                        },
+                                        textInputAction: TextInputAction.done,
+                                      ),
+                                      SizedBox(height: 4.h),
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: TextButton(
+                                          onPressed: () {
+                                            context.pushNamed('forgotPassword');
+                                          },
+                                          style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                                          child: Text("Forgot password?", style: textTheme.bodyMediumSemiBold!.copyWith(color: context.colors.primary)),
                                         ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                              SizedBox(height: 16.h),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed:
+                                      state.isLoading || !(isPhoneLogin ? isPhoneLoginFormValid : isFormValid)
+                                          ? null
+                                          : isPhoneLogin
+                                          ? phoneLoginProcess
+                                          : loginProcess,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        (isPhoneLogin ? isPhoneLoginFormValid : isFormValid) ? context.colors.primary : context.colors.defaultGrayEEEEEE,
+                                    padding: EdgeInsets.symmetric(vertical: 16.h),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.r)),
+                                  ),
+                                  child:
+                                      state.isLoading
+                                          ? CircularProgressIndicator()
+                                          : Text(
+                                            isPhoneLogin ? "Proceed" : "Sign In",
+                                            style: textTheme.bodyMediumSemiBold!.copyWith(
+                                              color:
+                                                  (isPhoneLogin ? isPhoneLoginFormValid : isFormValid)
+                                                      ? context.colors.defaultWhite
+                                                      : context.colors.defaultGray878787,
+                                            ),
+                                          ),
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 16.h),
-                            Row(
-                              children: [
-                                Expanded(child: Divider(color: context.colors.defaultGray878787)),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 10.w),
-                                  child: Text("Or sign in with", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.defaultGray878787)),
-                                ),
-                                Expanded(child: Divider(color: context.colors.defaultGray878787)),
-                              ],
-                            ),
-                            SizedBox(height: 16.h),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() => isPhoneLogin = !isPhoneLogin);
-                                  },
-                                  child: DeviceUtils.socialIcon(iconPath, context.colors.defaultGrayEEEEEE),
-                                ),
-                                SizedBox(width: 16.w),
-                                GestureDetector(
-                                  onTap: () {
-                                    signInWithProvider(OAuthProvider.google, context);
-                                  },
-                                  child: DeviceUtils.socialIcon("assets/icons/google.svg", context.colors.defaultGrayEEEEEE),
-                                ),
-                                SizedBox(width: 16.w),
-                                GestureDetector(
-                                  onTap: () {
-                                    signInWithProvider(OAuthProvider.twitter, context);
-                                  },
-                                  child: DeviceUtils.socialIcon("assets/icons/twitter.svg", context.colors.defaultGrayEEEEEE),
-                                ),
-                                SizedBox(width: 16.w),
-                                GestureDetector(
-                                  onTap: () {
-                                    signInWithProvider(OAuthProvider.facebook, context);
-                                  },
-                                  child: DeviceUtils.socialIcon("assets/icons/facebook.svg", context.colors.defaultGrayEEEEEE),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 30.h),
-                            Center(
-                              child: Padding(
-                                padding: EdgeInsets.only(bottom: 16.h),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    context.goNamed('register');
-                                  },
-                                  child: RichText(
-                                    text: TextSpan(
-                                      text: "Don't have an account? ",
-                                      style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText),
-                                      children: [TextSpan(text: "Register", style: textTheme.bodyMediumSemiBold!.copyWith(color: context.colors.primary))],
+                              SizedBox(height: 16.h),
+                              Row(
+                                children: [
+                                  Expanded(child: Divider(color: context.colors.defaultGray878787)),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 10.w),
+                                    child: Text("Or sign in with", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.defaultGray878787)),
+                                  ),
+                                  Expanded(child: Divider(color: context.colors.defaultGray878787)),
+                                ],
+                              ),
+                              SizedBox(height: 16.h),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        isPhoneLogin = !isPhoneLogin;
+                                        FocusScope.of(context).unfocus();
+                                      });
+                                    },
+                                    child: DeviceUtils.socialIcon(iconPath, context.colors.defaultGrayEEEEEE),
+                                  ),
+                                  SizedBox(width: 16.w),
+                                  GestureDetector(
+                                    onTap: () {
+                                      signInWithProvider(OAuthProvider.google, context);
+                                    },
+                                    child: DeviceUtils.socialIcon("assets/icons/google.svg", context.colors.defaultGrayEEEEEE),
+                                  ),
+                                  SizedBox(width: 16.w),
+                                  GestureDetector(
+                                    onTap: () {
+                                      signInWithProvider(OAuthProvider.twitter, context);
+                                    },
+                                    child: DeviceUtils.socialIcon("assets/icons/twitter.svg", context.colors.defaultGrayEEEEEE),
+                                  ),
+                                  SizedBox(width: 16.w),
+                                  GestureDetector(
+                                    onTap: () {
+                                      signInWithProvider(OAuthProvider.facebook, context);
+                                    },
+                                    child: DeviceUtils.socialIcon("assets/icons/facebook.svg", context.colors.defaultGrayEEEEEE),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 30.h),
+                              Center(
+                                child: Padding(
+                                  padding: EdgeInsets.only(bottom: 16.h),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      context.goNamed('register');
+                                    },
+                                    child: RichText(
+                                      text: TextSpan(
+                                        text: "Don't have an account? ",
+                                        style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText),
+                                        children: [TextSpan(text: "Register", style: textTheme.bodyMediumSemiBold!.copyWith(color: context.colors.primary))],
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
           ),

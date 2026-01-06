@@ -17,6 +17,10 @@ class CustomFormField extends StatefulWidget {
   final String? Function(String? value)? validator;
   final FocusNode focusNode;
 
+  final TextInputAction? textInputAction;
+
+  final bool isDOB;
+
   const CustomFormField({
     super.key,
     required this.controller,
@@ -31,6 +35,8 @@ class CustomFormField extends StatefulWidget {
     this.onChanged,
     this.errorText,
     this.validator,
+    this.textInputAction,
+    this.isDOB = false,
   });
 
   @override
@@ -63,6 +69,7 @@ class _CustomFormFieldState extends State<CustomFormField> {
       obscureText: widget.isPassword && widget.obscureText,
       keyboardType: widget.keyboardType,
       cursorColor: context.colors.primary,
+      textInputAction: widget.textInputAction,
       obscuringCharacter: "*",
       readOnly: widget.readOnly,
       focusNode: widget.focusNode,
@@ -72,65 +79,37 @@ class _CustomFormFieldState extends State<CustomFormField> {
       style: textTheme.bodyMediumMedium,
       decoration: InputDecoration(
         hintText: widget.hintText,
-        hintStyle: textTheme.bodyMediumMedium!.copyWith(
-          color: context.colors.defaultGray878787,
-        ),
+        hintStyle: textTheme.bodyMediumMedium!.copyWith(color: context.colors.defaultGray878787),
         filled: true,
         fillColor: context.colors.background,
         errorText: widget.errorText,
         errorMaxLines: 3,
-        errorStyle: textTheme.bodyMediumMedium!.copyWith(
-          color: context.colors.error,
-        ),
+        errorStyle: textTheme.bodyMediumMedium!.copyWith(color: context.colors.error),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(
-            color:
-                _hasFocus
-                    ? context.colors.primary
-                    : context.colors.defaultGray878787,
-            width: borderWidth,
-          ),
+          borderSide: BorderSide(color: _hasFocus ? context.colors.primary : context.colors.defaultGray878787, width: borderWidth),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(
-            color: context.colors.defaultGray878787,
-            width: borderWidth,
-          ),
+          borderSide: BorderSide(color: context.colors.defaultGray878787, width: borderWidth),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(
-            color: context.colors.primary,
-            width: borderWidth + 0.5,
-          ),
+          borderSide: BorderSide(color: context.colors.primary, width: borderWidth + 0.5),
         ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(
-            color: context.colors.error,
-            width: borderWidth,
-          ),
-        ),
+        errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: context.colors.error, width: borderWidth)),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(
-            color: context.colors.error,
-            width: borderWidth + 0.2,
-          ),
+          borderSide: BorderSide(color: context.colors.error, width: borderWidth + 0.2),
         ),
         suffixIcon:
             widget.isPassword
                 ? IconButton(
-                  icon: Icon(
-                    widget.obscureText
-                        ? Icons.visibility_off
-                        : Icons.visibility,
-                    color: context.colors.generalText,
-                  ),
+                  icon: Icon(widget.obscureText ? Icons.visibility_off : Icons.visibility, color: context.colors.generalText),
                   onPressed: widget.onVisibilityTap,
                 )
+                : widget.isDOB
+                ? IconButton(icon: Icon(Icons.calendar_month_sharp, color: context.colors.generalText), onPressed: widget.onTap)
                 : null,
       ),
     );

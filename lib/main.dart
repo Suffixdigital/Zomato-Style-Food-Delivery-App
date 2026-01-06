@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -24,6 +27,17 @@ void main() async {
       statusBarIconBrightness: Brightness.dark,
     ),
   );
+
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: !kIsWeb && Platform.isAndroid ? Brightness.dark : Brightness.light,
+      systemNavigationBarColor: Colors.white,
+      systemNavigationBarDividerColor: Colors.transparent,
+      systemNavigationBarIconBrightness: Brightness.dark,
+    ),
+  );
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -32,6 +46,9 @@ void main() async {
 
   await Supabase.initialize(
     url: 'https://evqveotscootuaaruplk.supabase.co',
+    authOptions: const FlutterAuthClientOptions(authFlowType: AuthFlowType.pkce),
+    realtimeClientOptions: const RealtimeClientOptions(logLevel: RealtimeLogLevel.info),
+
     anonKey:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2cXZlb3RzY29vdHVhYXJ1cGxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5MTg4NjQsImV4cCI6MjA2NjQ5NDg2NH0.HKn7JP4qvnMCQLW8guV4uzWrzv5ft_gBZo_HKeFDW3U',
   );

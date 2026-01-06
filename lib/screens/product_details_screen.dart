@@ -19,8 +19,7 @@ class ProductDetailsScreen extends ConsumerStatefulWidget {
   const ProductDetailsScreen({super.key, required this.categoryItem});
 
   @override
-  ConsumerState<ProductDetailsScreen> createState() =>
-      _ProductDetailsScreenState();
+  ConsumerState<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
 }
 
 class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
@@ -36,11 +35,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    imageList = [
-      widget.categoryItem.image,
-      widget.categoryItem.image,
-      widget.categoryItem.image,
-    ];
+    imageList = [widget.categoryItem.image, widget.categoryItem.image, widget.categoryItem.image];
 
     _scrollController.addListener(() {
       final offset = _scrollController.offset;
@@ -55,9 +50,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final relatedItemsAsync = ref.watch(
-      relatedItemsProvider(widget.categoryItem.categoryId),
-    );
+    final relatedItemsAsync = ref.watch(relatedItemsProvider(widget.categoryItem.categoryId));
     final textTheme = Theme.of(context).extension<AppTextTheme>()!;
 
     return ScreenUtilInit(
@@ -68,6 +61,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
               children: [
                 /// Main scrollable content
                 SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
                   controller: _scrollController,
                   child: Column(
                     children: [
@@ -77,10 +71,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                           Hero(
                             tag: widget.categoryItem,
                             child: ClipRRect(
-                              borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(24.r),
-                                bottomRight: Radius.circular(24.r),
-                              ),
+                              borderRadius: BorderRadius.only(bottomLeft: Radius.circular(24.r), bottomRight: Radius.circular(24.r)),
                               child: CarouselSlider.builder(
                                 itemCount: imageList.length,
                                 options: CarouselOptions(
@@ -94,11 +85,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                                   },
                                 ),
                                 itemBuilder: (context, index, _) {
-                                  return Image.network(
-                                    imageList[index],
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                  );
+                                  return Image.network(imageList[index], width: double.infinity, fit: BoxFit.cover);
                                 },
                               ),
                             ),
@@ -135,134 +122,66 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              widget.categoryItem.name,
-                              style: textTheme.headingH5SemiBold!.copyWith(
-                                color: context.colors.generalText,
-                              ),
-                            ),
+                            Text(widget.categoryItem.name, style: textTheme.headingH5SemiBold!.copyWith(color: context.colors.generalText)),
                             SizedBox(height: 10.h),
-                            Text(
-                              "\$${widget.categoryItem.price}",
-                              style: textTheme.headingH6Bold!.copyWith(
-                                color: context.colors.primary,
-                              ),
-                            ),
+                            Text("\$${widget.categoryItem.price}", style: textTheme.headingH6Bold!.copyWith(color: context.colors.primary)),
                             SizedBox(height: 12.h),
                             Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 12.w,
-                                vertical: 12.h,
-                              ),
+                              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
                               decoration: BoxDecoration(
-                                color: context.colors.primary.withValues(
-                                  alpha: 0.06,
-                                ),
+                                color: context.colors.primary.withValues(alpha: 0.06),
                                 // Light peach-like color
                                 borderRadius: BorderRadius.circular(5.r),
                               ),
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   SvgPicture.asset(
                                     "assets/icons/dollor.svg",
                                     width: 15.w,
                                     height: 15.h,
-                                    colorFilter: ColorFilter.mode(
-                                      context.colors.primary,
-                                      BlendMode.srcIn,
-                                    ),
+                                    colorFilter: ColorFilter.mode(context.colors.primary, BlendMode.srcIn),
                                   ),
-                                  Text(
-                                    "Free Delivery",
-                                    style: textTheme.bodyMediumRegular!
-                                        .copyWith(
-                                          color:
-                                              context.colors.defaultGray878787,
-                                        ),
-                                  ),
+                                  Text("Free Delivery", style: textTheme.bodyMediumRegular!.copyWith(color: context.colors.defaultGray878787)),
                                   SizedBox(width: 50.w),
                                   SvgPicture.asset(
                                     "assets/icons/clock.svg",
                                     width: 15.w,
                                     height: 15.h,
-                                    colorFilter: ColorFilter.mode(
-                                      context.colors.primary,
-                                      BlendMode.srcIn,
-                                    ),
+                                    colorFilter: ColorFilter.mode(context.colors.primary, BlendMode.srcIn),
                                   ),
-                                  Text(
-                                    " 20 - 30",
-                                    style: textTheme.bodyMediumRegular!
-                                        .copyWith(
-                                          color:
-                                              context.colors.defaultGray878787,
-                                        ),
-                                  ),
+                                  Text(" 20 - 30", style: textTheme.bodyMediumRegular!.copyWith(color: context.colors.defaultGray878787)),
                                   SizedBox(width: 50.w),
                                   SvgPicture.asset(
                                     "assets/icons/star.svg",
                                     width: 15.w,
                                     height: 15.h,
-                                    colorFilter: ColorFilter.mode(
-                                      context.colors.primary,
-                                      BlendMode.srcIn,
-                                    ),
+                                    colorFilter: ColorFilter.mode(context.colors.primary, BlendMode.srcIn),
                                   ),
-                                  Text(
-                                    " ${widget.categoryItem.rating}",
-                                    style: textTheme.bodyMediumRegular!
-                                        .copyWith(
-                                          color:
-                                              context.colors.defaultGray878787,
-                                        ),
-                                  ),
+                                  Text(" ${widget.categoryItem.rating}", style: textTheme.bodyMediumRegular!.copyWith(color: context.colors.defaultGray878787)),
                                 ],
                               ),
                             ),
                             SizedBox(height: 15.h),
-                            Divider(
-                              color: context.colors.defaultGray878787,
-                              height: 2.h,
-                            ),
+                            Divider(color: context.colors.defaultGray878787, height: 2.h),
                             SizedBox(height: 15.h),
-                            Text(
-                              "Description",
-                              style: textTheme.bodyLargeSemiBold!.copyWith(
-                                color: context.colors.generalText,
-                              ),
-                            ),
+                            Text("Description", style: textTheme.bodyLargeSemiBold!.copyWith(color: context.colors.generalText)),
                             SizedBox(height: 8.h),
                             Text(
                               "${widget.categoryItem.description} ${widget.categoryItem.description} ${widget.categoryItem.description} ${widget.categoryItem.description}",
-                              style: textTheme.bodyMediumRegular!.copyWith(
-                                color: context.colors.defaultGray878787,
-                              ),
+                              style: textTheme.bodyMediumRegular!.copyWith(color: context.colors.defaultGray878787),
                             ),
                             SizedBox(height: 24.h),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  "Recommended For You",
-                                  style: textTheme.bodyLargeSemiBold!.copyWith(
-                                    color: context.colors.generalText,
-                                  ),
-                                ),
-                                Text(
-                                  "See All",
-                                  style: textTheme.bodyLargeRegular!.copyWith(
-                                    color: context.colors.primary,
-                                  ),
-                                ),
+                                Text("Recommended For You", style: textTheme.bodyLargeSemiBold!.copyWith(color: context.colors.generalText)),
+                                Text("See All", style: textTheme.bodyLargeRegular!.copyWith(color: context.colors.primary)),
                               ],
                             ),
                             SizedBox(height: 12.h),
                             relatedItemsAsync.when(
-                              error:
-                                  (err, stack) =>
-                                      Center(child: Text('Error: $err')),
+                              error: (err, stack) => Center(child: Text('Error: $err')),
                               loading: () => Center(child: ShimmerLoader()),
                               data:
                                   (categoryItems) => SizedBox(
@@ -270,18 +189,11 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                                     child: ListView.separated(
                                       scrollDirection: Axis.horizontal,
                                       itemCount: categoryItems.length,
-                                      separatorBuilder:
-                                          (_, __) => SizedBox(width: 10.w),
+                                      separatorBuilder: (_, __) => SizedBox(width: 10.w),
                                       itemBuilder:
                                           (_, index) => ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                              12.r,
-                                            ),
-                                            child: Image.network(
-                                              categoryItems[index].image,
-                                              width: 100.w,
-                                              fit: BoxFit.cover,
-                                            ),
+                                            borderRadius: BorderRadius.circular(12.r),
+                                            child: Image.network(categoryItems[index].image, width: 100.w, fit: BoxFit.cover),
                                           ),
                                     ),
                                   ),
@@ -306,27 +218,15 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                         onPressed: () {
                           context.goNamed('home');
                         },
-                        icon: DeviceUtils.backIcon(
-                          "assets/icons/back.svg",
-                          context.colors.generalText,
-                          16,
-                        ),
+                        icon: DeviceUtils.backIcon("assets/icons/back.svg", context.colors.generalText, 16),
                       ),
-                      Text(
-                        "About This Menu",
-                        style: textTheme.bodyLargeSemiBold!.copyWith(
-                          color: context.colors.generalText,
-                        ),
-                      ),
+                      Text("About This Menu", style: textTheme.bodyLargeSemiBold!.copyWith(color: context.colors.generalText)),
                       AnimatedSwitcher(
                         duration: Duration(milliseconds: 300),
-                        transitionBuilder:
-                            (child, animation) =>
-                                ScaleTransition(scale: animation, child: child),
+                        transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
                         child: IconButton(
                           key: ValueKey(isFavorite),
-                          onPressed:
-                              () => setState(() => isFavorite = !isFavorite),
+                          onPressed: () => setState(() => isFavorite = !isFavorite),
                           icon: Container(
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
@@ -338,29 +238,20 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                             ),
                             child: CircleAvatar(
                               radius: 16.r,
-                              backgroundColor:
-                                  isFavorite
-                                      ? context.colors.defaultWhite
-                                      : Colors.transparent,
+                              backgroundColor: isFavorite ? context.colors.defaultWhite : Colors.transparent,
                               child:
                                   isFavorite
                                       ? SvgPicture.asset(
                                         "assets/icons/favorite_selected.svg",
                                         width: 16.w,
                                         height: 16.h,
-                                        colorFilter: ColorFilter.mode(
-                                          context.colors.error,
-                                          BlendMode.srcIn,
-                                        ),
+                                        colorFilter: ColorFilter.mode(context.colors.error, BlendMode.srcIn),
                                       )
                                       : SvgPicture.asset(
                                         "assets/icons/favorite.svg",
                                         width: 16.w,
                                         height: 16.h,
-                                        colorFilter: ColorFilter.mode(
-                                          context.colors.defaultWhite,
-                                          BlendMode.srcIn,
-                                        ),
+                                        colorFilter: ColorFilter.mode(context.colors.defaultWhite, BlendMode.srcIn),
                                       ),
                             ),
                           ),
@@ -372,12 +263,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
               ],
             ),
             bottomNavigationBar: Padding(
-              padding: EdgeInsets.only(
-                left: 16.w,
-                right: 16.h,
-                bottom: 56.h,
-                top: 10.h,
-              ),
+              padding: EdgeInsets.only(left: 16.w, right: 16.h, bottom: 56.h, top: 10.h),
               child: Row(
                 children: [
                   Row(
@@ -388,29 +274,14 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                             setState(() => quantity--);
                           }
                         },
-                        child: DeviceUtils.backIcon(
-                          "assets/icons/minus.svg",
-                          quantity > 1
-                              ? context.colors.generalText
-                              : context.colors.defaultGray878787,
-                          16,
-                        ),
+                        child: DeviceUtils.backIcon("assets/icons/minus.svg", quantity > 1 ? context.colors.generalText : context.colors.defaultGray878787, 16),
                       ),
                       SizedBox(width: 12.w),
-                      Text(
-                        "$quantity",
-                        style: AppTextTheme.fallback(isTablet: false)
-                            .headingH6SemiBold!
-                            .copyWith(color: context.colors.generalText),
-                      ),
+                      Text("$quantity", style: AppTextTheme.fallback(isTablet: false).headingH6SemiBold!.copyWith(color: context.colors.generalText)),
                       SizedBox(width: 12.w),
                       GestureDetector(
                         onTap: () => setState(() => quantity++),
-                        child: DeviceUtils.backIcon(
-                          "assets/icons/plus.svg",
-                          context.colors.generalText,
-                          16,
-                        ),
+                        child: DeviceUtils.backIcon("assets/icons/plus.svg", context.colors.generalText, 16),
                       ),
                     ],
                   ),
@@ -422,36 +293,20 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                         final cartVM = ref.read(cartViewModelProvider.notifier);
                         cartVM.addItemFromFood(widget.categoryItem, quantity);
                         context.goNamed('home');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              '${widget.categoryItem.name} added to cart!',
-                            ),
-                          ),
-                        );
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${widget.categoryItem.name} added to cart!')));
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: context.colors.primary,
                         padding: EdgeInsets.symmetric(vertical: 16.h),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.r),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.r)),
                       ),
                       icon: SvgPicture.asset(
                         "assets/icons/cart_icon.svg",
                         width: 20.w,
                         height: 20.h,
-                        colorFilter: ColorFilter.mode(
-                          context.colors.defaultWhite,
-                          BlendMode.srcIn,
-                        ),
+                        colorFilter: ColorFilter.mode(context.colors.defaultWhite, BlendMode.srcIn),
                       ),
-                      label: Text(
-                        "Add to Cart",
-                        style: textTheme.bodyMediumSemiBold!.copyWith(
-                          color: context.colors.defaultWhite,
-                        ),
-                      ),
+                      label: Text("Add to Cart", style: textTheme.bodyMediumSemiBold!.copyWith(color: context.colors.defaultWhite)),
                     ),
                   ),
                 ],

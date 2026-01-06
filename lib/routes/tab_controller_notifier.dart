@@ -1,21 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
-final firebaseAuthProvider = Provider((ref) => FirebaseAuth.instance);
-
-final navigatorKeyProvider = Provider<GlobalKey<NavigatorState>>((ref) => GlobalKey<NavigatorState>());
-
-final needsPasswordSetupProvider = StateProvider<bool>((ref) => false);
-
-final showResetPasswordSheetProvider = StateProvider<bool>((ref) => false);
-
-final isLinkExpired = StateProvider<bool>((ref) => false);
 final linkExpiredMessage = StateProvider<String>((ref) => '');
 
 final tabIndexProvider = StateProvider<int>((ref) => 0);
-
-final authStateProvider = StreamProvider<AuthState>((ref) {
-  return Supabase.instance.client.auth.onAuthStateChange;
-});

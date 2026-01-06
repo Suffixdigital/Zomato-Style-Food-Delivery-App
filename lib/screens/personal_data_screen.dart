@@ -112,6 +112,7 @@ class _ProfileDataScreenState extends ConsumerState<ProfileDataScreen> {
   }
 
   void saveProfile() {
+    FocusScope.of(context).unfocus();
     ref
         .read(personalDataProvider.notifier)
         .updateUser(
@@ -305,195 +306,206 @@ class _ProfileDataScreenState extends ConsumerState<ProfileDataScreen> {
             minTextAdapt: true,
             builder:
                 (context, child) => Scaffold(
-                  body: SafeArea(
-                    child: Column(
-                      children: [
-                        PersonalDataHeader(onBackPressed),
-                        Expanded(
-                          child: SingleChildScrollView(
-                            padding: EdgeInsets.only(left: 20.w, right: 20.w),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Center(
-                                  child: Stack(
-                                    children: [
-                                      CircleAvatar(radius: 45.r, child: Image.asset("assets/images/profile.png")),
-                                      Positioned(
-                                        bottom: 0,
-                                        right: 0,
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: context.colors.primary,
-                                            shape: BoxShape.circle,
-                                            border: Border.all(color: context.colors.defaultWhite, width: 1.w),
-                                          ),
-                                          padding: EdgeInsets.all(5.sp),
-                                          child: Icon(Icons.camera_alt, size: 16.sp, color: context.colors.defaultWhite),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(height: 20.h),
-                                Text("Full Name", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
-                                SizedBox(height: 8.h),
-                                CustomFormField(
-                                  hintText: "Full Name",
-                                  controller: fullNameController,
-                                  focusNode: fullNameFocus,
-                                  onTap: () {
-                                    if (!fullNameTouched) {
-                                      setState(() {
-                                        fullNameTouched = true;
-                                      });
-                                    }
-                                  },
-                                  keyboardType: TextInputType.name,
-                                  validator: (value) {
-                                    if (!fullNameTouched) {
-                                      return null;
-                                    }
-                                    if (value == null || value.trim().isEmpty) {
-                                      return '⦿ Name is required';
-                                    }
-                                    if (value.length < 3) {
-                                      return '⦿ Enter at least 3 characters';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                SizedBox(height: 16.h),
-                                Text("Date of birth", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
-                                SizedBox(height: 8.h),
-                                CustomFormField(
-                                  controller: dobController,
-                                  focusNode: dobFocus,
-                                  hintText: "Date of Birth",
-                                  keyboardType: TextInputType.number,
-                                  readOnly: true,
-                                  onTap: selectDate,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return '⦿ Date of birth is required';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                SizedBox(height: 16.h),
-                                Text("Gender", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
-                                SizedBox(height: 8.h),
-                                Wrap(
-                                  spacing: 20.w,
-                                  runSpacing: 20.w,
-                                  alignment: WrapAlignment.start,
-
-                                  children:
-                                      genderOptions.map((gender) {
-                                        final isSelected = selectedGender.toLowerCase() == gender.toLowerCase();
-                                        return ChoiceChip(
-                                          checkmarkColor: context.colors.defaultWhite,
-
-                                          label: Text(
-                                            gender,
-                                            style: textTheme.bodyMediumMedium!.copyWith(
-                                              color: isSelected ? context.colors.defaultWhite : context.colors.defaultBlack,
+                  body: GestureDetector(
+                    onTap: () => FocusScope.of(context).unfocus(),
+                    child: SafeArea(
+                      child: Column(
+                        children: [
+                          PersonalDataHeader(onBackPressed),
+                          Expanded(
+                            child: SingleChildScrollView(
+                              reverse: true,
+                              physics: const BouncingScrollPhysics(),
+                              padding: EdgeInsets.only(left: 20.w, right: 20.w),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Center(
+                                    child: Stack(
+                                      children: [
+                                        CircleAvatar(radius: 45.r, child: Image.asset("assets/images/profile.png")),
+                                        Positioned(
+                                          bottom: 0,
+                                          right: 0,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: context.colors.primary,
+                                              shape: BoxShape.circle,
+                                              border: Border.all(color: context.colors.defaultWhite, width: 1.w),
                                             ),
+                                            padding: EdgeInsets.all(5.sp),
+                                            child: Icon(Icons.camera_alt, size: 16.sp, color: context.colors.defaultWhite),
                                           ),
-                                          selected: isSelected,
-                                          selectedColor: context.colors.primary,
-                                          backgroundColor: context.colors.defaultWhite,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10.r),
-                                            side: BorderSide(color: isSelected ? context.colors.primary : context.colors.defaultBlack),
-                                          ),
-                                          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-                                          onSelected: (_) {
-                                            setState(() => selectedGender = gender);
-                                          },
-                                        );
-                                      }).toList(),
-                                ),
-                                SizedBox(height: 16.h),
-                                Text("Phone", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
-                                SizedBox(height: 8.h),
-                                CustomFormField(
-                                  controller: phoneController,
-                                  focusNode: phoneNumberFocus,
-                                  hintText: "Phone Number",
-                                  keyboardType: TextInputType.phone,
-                                  onTap: () {
-                                    if (!phoneNumberTouched) {
-                                      setState(() {
-                                        phoneNumberTouched = true;
-                                      });
-                                    }
-                                  },
-                                  validator: (value) {
-                                    if (!phoneNumberTouched) {
-                                      return null;
-                                    }
-                                    if (value == null || value.isEmpty) {
-                                      return '⦿ Phone number is required';
-                                    } else if (value.length < 10) {
-                                      return '⦿ Enter a valid phone number';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                SizedBox(height: 16.h),
-                                Text("Email", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
-                                SizedBox(height: 8.h),
-                                CustomFormField(
-                                  controller: emailController,
-                                  focusNode: emailFocus,
-                                  hintText: "Email ID",
-                                  keyboardType: TextInputType.emailAddress,
-                                  onTap: () {
-                                    if (!emailTouched) {
-                                      setState(() {
-                                        emailTouched = true;
-                                      });
-                                    }
-                                  },
-                                  validator: (value) {
-                                    if (!emailTouched) {
-                                      return null;
-                                    }
-                                    if (value == null || value.isEmpty) {
-                                      return '⦿ Email is required';
-                                    }
-                                    if (!emailRegex.hasMatch(value)) {
-                                      return '⦿ Enter a valid email';
-                                    }
-                                    return null;
-                                  },
-                                  //label: "Email Address",
-                                ),
-                                SizedBox(height: 25.h),
-
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: ElevatedButton(
-                                    onPressed: state.isLoading ? null : saveProfile,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: context.colors.primary,
-                                      padding: EdgeInsets.symmetric(vertical: 16.h),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.r)),
+                                        ),
+                                      ],
                                     ),
-                                    child:
-                                        state.isLoading
-                                            ? const CircularProgressIndicator()
-                                            : Text("Save", style: textTheme.bodyMediumSemiBold!.copyWith(color: context.colors.defaultWhite)),
                                   ),
-                                ),
+                                  SizedBox(height: 20.h),
+                                  Text("Full Name", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
+                                  SizedBox(height: 8.h),
+                                  CustomFormField(
+                                    hintText: "Full Name",
+                                    controller: fullNameController,
+                                    focusNode: fullNameFocus,
+                                    onTap: () {
+                                      if (!fullNameTouched) {
+                                        setState(() {
+                                          fullNameTouched = true;
+                                        });
+                                      }
+                                    },
+                                    keyboardType: TextInputType.name,
+                                    validator: (value) {
+                                      if (!fullNameTouched) {
+                                        return null;
+                                      }
+                                      if (value == null || value.trim().isEmpty) {
+                                        return '⦿ Name is required';
+                                      }
+                                      if (value.length < 3) {
+                                        return '⦿ Enter at least 3 characters';
+                                      }
+                                      return null;
+                                    },
+                                    textInputAction: TextInputAction.done,
+                                  ),
+                                  SizedBox(height: 16.h),
+                                  Text("Date of birth", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
+                                  SizedBox(height: 8.h),
+                                  CustomFormField(
+                                    controller: dobController,
+                                    focusNode: dobFocus,
+                                    hintText: "Date of Birth",
+                                    keyboardType: TextInputType.number,
+                                    readOnly: true,
+                                    onTap: selectDate,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return '⦿ Date of birth is required';
+                                      }
+                                      return null;
+                                    },
+                                    isDOB: true,
+                                  ),
+                                  SizedBox(height: 16.h),
+                                  Text("Gender", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
+                                  SizedBox(height: 8.h),
+                                  Wrap(
+                                    spacing: 20.w,
+                                    runSpacing: 20.w,
+                                    alignment: WrapAlignment.start,
 
-                                SizedBox(height: 25.h),
-                              ],
+                                    children:
+                                        genderOptions.map((gender) {
+                                          final isSelected = selectedGender.toLowerCase() == gender.toLowerCase();
+                                          return ChoiceChip(
+                                            checkmarkColor: context.colors.defaultWhite,
+
+                                            label: Text(
+                                              gender,
+                                              style: textTheme.bodyMediumMedium!.copyWith(
+                                                color: isSelected ? context.colors.defaultWhite : context.colors.defaultBlack,
+                                              ),
+                                            ),
+                                            selected: isSelected,
+                                            selectedColor: context.colors.primary,
+                                            backgroundColor: context.colors.defaultWhite,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(10.r),
+                                              side: BorderSide(color: isSelected ? context.colors.primary : context.colors.defaultBlack),
+                                            ),
+                                            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+                                            onSelected: (_) {
+                                              setState(() => selectedGender = gender);
+                                            },
+                                          );
+                                        }).toList(),
+                                  ),
+                                  SizedBox(height: 16.h),
+                                  Text("Phone", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
+                                  SizedBox(height: 8.h),
+                                  CustomFormField(
+                                    controller: phoneController,
+                                    focusNode: phoneNumberFocus,
+                                    hintText: "Phone Number",
+                                    keyboardType: TextInputType.phone,
+                                    readOnly: true,
+                                    onTap: () {
+                                      if (!phoneNumberTouched) {
+                                        setState(() {
+                                          phoneNumberTouched = true;
+                                        });
+                                      }
+                                    },
+                                    validator: (value) {
+                                      if (!phoneNumberTouched) {
+                                        return null;
+                                      }
+                                      if (value == null || value.isEmpty) {
+                                        return '⦿ Phone number is required';
+                                      } else if (value.length < 10) {
+                                        return '⦿ Enter a valid phone number';
+                                      }
+                                      return null;
+                                    },
+                                    textInputAction: TextInputAction.done,
+                                  ),
+                                  SizedBox(height: 16.h),
+                                  Text("Email", style: textTheme.bodyMediumMedium!.copyWith(color: context.colors.generalText)),
+                                  SizedBox(height: 8.h),
+                                  CustomFormField(
+                                    controller: emailController,
+                                    focusNode: emailFocus,
+                                    hintText: "Email ID",
+                                    keyboardType: TextInputType.emailAddress,
+                                    readOnly: true,
+                                    onTap: () {
+                                      if (!emailTouched) {
+                                        setState(() {
+                                          emailTouched = true;
+                                        });
+                                      }
+                                    },
+                                    validator: (value) {
+                                      if (!emailTouched) {
+                                        return null;
+                                      }
+                                      if (value == null || value.isEmpty) {
+                                        return '⦿ Email is required';
+                                      }
+                                      if (!emailRegex.hasMatch(value)) {
+                                        return '⦿ Enter a valid email';
+                                      }
+                                      return null;
+                                    },
+                                    //label: "Email Address",
+                                    textInputAction: TextInputAction.done,
+                                  ),
+                                  SizedBox(height: 25.h),
+
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: ElevatedButton(
+                                      onPressed: state.isLoading ? null : saveProfile,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: context.colors.primary,
+                                        padding: EdgeInsets.symmetric(vertical: 16.h),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.r)),
+                                      ),
+                                      child:
+                                          state.isLoading
+                                              ? const CircularProgressIndicator()
+                                              : Text("Save", style: textTheme.bodyMediumSemiBold!.copyWith(color: context.colors.defaultWhite)),
+                                    ),
+                                  ),
+
+                                  SizedBox(height: 25.h),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
