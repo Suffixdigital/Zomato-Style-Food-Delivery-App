@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Delete Account | Smart Food</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+:root {
+  --bg: #ffffff;
+  --text: #222;
+  --card: #f5f5f5;
+}
+[data-theme="dark"] {
+  --bg: #121212;
+  --text: #ffffff;
+  --card: #1e1e1e;
+}
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 24px;
+}
+.header {
+  background: var(--card);
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+select {
+  padding: 6px;
+  margin-right: 10px;
+}
+h1, h2 {
+  color: var(--text);
+}
+p, li {
+  font-size: 15px;
+  line-height: 1.6;
+}
+ul {
+  padding-left: 20px;
+}
+.footer {
+  margin-top: 40px;
+  font-size: 14px;
+  color: #777;
+}
+a {
+  color: #0a73ff;
+  text-decoration: none;
+}
+</style>
+</head>
+
+<body data-theme="system">
+<div class="container">
+
+  <div class="header">
+    <h1>Delete Account – Smart Food</h1>
+
+    <label>Language:</label>
+    <select id="lang">
+      <option value="en">English</option>
+      <option value="hi">हिन्दी</option>
+      <option value="gu">ગુજરાતી</option>
+    </select>
+
+    <label>Theme:</label>
+    <select id="theme">
+      <option value="system">System</option>
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
+  </div>
+
+  <!-- ENGLISH -->
+  <div class="lang en">
+    <h2>How to Delete Your Smart Food Account</h2>
+
+    <p>
+      Smart Food respects your privacy and gives you full control over your account
+      and personal data. You can request account deletion at any time.
+    </p>
+
+    <h2>Option 1: Delete Account from the App</h2>
+    <ul>
+      <li>Open the <strong>Smart Food</strong> app</li>
+      <li>Go to <strong>Profile → Settings</strong></li>
+      <li>Select <strong>Delete Account</strong></li>
+      <li>Confirm the deletion request</li>
+    </ul>
+
+    <h2>Option 2: Request Deletion via Email</h2>
+    <p>
+      If you are unable to access the app, you may request account deletion by
+      sending an email from your registered email address to:
+    </p>
+    <p>
+       <a href="mailto:team.suffixdigital@gmail.com">Suffix Digital - Mobile App</a>
+    </p>
+    <p>
+      Please include the subject line: <strong>“Delete My Smart Food Account”</strong>
+    </p>
+
+    <h2>What Data Is Deleted</h2>
+    <p>
+      Once your request is processed, the following data will be permanently deleted:
+    </p>
+    <ul>
+      <li>Email address</li>
+      <li>Phone number</li>
+      <li>User authentication data</li>
+      <li>Profile and account details</li>
+      <li>Order history and related records</li>
+    </ul>
+
+    <h2>Processing Time</h2>
+    <p>
+      Account deletion requests are processed within <strong>7 business days</strong>.
+      Some data may be retained temporarily if required by law.
+    </p>
+
+    <h2>Backend & Security</h2>
+    <p>
+      Smart Food uses <strong>Supabase</strong> for authentication and database services.
+      Account deletion removes user records from Supabase systems securely.
+    </p>
+  </div>
+
+  <!-- HINDI -->
+  <div class="lang hi" style="display:none">
+    <h2>खाता कैसे हटाएं</h2>
+    <p>
+      Smart Food ऐप में प्रोफ़ाइल → सेटिंग्स → खाता हटाएं विकल्प का उपयोग करके
+      आप अपना खाता हटा सकते हैं।
+    </p>
+    <p>
+      आप ईमेल द्वारा भी अनुरोध भेज सकते हैं:
+      <br>
+      team.suffixdigital@gmail.com
+    </p>
+  </div>
+
+  <!-- GUJARATI -->
+  <div class="lang gu" style="display:none">
+    <h2>એકાઉન્ટ કેવી રીતે કાઢવું</h2>
+    <p>
+      Smart Food એપમાં પ્રોફાઇલ → સેટિંગ્સ → એકાઉન્ટ ડિલીટ વિકલ્પનો ઉપયોગ કરીને
+      તમે તમારું એકાઉન્ટ કાઢી શકો છો.
+    </p>
+    <p>
+      તમે ઈમેલ દ્વારા પણ વિનંતી કરી શકો છો:
+      <br>
+      team.suffixdigital@gmail.com
+    </p>
+  </div>
+
+  <div class="footer">
+    <p>Effective Date: 01/01/2026</p>
+    <p>© Smart Food. All rights reserved.</p>
+  </div>
+
+</div>
+
+<script>
+const lang = document.getElementById("lang");
+const theme = document.getElementById("theme");
+
+lang.onchange = () => {
+  document.querySelectorAll(".lang").forEach(el => el.style.display = "none");
+  document.querySelector(`.lang.${lang.value}`).style.display = "block";
+};
+
+theme.onchange = () => {
+  document.body.setAttribute("data-theme", theme.value);
+};
+</script>
+
+</body>
+</html>
